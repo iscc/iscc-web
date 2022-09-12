@@ -11,7 +11,7 @@ def test_tus_options(client_session):
     expected = {
         "tus-resumable": "1.0.0",
         "tus-version": "1.0.0",
-        "tus-max-size": "1073741824",
+        "tus-max-size": "104857600",
         "tus-extension": "creation",
     }
     assert set(expected.items()).issubset(set(response.headers.items()))

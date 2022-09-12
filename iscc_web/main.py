@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 import iscc_web as iw
-import blacksheep as bs
 import uvicorn
+import blacksheep as bs
 from aiofiles.os import path
 
+__all__ = ["app"]
 
-app = bs.Application()
+
+app = bs.Application(show_error_details=True, debug=True)
 
 
 @app.router.get()
@@ -13,15 +15,12 @@ async def home():
     return f"Hello, World!"
 
 
-# TUS protocol handlers
-
-
 @app.router.options("/tus")
 async def tus_options():
     response = bs.no_content()
     response.add_header(b"Tus-Resumable", b"1.0.0")
     response.add_header(b"Tus-Version", b"1.0.0")
-    response.add_header(b"Tus-Max-Size", b"1073741824")
+    response.add_header(b"Tus-Max-Size", str(iw.opts.max_upload_size).encode("ascii"))
     response.add_header(b"Tus-Extension", b"creation")
     return response
 

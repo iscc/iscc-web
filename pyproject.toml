@@ -1,0 +1,33 @@
+[tool.poetry]
+name = "iscc-web"
+version = "0.1.0"
+description = "ISCC - Generator Web Application"
+authors = ["Titusz <tp@py7.de>"]
+license = "Apache-2.0"
+readme = "README.md"
+homepage = "https://github.com/iscc/iscc-web"
+
+[tool.poetry.dependencies]
+python = ">=3.8,<3.11"
+blacksheep = "^1.2"
+uvicorn = "^0.18"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.1"
+black = "^22.8"
+poethepoet = "^0.16"
+
+[tool.black]
+skip-string-normalization = false
+line-length = 100
+target-version = ['py38']
+
+[tool.poe.tasks]
+format = { cmd = "poetry run black .", help = "Code style formating with black" }
+test = { cmd = "poetry run pytest", help = "Run tests" }
+run = { cmd = "uvicorn iscc_web.asgi:application --reload", help = "Run dev server"}
+all = ["format", "test"]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

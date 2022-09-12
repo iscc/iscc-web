@@ -1,1 +1,1 @@
-# iscc-web - ISCC Generator Web App
+# iscc-web - Minimal ISCC Generator Web Application

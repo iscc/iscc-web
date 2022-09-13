@@ -1,36 +1,14 @@
 # -*- coding: utf-8 -*-
-import iscc_web as iw
 import uvicorn
-import blacksheep as bs
-from aiofiles.os import path
+from blacksheep import Application
+import pathlib
 
 __all__ = ["app"]
+HERE = pathlib.Path(__file__).parent.absolute()
+STATIC = HERE / "static"
 
-
-app = bs.Application(show_error_details=True, debug=True)
-
-
-@app.router.get()
-async def home():
-    return f"Hello, World!"
-
-
-@app.router.options("/tus")
-async def tus_options():
-    response = bs.no_content()
-    response.add_header(b"Tus-Resumable", b"1.0.0")
-    response.add_header(b"Tus-Version", b"1.0.0")
-    response.add_header(b"Tus-Max-Size", str(iw.opts.max_upload_size).encode("ascii"))
-    response.add_header(b"Tus-Extension", b"creation")
-    return response
-
-
-@app.router.head("/tus/{media_id}")
-async def tus_head(media_id: str):
-    if not await path.exists(iw.opts.media_path / media_id):
-        response = bs.not_found()
-        response.add_header(b"Cache-Control", b"no-store")
-        return response
+app = Application(show_error_details=True, debug=True)
+app.serve_files(STATIC, root_path="", fallback_document="index.html")
 
 
 def main():

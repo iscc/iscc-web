@@ -12,7 +12,7 @@ python = ">=3.8,<3.11"
 blacksheep = "^1.2"
 uvicorn = "^0.18"
 aiofiles = "^22.1.0"
-pydantic = "^1.10.2"
+iscc-core = "^0.2.11"
 
 [tool.poetry.scripts]
 iscc-web = 'iscc_web.main:main'

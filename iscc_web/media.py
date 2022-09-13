@@ -3,10 +3,10 @@ import base64
 import aiofiles
 import iscc_core as ic
 from blacksheep import Request, Response, file
-from blacksheep.server.controllers import Controller, options, post, head, patch, get
+from blacksheep.server.controllers import Controller, options, post, head, patch, get, delete
 from pydantic import BaseModel
 from iscc_web.options import opts
-from aiofiles.os import path
+from aiofiles.os import path, remove
 
 
 class FileMeta(BaseModel):
@@ -65,7 +65,7 @@ class Tus(Controller):
         response.add_header(b"Tus-Resumable", b"1.0.0")
         response.add_header(b"Tus-Version", b"1.0.0")
         response.add_header(b"Tus-Max-Size", str(opts.max_upload_size).encode("ascii"))
-        response.add_header(b"Tus-Extension", b"creation")
+        response.add_header(b"Tus-Extension", b"creation,termination")
 
     @options("/tus")
     async def tus_options(self):
@@ -87,6 +87,15 @@ class Tus(Controller):
                     chunk = await infile.read(opts.io_read_size)
 
         return file(provider, content_type=meta.filetype, file_name=meta.filename)
+
+    @delete("/tus/{media_id}")
+    async def tus_delete(self, media_id: str):
+        """Delete media file and metadata"""
+        if not await self.file_exists(media_id):
+            return self.not_found()
+        await remove(self.file_path(media_id))
+        await remove(self.meta_path(media_id))
+        return self.no_content()
 
     @post("/tus")
     async def tus_post(self, request: Request):

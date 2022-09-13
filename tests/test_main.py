@@ -12,7 +12,7 @@ def test_tus_options(client_session):
         "tus-resumable": "1.0.0",
         "tus-version": "1.0.0",
         "tus-max-size": "1073741824",
-        "tus-extension": "creation",
+        "tus-extension": "creation,termination",
     }
     assert set(expected.items()).issubset(set(response.headers.items()))
 

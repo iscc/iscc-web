@@ -80,6 +80,7 @@ class Tus(Controller):
         response.add_header(b"Tus-Max-Size", str(opts.max_upload_size).encode("ascii"))
         response.add_header(b"Tus-Extension", b"creation,termination")
 
+    @docs(responses={400: "Bad Request"})
     @options("/tus")
     async def tus_options(self):
         """Check TUS protocol features"""
@@ -103,6 +104,7 @@ class Tus(Controller):
 
         return self.file(provider, content_type=meta.filetype, file_name=meta.filename)
 
+    @docs(responses={400: "Bad Request"})
     @delete("/tus/{media_id}")
     async def tus_delete(self, media_id: str):
         """Delete file"""
@@ -119,9 +121,7 @@ class Tus(Controller):
     )
     @post("/tus")
     async def tus_post(self, request: Request, length: UploadLength, metadata: UploadMetadata):
-        """
-        Create upload
-        """
+        """Create upload"""
 
         # if not upload_length:
         #     return self.bad_request("Header Upload-Length required")
@@ -147,6 +147,7 @@ class Tus(Controller):
         response.add_header(b"Location", f"/tus/{media_id}".encode("ascii"))
         return response
 
+    @docs(responses={400: "Bad Request"})
     @patch("/tus/{media_id}")
     async def tus_patch(self, request: Request, media_id: str):
         """Add data to an upload"""
@@ -176,6 +177,7 @@ class Tus(Controller):
         response.add_header(b"Upload-Offset", str(new_offset).encode("ascii"))
         return response
 
+    @docs(responses={200: "Ok"})
     @head("/tus/{media_id}")
     async def tus_head(self, media_id: str):
         """Get upload status"""

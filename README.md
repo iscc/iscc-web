@@ -13,6 +13,7 @@ iscc-web
 ```
 
 Access the app at http://localhost:8000
+Api documentation is at /docs and /redocs
 
 Before committing any changes run code formatting and tests with:
 ```

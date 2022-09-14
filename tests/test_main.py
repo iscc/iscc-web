@@ -57,7 +57,12 @@ def test_tus_post_length_to_big(client_session):
     header, the Server MUST respond with the 413 Request Entity Too Large status.
     """
     response = client_session.post(
-        "/tus", headers={"Tus-Resumable": "1.0.0", "Upload-Length": "1073741825"}
+        "/tus",
+        headers={
+            "Tus-Resumable": "1.0.0",
+            "Upload-Metadata": "filename d29ybGRfZG9taW5hdGlvbl9wbGFuLnBkZg==,is_confidential",
+            "Upload-Length": "1073741825",
+        },
     )
     assert response.status_code == 413
 

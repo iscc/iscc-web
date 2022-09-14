@@ -2,11 +2,24 @@
 import base64
 import aiofiles
 import iscc_core as ic
-from blacksheep import Request, Response, file
+from blacksheep import Request, Response, FromHeader
 from blacksheep.server.controllers import Controller, options, post, head, patch, get, delete
 from pydantic import BaseModel
 from iscc_web.options import opts
 from aiofiles.os import path, remove
+from iscc_web.main import docs
+
+
+class TusResumable(FromHeader[str]):
+    name = "Tus-Resumable"
+
+
+class UploadLength(FromHeader[int]):
+    name = "Upload-Length"
+
+
+class UploadMetadata(FromHeader[str]):
+    name = "Upload-Metadata"
 
 
 class FileMeta(BaseModel):
@@ -69,11 +82,13 @@ class Tus(Controller):
 
     @options("/tus")
     async def tus_options(self):
+        """Check TUS protocol features"""
         return self.no_content()
 
+    @docs(responses={404: "Upload not found"})
     @get("/tus/{media_id}")
     async def tus_get(self, media_id: str):
-        """Stream file to client"""
+        """Download file"""
         if not await self.file_exists(media_id):
             return self.not_found()
 
@@ -86,39 +101,45 @@ class Tus(Controller):
                     yield chunk
                     chunk = await infile.read(opts.io_read_size)
 
-        return file(provider, content_type=meta.filetype, file_name=meta.filename)
+        return self.file(provider, content_type=meta.filetype, file_name=meta.filename)
 
     @delete("/tus/{media_id}")
     async def tus_delete(self, media_id: str):
-        """Delete media file and metadata"""
+        """Delete file"""
         if not await self.file_exists(media_id):
             return self.not_found()
         await remove(self.file_path(media_id))
         await remove(self.meta_path(media_id))
         return self.no_content()
 
+    @docs(
+        summary="Create Upload",
+        description="Create a new upload resource. Send length and metadata via headers.",
+        responses={413: "Request entity too large", 400: "Bad Request"},
+    )
     @post("/tus")
-    async def tus_post(self, request: Request):
+    async def tus_post(self, request: Request, length: UploadLength, metadata: UploadMetadata):
+        """
+        Create upload
+        """
 
-        upload_length = request.get_first_header(b"Upload-Length")
-        if not upload_length:
-            return self.bad_request("Header Upload-Length required")
-        elif int(upload_length) > opts.max_upload_size:
+        # if not upload_length:
+        #     return self.bad_request("Header Upload-Length required")
+        if length.value > opts.max_upload_size:
             return self.status_code(413, "Request entity too large")
-        upload_length = int(upload_length)
 
-        upload_metadata = request.get_first_header(b"Upload-Metadata")
-        if not upload_metadata:
+        # metadata = request.get_first_header(b"Upload-Metadata")
+        if not metadata.value:
             return self.bad_request("Header Upload-Metadata required")
-        elif b"filename" not in upload_metadata:
+        elif "filename" not in metadata.value:
             return self.bad_request("Header Upload-Metadata must include filename")
-        upload_metadata = upload_metadata.decode("ascii")
+        # metadata = metadata.decode("ascii")
 
         # Create Metadata and Upload file
         media_id = ic.Flake().string.lower()
         meta_obj = FileMeta(
-            upload_length=upload_length,
-            upload_metadata=upload_metadata,
+            upload_length=length.value,
+            upload_metadata=metadata.value,
         )
         await self.write_meta(media_id, meta_obj)
         await self.create_file(media_id)
@@ -128,7 +149,7 @@ class Tus(Controller):
 
     @patch("/tus/{media_id}")
     async def tus_patch(self, request: Request, media_id: str):
-        """Advance upload"""
+        """Add data to an upload"""
         #  MUST use Content-Type: application/offset+octet-stream, otherwise the server SHOULD
         #  return a 415 Unsupported Media Type status
         content_type = request.get_first_header(b"Content-Type")
@@ -157,6 +178,7 @@ class Tus(Controller):
 
     @head("/tus/{media_id}")
     async def tus_head(self, media_id: str):
+        """Get upload status"""
         if not await self.file_exists(media_id):
             response = self.not_found()
             response.add_header(b"Cache-Control", b"no-store")

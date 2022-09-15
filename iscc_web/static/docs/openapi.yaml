@@ -1,0 +1,79 @@
+openapi: 3.0.3
+info:
+  title: ISCC-WEB Generator API
+  description: Simple ISCC Generator Service
+  version: 0.1.0
+
+servers:
+  - url: http://localhost:8000/api/v1
+
+paths:
+  /media:
+    post:
+      operationId: upload-file
+      summary: Upload file
+      description: Upload a file for ISCC processing.
+      parameters:
+        - name: X-Upload-Filename
+          in: header
+          description: Base64 encoded file name of the uploaded file.
+          required: true
+          schema:
+            type: string
+            example: eW91ci1tZWRpYS1maWxlLmpwZw==
+      requestBody:
+        description: The raw file data (not form encoded)
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+        required: true
+      responses:
+        201:
+          description: Created
+          headers:
+            Location:
+              description: Root-relative link to created resource
+              schema:
+                type: string
+                format: uri-reference
+                example: /api/v1/media/061k2igj91k1i
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    format: uri-reference
+                    example: /api/v1/media/061k2tvgjkbis
+                  media_id:
+                    type: string
+                    minLength: 13
+                    maxLength: 13
+                    pattern: ^[0-9a-v]+=*$
+                    example: 061k2tvgjkbis
+        400:
+          description: Bad Request
+  /media/{media_id}:
+    get:
+      operationId: download-file
+      summary: Download file
+      description: Download processed file.
+      parameters:
+        - name: media_id
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 13
+            maxLength: 13
+            pattern: ^[0-9a-v]+=*$
+            example: 061k2tvgjkbis
+      responses:
+        200:
+          description: Ok
+        404:
+          description: File not found
+

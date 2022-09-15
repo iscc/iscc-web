@@ -1,20 +1,13 @@
 import os
 from multiprocessing import Process
 from time import sleep
-from urllib.parse import urljoin
 import pytest
-import requests
 import uvicorn
 from iscc_web.main import app
 
 
-class ClientSession(requests.Session):
-    def __init__(self, base_url):
-        self.base_url = base_url
-        super().__init__()
-
-    def request(self, method, url, *args, **kwargs):
-        return super().request(method, urljoin(self.base_url, url), *args, **kwargs)
+server_host = "localhost"
+server_port = 44555
 
 
 def get_sleep_time():
@@ -23,15 +16,6 @@ def get_sleep_time():
     if os.name == "nt":
         return 1.5
     return 0.5
-
-
-server_host = "127.0.0.1"
-server_port = 44555
-
-
-@pytest.fixture(scope="session")
-def client_session():
-    return ClientSession(f"http://{server_host}:{server_port}")
 
 
 def _start_server():

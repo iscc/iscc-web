@@ -7,7 +7,6 @@
 </head>
 <body>
 <section class="example-one">
-    <h5>autoProceed is on</h5>
 
     <!-- Target DOM node #1 -->
     <div class="for-DragDrop"></div>
@@ -23,7 +22,14 @@
 </section>
 
 <script type="module">
-    import {Uppy, DragDrop, Tus, ProgressBar} from "https://releases.transloadit.com/uppy/v3.0.1/uppy.min.mjs"
+    import {
+        Uppy,
+        DragDrop,
+        ProgressBar,
+        XHRUpload
+    } from "https://releases.transloadit.com/uppy/v3.0.1/uppy.min.mjs"
+
+    import {Base64} from 'https://cdn.jsdelivr.net/npm/js-base64@3.7.2/base64.mjs'
 
     const onUploadSuccess = (elForUploadedFiles) => (file, response) => {
         const url = response.uploadURL
@@ -39,10 +45,18 @@
         document.querySelector(elForUploadedFiles).appendChild(li)
     }
 
+
     const uppyOne = new Uppy({debug: true, autoProceed: true})
     uppyOne
         .use(DragDrop, {target: '.example-one .for-DragDrop'})
-        .use(Tus, {endpoint: 'http://localhost:8000/tus'})
+        .use(XHRUpload, {
+            endpoint: 'http://localhost:8000/api/v1/media',
+            formData: false,
+            headers: file => ({
+                'X-Upload-Filename': Base64.encode(file.name)
+            })
+
+        })
         .use(ProgressBar, {target: '.example-one .for-ProgressBar', hideAfterFinish: false})
         .on('upload-success', onUploadSuccess('.example-one .uploaded-files ol'))
 </script>

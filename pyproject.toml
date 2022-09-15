@@ -17,14 +17,12 @@ iscc-core = "^0.2.11"
 [tool.poetry.scripts]
 iscc-web = 'iscc_web.main:main'
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "^7.1"
 black = "^22.8"
 poethepoet = "^0.16"
-
-[tool.poetry.group.dev.dependencies]
 pytest-asyncio = "^0.19.0"
-requests = "^2.28.1"
+schemathesis = "^3.17.2"
 
 [tool.black]
 skip-string-normalization = false

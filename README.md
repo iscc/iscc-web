@@ -19,3 +19,9 @@ Before committing any changes run code formatting and tests with:
 ```
 poe all
 ```
+
+
+# Special thanks to the developers of
+
+- [Blacksheep](https://github.com/Neoteroi/BlackSheep) (see [benchmarks](http://klen.github.io/py-frameworks-bench/))
+- [Schemathesis](https://github.com/schemathesis/schemathesis)

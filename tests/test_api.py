@@ -16,6 +16,13 @@ schema.add_link(
     parameters={"media_id": "$response.body#/media_id"},
 )
 
+schema.add_link(
+    source=schema["/media"]["POST"],
+    target=schema["/metadata/{media_id}"]["GET"],
+    status_code="201",
+    parameters={"media_id": "$response.body#/media_id"},
+)
+
 
 @settings(suppress_health_check=[HealthCheck(2)])
 @schema.parametrize()

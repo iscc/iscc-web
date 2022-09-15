@@ -18,7 +18,7 @@ app.serve_files(STATIC / "docs", root_path="/docs", extensions={".html", ".yaml"
 app.serve_files(STATIC / "redocs", root_path="/redocs", extensions={".html"})
 
 
-Route.value_patterns["mid"] = r"^[0-9a-q]+=*$"
+Route.value_patterns["mid"] = r"[0-9a-q]+=*"
 
 
 def main():

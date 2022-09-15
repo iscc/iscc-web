@@ -66,7 +66,7 @@ paths:
             type: string
             minLength: 13
             maxLength: 13
-            pattern: ^[0-9a-v]+=*$
+            pattern: '[0-9a-q]+=*'
             example: 061k2tvgjkbis
       responses:
         200:
@@ -86,14 +86,39 @@ paths:
             type: string
             minLength: 13
             maxLength: 13
-            pattern: ^[0-9a-v]+=*$
+            pattern: '[0-9a-q]+=*'
             example: 061k2tvgjkbis
       responses:
         204:
           description: No Content
         404:
           description: File not found
-
+  /metadata/{media_id}:
+    get:
+      operationId: extract-metadata
+      summary: Extract Metadata
+      description: Extract embedded metadata from media file
+      tags:
+        - metadata
+      parameters:
+        - name: media_id
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 13
+            maxLength: 13
+            pattern: '[0-9a-q]+=*'
+            example: 061k2tvgjkbis
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetadataResponse"
+        404:
+          description: Not Found
 components:
   schemas:
     UploadResponse:
@@ -108,5 +133,21 @@ components:
           type: string
           minLength: 13
           maxLength: 13
-          pattern: ^[0-9a-v]+=*$
+          pattern: '[0-9a-q]+=*'
           example: 061k2tvgjkbis
+    MetadataResponse:
+      description: Metadata extracted from the media asset.
+      type: object
+      properties:
+        name:
+          description: The title or name of creative work.
+          type: string
+          example: "Example Title"
+        description:
+          description: Description of the createive work.
+          type: string
+          example: "Example disambiguating description."
+        meta:
+          description: Subject, industry, or use-case specific metadata. (Encoded as JSON string or Data-URL)
+          type: string
+          example: "data:application/json;charset=utf-8;base64,eyJleHRlbmRlZCI6Im1ldGFkYXRhIn0="

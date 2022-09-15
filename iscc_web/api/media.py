@@ -1,6 +1,5 @@
 import base64
 import binascii
-import re
 import aiofiles
 import iscc_core as ic
 from blacksheep import Request
@@ -55,13 +54,9 @@ class Media(ApiController):
             location=location.encode("ascii"), value={"url": location, "media_id": media_id}
         )
 
-    @get("{media_id}")
+    @get("{mid:media_id}")
     async def download_file(self, media_id: str):
         """Download file"""
-
-        if not re.match(r"^[0-9a-v]+=*$", media_id):
-            return self.not_found()
-
         if not await self.file_exists(media_id):
             return self.not_found()
 
@@ -76,12 +71,9 @@ class Media(ApiController):
 
         return self.file(provider, content_type=meta.content_type, file_name=meta.file_name)
 
-    @delete("{media_id}")
+    @delete("{mid:media_id}")
     async def delete_file(self, media_id: str):
         """Delete file"""
-        if not re.match(r"^[0-9a-v]+=*$", media_id):
-            return self.not_found()
-
         if not await self.file_exists(media_id):
             return self.not_found()
 

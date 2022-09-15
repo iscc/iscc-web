@@ -42,18 +42,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  url:
-                    type: string
-                    format: uri-reference
-                    example: /api/v1/media/061k2tvgjkbis
-                  media_id:
-                    type: string
-                    minLength: 13
-                    maxLength: 13
-                    pattern: ^[0-9a-v]+=*$
-                    example: 061k2tvgjkbis
+                $ref: "#/components/schemas/UploadResponse"
         400:
           description: Bad Request
   /media/{media_id}:
@@ -77,3 +66,19 @@ paths:
         404:
           description: File not found
 
+components:
+  schemas:
+    UploadResponse:
+      description: Information required to download the newly created media resource.
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri-reference
+          example: /api/v1/media/061k2tvgjkbis
+        media_id:
+          type: string
+          minLength: 13
+          maxLength: 13
+          pattern: ^[0-9a-v]+=*$
+          example: 061k2tvgjkbis

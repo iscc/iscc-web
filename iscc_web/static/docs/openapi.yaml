@@ -7,12 +7,18 @@ info:
 servers:
   - url: http://localhost:8000/api/v1
 
+tags:
+  - name: media
+    description: Endpoints for uploading, downloading and deleting media files.
+
 paths:
   /media:
     post:
       operationId: upload-file
       summary: Upload file
       description: Upload a file for ISCC processing.
+      tags:
+        - media
       parameters:
         - name: X-Upload-Filename
           in: header
@@ -50,6 +56,8 @@ paths:
       operationId: download-file
       summary: Download file
       description: Download processed file.
+      tags:
+        - media
       parameters:
         - name: media_id
           in: path
@@ -63,6 +71,26 @@ paths:
       responses:
         200:
           description: Ok
+        404:
+          description: File not found
+    delete:
+      operationId: delete-file
+      summary: Delete file
+      tags:
+        - media
+      parameters:
+        - name: media_id
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 13
+            maxLength: 13
+            pattern: ^[0-9a-v]+=*$
+            example: 061k2tvgjkbis
+      responses:
+        204:
+          description: No Content
         404:
           description: File not found
 

@@ -4,10 +4,10 @@ import re
 import aiofiles
 import iscc_core as ic
 from blacksheep import Request
-from blacksheep.server.controllers import ApiController, get, post
+from blacksheep.server.controllers import ApiController, post, get, delete
 from pydantic import BaseModel
 from iscc_web.options import opts
-from aiofiles.os import path
+from aiofiles.os import path, remove
 
 
 class FileMeta(BaseModel):
@@ -20,27 +20,6 @@ class Media(ApiController):
     @classmethod
     def version(cls) -> str:
         return "v1"
-
-    @get("{media_id}")
-    async def download_file(self, media_id: str):
-        """Download file"""
-
-        if not re.match(r"^[0-9a-v]+=*$", media_id):
-            return self.not_found()
-
-        if not await self.file_exists(media_id):
-            return self.not_found()
-
-        meta = await self.read_meta(media_id)
-
-        async def provider():
-            async with aiofiles.open(self.file_path(media_id), "rb") as infile:
-                chunk = await infile.read(opts.io_read_size)
-                while chunk:
-                    yield chunk
-                    chunk = await infile.read(opts.io_read_size)
-
-        return self.file(provider, content_type=meta.content_type, file_name=meta.file_name)
 
     @post()
     async def upload_file(self, request: Request):
@@ -75,6 +54,40 @@ class Media(ApiController):
         return self.created(
             location=location.encode("ascii"), value={"url": location, "media_id": media_id}
         )
+
+    @get("{media_id}")
+    async def download_file(self, media_id: str):
+        """Download file"""
+
+        if not re.match(r"^[0-9a-v]+=*$", media_id):
+            return self.not_found()
+
+        if not await self.file_exists(media_id):
+            return self.not_found()
+
+        meta = await self.read_meta(media_id)
+
+        async def provider():
+            async with aiofiles.open(self.file_path(media_id), "rb") as infile:
+                chunk = await infile.read(opts.io_read_size)
+                while chunk:
+                    yield chunk
+                    chunk = await infile.read(opts.io_read_size)
+
+        return self.file(provider, content_type=meta.content_type, file_name=meta.file_name)
+
+    @delete("{media_id}")
+    async def delete_file(self, media_id: str):
+        """Delete file"""
+        if not re.match(r"^[0-9a-v]+=*$", media_id):
+            return self.not_found()
+
+        if not await self.file_exists(media_id):
+            return self.not_found()
+
+        await remove(self.file_path(media_id))
+        await remove(self.meta_path(media_id))
+        return self.no_content()
 
     @staticmethod
     def file_path(media_id: str) -> str:

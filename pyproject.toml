@@ -11,8 +11,8 @@ homepage = "https://github.com/iscc/iscc-web"
 python = ">=3.8,<3.11"
 blacksheep = "^1.2"
 uvicorn = "^0.18"
-aiofiles = "^22.1.0"
-iscc-core = "^0.2.11"
+aiofiles = "^22.1"
+iscc_sdk = "*"
 
 [tool.poetry.scripts]
 iscc-web = 'iscc_web.main:main'

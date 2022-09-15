@@ -9,10 +9,11 @@ from iscc_web.options import opts
 from aiofiles.os import path, remove
 
 
-class FileMeta(BaseModel):
+class UploadMeta(BaseModel):
 
     file_name: str
     content_type: str
+    client_ip: str
 
 
 class Media(ApiController):
@@ -41,7 +42,11 @@ class Media(ApiController):
 
         # Create ID
         media_id = ic.Flake().string.lower()
-        file_meta = FileMeta(content_type=content_type, file_name=file_name)
+        file_meta = UploadMeta(
+            content_type=content_type,
+            file_name=file_name,
+            client_ip=request.client_ip,
+        )
 
         # Save Uploaded data
         await self.write_meta(media_id, file_meta)
@@ -94,12 +99,12 @@ class Media(ApiController):
     async def file_exists(self, media_id):
         return await path.exists(self.file_path(media_id))
 
-    async def write_meta(self, media_id: str, file_meta: FileMeta) -> None:
+    async def write_meta(self, media_id: str, file_meta: UploadMeta) -> None:
         async with aiofiles.open(self.meta_path(media_id), "w") as infile:
             await infile.write(file_meta.json(indent=2))
 
-    async def read_meta(self, media_id: str) -> FileMeta:
+    async def read_meta(self, media_id: str) -> UploadMeta:
         """Read file metadata"""
         async with aiofiles.open(self.meta_path(media_id), "rb") as infile:
             data = await infile.read()
-        return FileMeta.parse_raw(data)
+        return UploadMeta.parse_raw(data)

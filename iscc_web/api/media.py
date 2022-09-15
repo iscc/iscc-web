@@ -31,20 +31,25 @@ class Media(ApiController):
             file_name_data = base64.b64decode(file_name_base64, validate=True)
         except binascii.Error:
             return self.status_code(400, "Bad Request - X-Upload-Filename is not base64.")
+
         try:
             file_name = file_name_data.decode("utf-8", "strict")
         except UnicodeDecodeError:
             return self.status_code(400, "Bad Request - X-Uploaded-Filename is not UTF-8 encoded")
+
         if not file_name:
             return self.status_code(400, "Bad Request - X-Upload-Filename is empty")
 
-        content_type = request.content_type().decode("ascii")
+        try:
+            content_type = request.content_type().decode("ascii")
+        except AttributeError:
+            content_type = ""
 
         # Create ID
         media_id = ic.Flake().string.lower()
         file_meta = UploadMeta(
-            content_type=content_type,
             file_name=file_name,
+            content_type=content_type,
             client_ip=request.client_ip,
         )
 

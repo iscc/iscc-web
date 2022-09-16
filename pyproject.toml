@@ -23,17 +23,27 @@ black = "^22.8"
 poethepoet = "^0.16"
 pytest-asyncio = "^0.19.0"
 schemathesis = "^3.17.2"
+datamodel-code-generator = "^0.13.1"
 
 [tool.black]
-skip-string-normalization = false
 line-length = 100
 target-version = ['py38']
+preview = true
+
+[tool.datamodel-codegen]
+input = "iscc_web/static/docs/openapi.yaml"
+output = "iscc_web/api/schema.py"
+encoding = "utf-8"
+disable-timestamp = true
+target-python-version = "3.8"
 
 [tool.poe.tasks]
+codegen = { cmd = "datamodel-codegen", help="Build code from OpenAPI Schema"}
 format = { cmd = "poetry run black .", help = "Code style formating with black" }
+lf = { cmd = "poetry run python -m develop.lf", help = "Convert line endings to LF" }
 test = { cmd = "poetry run pytest", help = "Run tests" }
 run = { cmd = "uvicorn iscc_web.asgi:application --reload", help = "Run dev server"}
-all = ["format", "test"]
+all = ["codegen", "format", "lf", "test"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

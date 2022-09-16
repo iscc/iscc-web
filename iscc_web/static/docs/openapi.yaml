@@ -104,7 +104,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MetadataResponse"
+                $ref: "#/components/schemas/Metadata"
         404:
           description: Not Found
 components:
@@ -126,8 +126,8 @@ components:
           example: /api/v1/media/061k2tvgjkbis
         media_id:
           $ref: "#/components/schemas/MediaID"
-    MetadataResponse:
-      description: Metadata extracted from the media asset.
+    Metadata:
+      description: Metadata for media file embedding.
       type: object
       properties:
         name:

@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 import asyncio
-from blacksheep.server.controllers import ApiController, get
+from blacksheep.server.controllers import ApiController, get, post
+
+from iscc_web.api.schema import Metadata
 from iscc_web.api.pool import Pool
-from iscc_web import opts, FileHandler
+from iscc_web import FileHandler
 import iscc_sdk as idk
-from aiofiles.os import path
 
 
 class Metadata(ApiController, FileHandler):
@@ -23,10 +24,9 @@ class Metadata(ApiController, FileHandler):
         metadata = await loop.run_in_executor(pool.executor, idk.extract_metadata, file_path)
         return metadata.json(include={"name", "description", "meta"})
 
-    @staticmethod
-    def file_path(media_id: str) -> str:
-        """Construct file path for media_id"""
-        return (opts.media_path / media_id).as_posix()
-
-    async def file_exists(self, media_id):
-        return await path.exists(self.file_path(media_id))
+    @post("mid:media_id")
+    async def embed(self, media_id: str, metadata: Metadata):
+        """Embed metadata in media file"""
+        if not await self.file_exists(media_id):
+            return self.not_found()
+        idk.embed_metadata()

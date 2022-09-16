@@ -3,14 +3,11 @@ info:
   title: ISCC-WEB Generator API
   description: Simple ISCC Generator Service
   version: 0.1.0
-
 servers:
-  - url: http://localhost:8000/api/v1
-
+- url: http://localhost:8000/api/v1
 tags:
-  - name: media
-    description: Endpoints for uploading, downloading and deleting media files.
-
+- name: media
+  description: Endpoints for uploading, downloading and deleting media files.
 paths:
   /media:
     post:
@@ -18,15 +15,15 @@ paths:
       summary: Upload file
       description: Upload a file for ISCC processing.
       tags:
-        - media
+      - media
       parameters:
-        - name: X-Upload-Filename
-          in: header
-          description: Base64 encoded file name of the uploaded file.
-          required: true
-          schema:
-            type: string
-            example: eW91ci1tZWRpYS1maWxlLmpwZw==
+      - name: X-Upload-Filename
+        in: header
+        description: Base64 encoded file name of the uploaded file.
+        required: true
+        schema:
+          type: string
+          example: eW91ci1tZWRpYS1maWxlLmpwZw==
       requestBody:
         description: The raw file data (not form encoded)
         content:
@@ -48,7 +45,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UploadResponse"
+                $ref: '#/components/schemas/UploadResponse'
         400:
           description: Bad Request
   /media/{media_id}:
@@ -57,13 +54,13 @@ paths:
       summary: Download file
       description: Download processed file.
       tags:
-        - media
+      - media
       parameters:
-        - name: media_id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/MediaID"
+      - name: media_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/MediaID'
       responses:
         200:
           description: Ok
@@ -73,13 +70,13 @@ paths:
       operationId: delete-file
       summary: Delete file
       tags:
-        - media
+      - media
       parameters:
-        - name: media_id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/MediaID"
+      - name: media_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/MediaID'
       responses:
         204:
           description: No Content
@@ -91,20 +88,20 @@ paths:
       summary: Extract Metadata
       description: Extract embedded metadata from media file
       tags:
-        - metadata
+      - metadata
       parameters:
-        - name: media_id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/MediaID"
+      - name: media_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/MediaID'
       responses:
         200:
           description: Ok
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/InlineMetadata"
+                $ref: '#/components/schemas/InlineMetadata'
         404:
           description: Not Found
     post:
@@ -112,19 +109,19 @@ paths:
       summary: Embed Metadata
       description: Embed metadata into media file.
       tags:
-        - metadata
+      - metadata
       parameters:
-        - name: media_id
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/MediaID"
+      - name: media_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/MediaID'
       requestBody:
         description: Metadata for embedding
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/InlineMetadata"
+              $ref: '#/components/schemas/InlineMetadata'
         required: true
       responses:
         201:
@@ -139,7 +136,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UploadResponse"
+                $ref: '#/components/schemas/UploadResponse'
         400:
           description: Bad Request
         404:
@@ -162,7 +159,7 @@ components:
           format: uri-reference
           example: /api/v1/media/061kcmrj55fi8
         media_id:
-          $ref: "#/components/schemas/MediaID"
+          $ref: '#/components/schemas/MediaID'
     InlineMetadata:
       title: iscc-embeddable
       type: object
@@ -178,9 +175,9 @@ components:
           type: string
           example: a 1984 fantasy film co-written and directed by *Wolfgang Petersen*
           maxLength: 4096
-          description: Description of the *digital content* identified by the **ISCC**. **Used as
-            input for ISCC Meta-Code generation**. Any user presentable text string (including Markdown
-            text) indicative of the identity  of the referent may be used.
+          description: Description of the *digital content* identified by the **ISCC**. **Used
+            as input for ISCC Meta-Code generation**. Any user presentable text string (including
+            Markdown text) indicative of the identity  of the referent may be used.
         meta:
           type: string
           maxLength: 16384
@@ -189,7 +186,7 @@ components:
         creator:
           description: An entity primarily responsible for making the resource.
           type: string
-          example: "Joanne K. Rowling"
+          example: Joanne K. Rowling
         license:
           type: string
           description: URI of license for the identified *digital content*.
@@ -198,8 +195,8 @@ components:
           type: string
           format: uri
           description: This field must contain a valid URL referring to a page showing information
-            about how one can acquire a license for the item. This may be a page of a web shop or
-            NFT marketplace ready for providing a license.
+            about how one can acquire a license for the item. This may be a page of a web
+            shop or NFT marketplace ready for providing a license.
           example: https://example.com/buy-license-for-item-here
         credit:
           type: string
@@ -208,6 +205,6 @@ components:
           example: Frank Farian - Getty Images
         rights:
           type: string
-          description: Contains any necessary copyright notice and should identify the current owner
-            of the copyright of this work with associated intellectual property rights.
+          description: Contains any necessary copyright notice and should identify the current
+            owner of the copyright of this work with associated intellectual property rights.
           example: Copyright 2022 ISCC Foundation - www.iscc.codes

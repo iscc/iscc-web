@@ -2,12 +2,12 @@
 import asyncio
 from blacksheep.server.controllers import ApiController, get
 from iscc_web.api.pool import Pool
-from iscc_web import opts
+from iscc_web import opts, FileHandler
 import iscc_sdk as idk
 from aiofiles.os import path
 
 
-class Metadata(ApiController):
+class Metadata(ApiController, FileHandler):
     @classmethod
     def version(cls) -> str:
         return "v1"

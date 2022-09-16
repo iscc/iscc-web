@@ -4,19 +4,12 @@ import aiofiles
 import iscc_core as ic
 from blacksheep import Request
 from blacksheep.server.controllers import ApiController, post, get, delete
-from pydantic import BaseModel
-from iscc_web.options import opts
-from aiofiles.os import path, remove
+from iscc_web import opts
+from iscc_web.api.mixins import FileHandler
+from iscc_web.api.models import UploadMeta
 
 
-class UploadMeta(BaseModel):
-
-    file_name: str
-    content_type: str
-    client_ip: str
-
-
-class Media(ApiController):
+class Media(ApiController, FileHandler):
     @classmethod
     def version(cls) -> str:
         return "v1"
@@ -86,30 +79,5 @@ class Media(ApiController):
         """Delete file"""
         if not await self.file_exists(media_id):
             return self.not_found()
-
-        await remove(self.file_path(media_id))
-        await remove(self.meta_path(media_id))
+        await self.delete_files(media_id)
         return self.no_content()
-
-    @staticmethod
-    def file_path(media_id: str) -> str:
-        """Construct file path for media_id"""
-        return (opts.media_path / media_id).as_posix()
-
-    @staticmethod
-    def meta_path(media_id: str) -> str:
-        """Construct mdatadata path for media_id"""
-        return (opts.media_path / f"{media_id}.json").as_posix()
-
-    async def file_exists(self, media_id):
-        return await path.exists(self.file_path(media_id))
-
-    async def write_meta(self, media_id: str, file_meta: UploadMeta) -> None:
-        async with aiofiles.open(self.meta_path(media_id), "w") as infile:
-            await infile.write(file_meta.json(indent=2))
-
-    async def read_meta(self, media_id: str) -> UploadMeta:
-        """Read file metadata"""
-        async with aiofiles.open(self.meta_path(media_id), "rb") as infile:
-            data = await infile.read()
-        return UploadMeta.parse_raw(data)

@@ -3,7 +3,7 @@ from multiprocessing import Process
 from time import sleep
 import pytest
 import uvicorn
-from iscc_web.main import app
+from iscc_web import app
 
 
 server_host = "localhost"

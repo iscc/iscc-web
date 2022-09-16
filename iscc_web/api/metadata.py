@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 import asyncio
-
 from blacksheep.server.controllers import ApiController, get
-
 from iscc_web.api.pool import Pool
 from iscc_web import opts
 import iscc_sdk as idk

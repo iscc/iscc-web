@@ -1,6 +1,7 @@
 # iscc-web - Minimal ISCC Generator Web Application
 
 
+
 # Development
 
 Having a [Python](https://python.org) 3.8+ environment with [Poetry](https://python-poetry.org/) do:
@@ -13,7 +14,7 @@ iscc-web
 ```
 
 Access the app at http://localhost:8000
-Api documentation is at /docs and /redocs
+Api documentation is at /docs
 
 Before committing any changes run code formatting and tests with:
 ```

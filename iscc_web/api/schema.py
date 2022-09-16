@@ -3,9 +3,9 @@
 
 from __future__ import annotations
 
-from typing import Optional
+from typing import List, Optional, Union
 
-from pydantic import BaseModel, Field, constr
+from pydantic import AnyUrl, BaseModel, Field, constr
 
 
 class MediaID(BaseModel):
@@ -21,19 +21,61 @@ class UploadResponse(BaseModel):
     media_id: Optional[MediaID] = None
 
 
-class Metadata(BaseModel):
-    name: Optional[str] = Field(
-        None, description="The title or name of creative work.", example="Example Title"
-    )
-    description: Optional[str] = Field(
-        None,
-        description="Description of the createive work.",
-        example="Example disambiguating description.",
-    )
-    meta: Optional[str] = Field(
+class InlineMetadata(BaseModel):
+    name: Optional[constr(max_length=128)] = Field(
         None,
         description=(
-            "Subject, industry, or use-case specific metadata. (Encoded as JSON string or Data-URL)"
+            "The title or name of the intangible creation manifested by the identified *digital"
+            " content*. **Used as input for ISCC Meta-Code generation**."
         ),
+        example="The Never Ending Story",
+    )
+    description: Optional[constr(max_length=4096)] = Field(
+        None,
+        description=(
+            "Description of the *digital content* identified by the **ISCC**. **Used as input for"
+            " ISCC Meta-Code generation**. Any user presentable text string (including Markdown"
+            " text) indicative of the identity  of the referent may be used."
+        ),
+        example="a 1984 fantasy film co-written and directed by *Wolfgang Petersen*",
+    )
+    meta: Optional[constr(max_length=16384)] = Field(
+        None,
+        description="Subject, industry, or use-case specific metadata encoded as Data-URL.",
         example="data:application/json;charset=utf-8;base64,eyJleHRlbmRlZCI6Im1ldGFkYXRhIn0=",
+    )
+    creator: Optional[Union[str, List[str]]] = Field(
+        None,
+        description="An entity primarily responsible for making the resource.",
+        example="Joanne K. Rowling",
+    )
+    license: Optional[AnyUrl] = Field(
+        None,
+        description="URI of license for the identified *digital content*.",
+        example="https://example.com/license-terms-for-this-item",
+    )
+    acquire: Optional[AnyUrl] = Field(
+        None,
+        description=(
+            "This field must contain a valid URL referring to a page showing information about how"
+            " one can acquire a license for the item. This may be a page of a web shop or NFT"
+            " marketplace ready for providing a license."
+        ),
+        example="https://example.com/buy-license-for-item-here",
+    )
+    credit: Optional[str] = Field(
+        None,
+        description=(
+            "A line of text that you expect users of the image (such as Google Images) to display"
+            " alongside the image."
+        ),
+        example="Frank Farian - Getty Images",
+    )
+    rights: Optional[str] = Field(
+        None,
+        description=(
+            "Contains any necessary copyright notice and should identify the current owner of the"
+            " copyright of this work with associated intellectual property rights."
+        ),
+        example="Copyright 2022 ISCC Foundation - www.iscc.codes",
     )

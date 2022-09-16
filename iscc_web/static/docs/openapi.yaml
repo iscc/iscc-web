@@ -104,7 +104,44 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Metadata"
+                $ref: "#/components/schemas/InlineMetadata"
+        404:
+          description: Not Found
+    post:
+      operationId: embed-metadata
+      summary: Embed Metadata
+      description: Embed metadata into media file.
+      tags:
+        - metadata
+      parameters:
+        - name: media_id
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/MediaID"
+      requestBody:
+        description: Metadata for embedding
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InlineMetadata"
+        required: true
+      responses:
+        201:
+          description: Created
+          headers:
+            Location:
+              description: Root-relative link to created resource
+              schema:
+                type: string
+                format: uri-reference
+                example: /api/v1/media/061k2igj91k1i
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UploadResponse"
+        400:
+          description: Bad Request
         404:
           description: Not Found
 components:
@@ -126,19 +163,56 @@ components:
           example: /api/v1/media/061k2tvgjkbis
         media_id:
           $ref: "#/components/schemas/MediaID"
-    Metadata:
-      description: Metadata for media file embedding.
+    InlineMetadata:
+      title: iscc-embeddable
       type: object
+      description: Metadata intended to be embedded into the media asset.
       properties:
         name:
-          description: The title or name of creative work.
           type: string
-          example: "Example Title"
+          maxLength: 128
+          example: The Never Ending Story
+          description: The title or name of the intangible creation manifested by the identified
+            *digital content*. **Used as input for ISCC Meta-Code generation**.
         description:
-          description: Description of the createive work.
           type: string
-          example: "Example disambiguating description."
+          example: a 1984 fantasy film co-written and directed by *Wolfgang Petersen*
+          maxLength: 4096
+          description: Description of the *digital content* identified by the **ISCC**. **Used as
+            input for ISCC Meta-Code generation**. Any user presentable text string (including Markdown
+            text) indicative of the identity  of the referent may be used.
         meta:
-          description: Subject, industry, or use-case specific metadata. (Encoded as JSON string or Data-URL)
           type: string
-          example: "data:application/json;charset=utf-8;base64,eyJleHRlbmRlZCI6Im1ldGFkYXRhIn0="
+          maxLength: 16384
+          example: data:application/json;charset=utf-8;base64,eyJleHRlbmRlZCI6Im1ldGFkYXRhIn0=
+          description: Subject, industry, or use-case specific metadata encoded as Data-URL.
+        creator:
+          oneOf:
+          - type: string
+          - type: array
+            items:
+            - type: string
+          description: An entity primarily responsible for making the resource.
+          example: Joanne K. Rowling
+        license:
+          type: string
+          format: uri
+          description: URI of license for the identified *digital content*.
+          example: https://example.com/license-terms-for-this-item
+        acquire:
+          type: string
+          format: uri
+          description: This field must contain a valid URL referring to a page showing information
+            about how one can acquire a license for the item. This may be a page of a web shop or
+            NFT marketplace ready for providing a license.
+          example: https://example.com/buy-license-for-item-here
+        credit:
+          type: string
+          description: A line of text that you expect users of the image (such as Google Images)
+            to display alongside the image.
+          example: Frank Farian - Getty Images
+        rights:
+          type: string
+          description: Contains any necessary copyright notice and should identify the current owner
+            of the copyright of this work with associated intellectual property rights.
+          example: Copyright 2022 ISCC Foundation - www.iscc.codes

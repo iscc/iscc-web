@@ -1,7 +1,6 @@
 import base64
 import binascii
 import aiofiles
-import iscc_core as ic
 from blacksheep import Request
 from blacksheep.server.controllers import ApiController, post, get, delete
 from iscc_web import opts
@@ -39,7 +38,7 @@ class Media(ApiController, FileHandler):
             content_type = ""
 
         # Create ID
-        media_id = ic.Flake().string.lower()
+        media_id = self.new_media_id()
         file_meta = UploadMeta(
             file_name=file_name,
             content_type=content_type,
@@ -53,6 +52,7 @@ class Media(ApiController, FileHandler):
                 await outf.write(chunk)
 
         location = f"/api/v1/media/{media_id}"
+        # Todo return UploadResponse
         return self.created(
             location=location.encode("ascii"), value={"url": location, "media_id": media_id}
         )

@@ -20,7 +20,20 @@ class Metadata(ApiController, FileHandler):
         file_path = self.file_path(media_id)
         loop = asyncio.get_event_loop()
         metadata = await loop.run_in_executor(pool.executor, idk.extract_metadata, file_path)
-        return metadata.json(include={"name", "description", "meta"})
+        cleaned = metadata.dict(
+            include={
+                "name",
+                "description",
+                "meta",
+                "creator",
+                "license",
+                "acquire",
+                "credit",
+                "rights",
+            }
+        )
+        obj = InlineMetadata(**cleaned)
+        return self.json(obj.dict(exclude_none=True))
 
     @post("{media_id}")
     async def embed(self, media_id: str, meta: InlineMetadata, pool: Pool):

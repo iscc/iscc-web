@@ -44,7 +44,7 @@ paths:
               schema:
                 type: string
                 format: uri-reference
-                example: /api/v1/media/061k2igj91k1i
+                example: /api/v1/media/061kcmrj55fi8
           content:
             application/json:
               schema:
@@ -135,7 +135,7 @@ paths:
               schema:
                 type: string
                 format: uri-reference
-                example: /api/v1/media/061k2igj91k1i
+                example: /api/v1/media/061kcmrj55fi8
           content:
             application/json:
               schema:
@@ -152,7 +152,7 @@ components:
       minLength: 13
       maxLength: 13
       pattern: '[0-9a-q]+=*'
-      example: 061k2tvgjkbis
+      example: 061kcmrj55fi8
     UploadResponse:
       description: Information required to download the newly created media resource.
       type: object
@@ -160,7 +160,7 @@ components:
         url:
           type: string
           format: uri-reference
-          example: /api/v1/media/061k2tvgjkbis
+          example: /api/v1/media/061kcmrj55fi8
         media_id:
           $ref: "#/components/schemas/MediaID"
     InlineMetadata:
@@ -187,16 +187,11 @@ components:
           example: data:application/json;charset=utf-8;base64,eyJleHRlbmRlZCI6Im1ldGFkYXRhIn0=
           description: Subject, industry, or use-case specific metadata encoded as Data-URL.
         creator:
-          oneOf:
-          - type: string
-          - type: array
-            items:
-            - type: string
           description: An entity primarily responsible for making the resource.
-          example: Joanne K. Rowling
+          type: string
+          example: "Joanne K. Rowling"
         license:
           type: string
-          format: uri
           description: URI of license for the identified *digital content*.
           example: https://example.com/license-terms-for-this-item
         acquire:

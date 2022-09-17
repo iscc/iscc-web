@@ -75,7 +75,7 @@ class Media(ApiController, FileHandler):
 
         return self.file(provider, content_type=meta.content_type, file_name=meta.clean_file_name)
 
-    @delete("{media_id}")
+    @delete("{mid:media_id}")
     async def delete_file(self, media_id: str):
         """Delete file"""
         try:

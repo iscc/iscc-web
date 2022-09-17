@@ -14,7 +14,7 @@ class Metadata(ApiController, FileHandler):
     def version(cls) -> str:
         return "v1"
 
-    @get("{media_id}")
+    @get("{mid:media_id}")
     async def extract(self, media_id: str, pool: Pool):
         """Extract metadata from media"""
         try:
@@ -42,7 +42,7 @@ class Metadata(ApiController, FileHandler):
         obj = InlineMetadata(**cleaned)
         return self.json(obj.dict(exclude_none=True))
 
-    @post("{media_id}")
+    @post("{mid:media_id}")
     async def embed(self, media_id: str, meta: InlineMetadata, pool: Pool):
         """Embed metadata in media file.
 

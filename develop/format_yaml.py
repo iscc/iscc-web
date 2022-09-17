@@ -8,6 +8,8 @@ HERE = pathlib.Path(__file__).parent.absolute()
 
 def reformat():
     for f in HERE.parent.glob("**\*.yaml"):
+        if f.name == "pnpm-lock.yaml":
+            continue
         with open(f, "rt", encoding="utf-8") as infile:
             data = yaml.safe_load(infile)
         with open(f, "wt", encoding="utf-8", newline="\n") as outf:

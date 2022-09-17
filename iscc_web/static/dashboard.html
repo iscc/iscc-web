@@ -56,6 +56,7 @@
             endpoint: 'http://localhost:8000/api/v1/iscc_code',
             formData: false,
             responseUrlFieldName: "content",
+            timeout: 0,
             headers: file => ({
                 'X-Upload-Filename': Base64.encode(file.name)
             }),

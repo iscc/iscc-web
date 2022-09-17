@@ -58,13 +58,6 @@ class FileHandler:
             data = await infile.read()
         return UploadMeta.parse_raw(data)
 
-    # async def has_permission(self, client: str, media_id: str) -> bool:
-    #     """Check if user has permission to access file"""
-    #     meta = await self.read_meta(media_id)
-    #     if meta.client_ip == client:
-    #         return True
-    #     return False
-
     @staticmethod
     async def move_file(src: str, dst: str):
         """Move file from source to destination"""

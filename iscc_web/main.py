@@ -9,12 +9,11 @@ HERE = pathlib.Path(__file__).parent.absolute()
 STATIC = HERE / "static"
 
 
-app = Application(show_error_details=True, debug=True)
+app = Application(show_error_details=False, debug=True)
 app.serve_files(STATIC)
 app.serve_files(STATIC / "docs", root_path="/docs", extensions={".html", ".yaml"}, cache_time=0)
 app.services.add_singleton(Pool)
-
-Route.value_patterns["mid"] = r"[0-9a-q]+=*"
+Route.value_patterns["mid"] = r"[a-v0-9]{13}$"
 
 
 def main():

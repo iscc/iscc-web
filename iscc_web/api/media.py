@@ -1,6 +1,7 @@
 import base64
 import binascii
 import aiofiles
+from aiofiles.ospath import exists
 from blacksheep import Request
 from blacksheep.server.controllers import ApiController, post, get, delete
 from iscc_web import opts
@@ -37,47 +38,48 @@ class Media(ApiController, FileHandler):
         except AttributeError:
             content_type = ""
 
-        # Create ID
-        media_id = self.new_media_id()
-        file_meta = UploadMeta(
-            file_name=file_name,
-            content_type=content_type,
-            client_ip=request.client_ip,
-        )
+        # Create package directory
+        media_id, package_dir = await self.create_package()
 
-        # Save Uploaded data
-        await self.write_meta(media_id, file_meta)
-        async with aiofiles.open(self.file_path(media_id), "ab") as outf:
-            async for chunk in request.stream():
-                await outf.write(chunk)
+        # Store file metadata
+        ip = request.client_ip
+        file_meta_obj = UploadMeta(file_name=file_name, content_type=content_type, client_ip=ip)
+        await self.write_meta(media_id, file_meta_obj)
 
-        location = f"/api/v1/media/{media_id}"
-        # Todo return UploadResponse
+        location_header = f"/api/v1/media/{media_id}".encode("ascii")
+        location = f"{opts.base_url}/media/{media_id}"
+
         return self.created(
-            location=location.encode("ascii"), value={"url": location, "media_id": media_id}
+            location=location_header, value={"content": location, "media_id": media_id}
         )
 
     @get("{mid:media_id}")
     async def download_file(self, media_id: str):
         """Download file"""
-        if not await self.file_exists(media_id):
-            return self.not_found()
+        try:
+            meta = await self.read_meta(media_id)
+        except FileNotFoundError:
+            return self.not_found("File metadata not found")
 
-        meta = await self.read_meta(media_id)
+        file_path = (opts.media_path / media_id) / meta.clean_file_name
+
+        if not await exists(file_path):
+            return self.not_found("File not found")
 
         async def provider():
-            async with aiofiles.open(self.file_path(media_id), "rb") as infile:
+            async with aiofiles.open(file_path, "rb") as infile:
                 chunk = await infile.read(opts.io_read_size)
                 while chunk:
                     yield chunk
                     chunk = await infile.read(opts.io_read_size)
 
-        return self.file(provider, content_type=meta.content_type, file_name=meta.file_name)
+        return self.file(provider, content_type=meta.content_type, file_name=meta.clean_file_name)
 
-    @delete("{mid:media_id}")
+    @delete("{media_id}")
     async def delete_file(self, media_id: str):
         """Delete file"""
-        if not await self.file_exists(media_id):
-            return self.not_found()
-        await self.delete_files(media_id)
+        try:
+            await self.delete_package(media_id)
+        except FileNotFoundError:
+            return self.not_found("File not found")
         return self.no_content()

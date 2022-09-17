@@ -6,9 +6,76 @@ info:
 servers:
 - url: http://localhost:8000/api/v1
 tags:
+- name: iscc-code
+  description: Create ISCCs from media files.
 - name: media
-  description: Endpoints for uploading, downloading and deleting media files.
+  description: Upload, download or delete media files.
+- name: metadata
+  description: Extract or embed metadata in media files.
 paths:
+  /iscc_code:
+    post:
+      operationId: create-iscc-code
+      summary: Create ISCC-CODE
+      description: Upload a file for ISCC processing.
+      tags:
+      - iscc-code
+      parameters:
+      - name: X-Upload-Filename
+        in: header
+        description: Base64 encoded file name of the uploaded file.
+        required: true
+        schema:
+          type: string
+          example: eW91ci1tZWRpYS1maWxlLmpwZw==
+      requestBody:
+        description: The raw file data (not form encoded).
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+        required: true
+      responses:
+        201:
+          description: Created
+          headers:
+            Location:
+              description: Root-relative link to created media resource
+              schema:
+                type: string
+                format: uri-reference
+                example: /api/v1/media/061kcmrj55fi8
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IsccMetadata'
+        400:
+          description: Bad Request
+        422:
+          description: Unprocessable Entity - ISCC processsing error.
+  /iscc_code/{media_id}:
+    get:
+      operationId: get-iscc-code
+      summary: Get ISCC-CODE
+      description: Get ISCC-CODE for media_id
+      tags:
+      - iscc-code
+      parameters:
+      - name: media_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/MediaID'
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IsccMetadata'
+        404:
+          description: Not Found
   /media:
     post:
       operationId: upload-file
@@ -148,20 +215,58 @@ components:
       type: string
       minLength: 13
       maxLength: 13
-      pattern: '[0-9a-q]+=*'
+      pattern: '[a-v0-9]{13}$'
       example: 061kcmrj55fi8
     UploadResponse:
       description: Information required to download the newly created media resource.
       type: object
       properties:
-        url:
+        content:
           type: string
           format: uri-reference
-          example: /api/v1/media/061kcmrj55fi8
+          example: http://localhost:8000/api/v1/media/061knt35ejv6o
         media_id:
           $ref: '#/components/schemas/MediaID'
+    IsccMetadata:
+      description: '[ISCC Metadata](https://schema.iscc.codes) (JSON-LD)'
+      allOf:
+      - $ref: '#/components/schemas/BasicMetadata'
+      - $ref: '#/components/schemas/InlineMetadata'
+      - $ref: '#/components/schemas/TechnicalMetadata'
+    BasicMetadata:
+      description: Minimal ISCC Metadata
+      type: object
+      properties:
+        '@context':
+          type: string
+          format: uri
+          example: http://purl.org/iscc/context/0.4.0.jsonld
+          description: The [JSON-LD](https://json-ld.org/) Context URI for ISCC metadata.
+        '@type':
+          type: string
+          default: CreativeWork
+          enum:
+          - CreativeWork
+          - TextDigitalDocument
+          - ImageObject
+          - AudioObject
+          - VideoObject
+          description: The type of digital content according to schema.org classes (TextDigitalDocument,
+            ImageObject, AudioObject, VideoObject).
+        $schema:
+          type: string
+          format: uri
+          example: http://purl.org/iscc/schema/0.4.0.json
+          description: The [JSON Schema](https://json-schema.org/) URI for ISCC metadata.
+        iscc:
+          type: string
+          description: An **ISCC-CODE** in canonical representation. This is the minimal required
+            field for a valid ISCC Metadata object.
+          example: ISCC:KACYPXW445FTYNJ3CYSXHAFJMA2HUWULUNRFE3BLHRSCXYH2M5AEGQY
+          minLength: 15
+          maxLength: 73
+          pattern: ^ISCC:[A-Z2-7]{10,73}$
     InlineMetadata:
-      title: iscc-embeddable
       type: object
       description: Metadata intended to be embedded into the media asset.
       properties:
@@ -208,3 +313,65 @@ components:
           description: Contains any necessary copyright notice and should identify the current
             owner of the copyright of this work with associated intellectual property rights.
           example: Copyright 2022 ISCC Foundation - www.iscc.codes
+    TechnicalMetadata:
+      type: object
+      description: Technical ISCC Metadata automaticaly inferred from the media file by the
+        ISCC processor
+      properties:
+        mode:
+          description: The perceptual mode used to create the ISCC-CODE.
+          type: string
+          enum:
+          - text
+          - image
+          - audio
+          - video
+          - mixed
+          example: image
+        filename:
+          description: Filename of the referenced **digital content**
+          type: string
+          example: your-media-file.jpg
+        filesize:
+          description: File size of media asset in number of bytes.
+          type: integer
+        mediatype:
+          description: An [IANA Media Type](https://www.iana.org/assignments/media-types/media-types.xhtml)
+            (MIME type)
+          type: string
+          example: image/jpeg
+        duration:
+          description: Duration of audio-visual media in seconds.
+          type: integer
+          example: 60
+        fps:
+          description: Frames per second of video assets.
+          type: number
+          format: float
+          example: 24
+          minimum: 1
+        width:
+          description: Width of visual media in number of pixels.
+          type: integer
+          format: int32
+          example: 640
+        height:
+          description: Height of visual media in number of pixels.
+          type: integer
+          format: int32
+          example: 480
+          minimum: 1
+        characters:
+          description: Number of text characters (code points after Unicode normalization)
+          type: integer
+          example: 55689
+        language:
+          description: Primary language of content [BCP 47](https://tools.ietf.org/search/bcp47).
+          type: string
+          example: en-US
+        thumbnail:
+          description: URI an autogenerated user-presentable thumbnail-image that serves as
+            a preview of the digital content. The URI may be a Data-URL RFC2397.
+          type: string
+          format: uri
+          example: https://picsum.photos/200/300.jpg

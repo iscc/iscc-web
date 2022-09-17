@@ -13,6 +13,9 @@ blacksheep = "^1.2"
 uvicorn = "^0.18"
 aiofiles = "^22.1"
 iscc_sdk = "*"
+httpx = "^0.23.0"
+pathvalidate = "^2.5.2"
+aiofile = "^3.8.1"
 
 [tool.poetry.scripts]
 iscc-web = 'iscc_web.main:main'
@@ -24,6 +27,7 @@ poethepoet = "^0.16"
 pytest-asyncio = "^0.19.0"
 schemathesis = "^3.17.2"
 datamodel-code-generator = "^0.13.1"
+iscc-samples = "^0.4.0"
 
 [tool.black]
 line-length = 100

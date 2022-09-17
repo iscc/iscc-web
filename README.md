@@ -1,8 +1,10 @@
 # iscc-web - Minimal ISCC Generator Web Application
 
-
-
 # Development
+
+Both the backend and frontend servers need to run in parallel.
+
+## Backend
 
 Having a [Python](https://python.org) 3.8+ environment with [Poetry](https://python-poetry.org/) do:
 
@@ -17,12 +19,21 @@ Access the app at http://localhost:8000
 Api documentation is at /docs
 
 Before committing any changes run code formatting and tests with:
+
 ```
 poe all
 ```
 
+## Frontend
+
+Install Node.js with [asdf](https://asdf-vm.com/) or see [.tool-versions](.tool-versions) for the correct version. Packages are managed by
+[pnpm](https://pnpm.io/installation).
+
+Run `pnpm install` to install the frontend dependencies.
+
+Run `pnpm run dev` to run the development server.
 
 # Special thanks to the developers of
 
-- [Blacksheep](https://github.com/Neoteroi/BlackSheep) (see [benchmarks](http://klen.github.io/py-frameworks-bench/))
-- [Schemathesis](https://github.com/schemathesis/schemathesis)
+-   [Blacksheep](https://github.com/Neoteroi/BlackSheep) (see [benchmarks](http://klen.github.io/py-frameworks-bench/))
+-   [Schemathesis](https://github.com/schemathesis/schemathesis)

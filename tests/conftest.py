@@ -3,11 +3,18 @@ from multiprocessing import Process
 from time import sleep
 import pytest
 import uvicorn
-from iscc_web.main import app
+from iscc_web import app
+import httpx
+import os
+
+os.environ["ISCC_WEB_SCHEME"] = "http"
+os.environ["ISCC_WEB_HOST"] = "localhost"
+os.environ["ISCC_WEB_PORT"] = "44555"
 
 
 server_host = "localhost"
 server_port = 44555
+server_api_path = "api/v1"
 
 
 def get_sleep_time():
@@ -20,6 +27,11 @@ def get_sleep_time():
 
 def _start_server():
     uvicorn.run(app, host=server_host, port=server_port, log_level="debug")
+
+
+@pytest.fixture(scope="session")
+def api() -> httpx.Client:
+    return httpx.Client(base_url=f"http://{server_host}:{server_port}/{server_api_path}")
 
 
 @pytest.fixture(scope="session", autouse=True)

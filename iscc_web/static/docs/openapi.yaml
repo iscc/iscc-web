@@ -3,30 +3,94 @@ info:
   title: ISCC-WEB Generator API
   description: Simple ISCC Generator Service
   version: 0.1.0
-
 servers:
-  - url: http://localhost:8000/api/v1
-
+- url: http://localhost:8000/api/v1
 tags:
-  - name: media
-    description: Endpoints for uploading, downloading and deleting media files.
-
+- name: iscc-code
+  description: Create ISCCs from media files.
+- name: media
+  description: Upload, download or delete media files.
+- name: metadata
+  description: Extract or embed metadata in media files.
 paths:
+  /iscc_code:
+    post:
+      operationId: create-iscc-code
+      summary: Create ISCC-CODE
+      description: Upload a file for ISCC processing.
+      tags:
+      - iscc-code
+      parameters:
+      - name: X-Upload-Filename
+        in: header
+        description: Base64 encoded file name of the uploaded file.
+        required: true
+        schema:
+          type: string
+          example: eW91ci1tZWRpYS1maWxlLmpwZw==
+      requestBody:
+        description: The raw file data (not form encoded).
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+        required: true
+      responses:
+        201:
+          description: Created
+          headers:
+            Location:
+              description: Root-relative link to created media resource
+              schema:
+                type: string
+                format: uri-reference
+                example: /api/v1/media/061kcmrj55fi8
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IsccMetadata'
+        400:
+          description: Bad Request
+        422:
+          description: Unprocessable Entity - ISCC processsing error.
+  /iscc_code/{media_id}:
+    get:
+      operationId: get-iscc-code
+      summary: Get ISCC-CODE
+      description: Get ISCC-CODE for media_id
+      tags:
+      - iscc-code
+      parameters:
+      - name: media_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/MediaID'
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IsccMetadata'
+        404:
+          description: Not Found
   /media:
     post:
       operationId: upload-file
       summary: Upload file
       description: Upload a file for ISCC processing.
       tags:
-        - media
+      - media
       parameters:
-        - name: X-Upload-Filename
-          in: header
-          description: Base64 encoded file name of the uploaded file.
-          required: true
-          schema:
-            type: string
-            example: eW91ci1tZWRpYS1maWxlLmpwZw==
+      - name: X-Upload-Filename
+        in: header
+        description: Base64 encoded file name of the uploaded file.
+        required: true
+        schema:
+          type: string
+          example: eW91ci1tZWRpYS1maWxlLmpwZw==
       requestBody:
         description: The raw file data (not form encoded)
         content:
@@ -44,11 +108,11 @@ paths:
               schema:
                 type: string
                 format: uri-reference
-                example: /api/v1/media/061k2igj91k1i
+                example: /api/v1/media/061kcmrj55fi8
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UploadResponse"
+                $ref: '#/components/schemas/UploadResponse'
         400:
           description: Bad Request
   /media/{media_id}:
@@ -57,17 +121,13 @@ paths:
       summary: Download file
       description: Download processed file.
       tags:
-        - media
+      - media
       parameters:
-        - name: media_id
-          in: path
-          required: true
-          schema:
-            type: string
-            minLength: 13
-            maxLength: 13
-            pattern: '[0-9a-q]+=*'
-            example: 061k2tvgjkbis
+      - name: media_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/MediaID'
       responses:
         200:
           description: Ok
@@ -77,17 +137,13 @@ paths:
       operationId: delete-file
       summary: Delete file
       tags:
-        - media
+      - media
       parameters:
-        - name: media_id
-          in: path
-          required: true
-          schema:
-            type: string
-            minLength: 13
-            maxLength: 13
-            pattern: '[0-9a-q]+=*'
-            example: 061k2tvgjkbis
+      - name: media_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/MediaID'
       responses:
         204:
           description: No Content
@@ -99,55 +155,223 @@ paths:
       summary: Extract Metadata
       description: Extract embedded metadata from media file
       tags:
-        - metadata
+      - metadata
       parameters:
-        - name: media_id
-          in: path
-          required: true
-          schema:
-            type: string
-            minLength: 13
-            maxLength: 13
-            pattern: '[0-9a-q]+=*'
-            example: 061k2tvgjkbis
+      - name: media_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/MediaID'
       responses:
         200:
           description: Ok
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MetadataResponse"
+                $ref: '#/components/schemas/InlineMetadata'
+        404:
+          description: Not Found
+    post:
+      operationId: embed-metadata
+      summary: Embed Metadata
+      description: Embed metadata into media file.
+      tags:
+      - metadata
+      parameters:
+      - name: media_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/MediaID'
+      requestBody:
+        description: Metadata for embedding
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InlineMetadata'
+        required: true
+      responses:
+        201:
+          description: Created
+          headers:
+            Location:
+              description: Root-relative link to created resource
+              schema:
+                type: string
+                format: uri-reference
+                example: /api/v1/media/061kcmrj55fi8
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadResponse'
+        400:
+          description: Bad Request
         404:
           description: Not Found
 components:
   schemas:
+    MediaID:
+      description: ID for an uploaded file generated by server for each upload event.
+      type: string
+      minLength: 13
+      maxLength: 13
+      pattern: '[a-v0-9]{13}$'
+      example: 061kcmrj55fi8
     UploadResponse:
       description: Information required to download the newly created media resource.
       type: object
       properties:
-        url:
+        content:
           type: string
           format: uri-reference
-          example: /api/v1/media/061k2tvgjkbis
+          example: http://localhost:8000/api/v1/media/061knt35ejv6o
         media_id:
-          type: string
-          minLength: 13
-          maxLength: 13
-          pattern: '[0-9a-q]+=*'
-          example: 061k2tvgjkbis
-    MetadataResponse:
-      description: Metadata extracted from the media asset.
+          $ref: '#/components/schemas/MediaID'
+    IsccMetadata:
+      description: '[ISCC Metadata](https://schema.iscc.codes) (JSON-LD)'
+      allOf:
+      - $ref: '#/components/schemas/BasicMetadata'
+      - $ref: '#/components/schemas/InlineMetadata'
+      - $ref: '#/components/schemas/TechnicalMetadata'
+    BasicMetadata:
+      description: Minimal ISCC Metadata
       type: object
       properties:
+        '@context':
+          type: string
+          format: uri
+          example: http://purl.org/iscc/context/0.4.0.jsonld
+          description: The [JSON-LD](https://json-ld.org/) Context URI for ISCC metadata.
+        '@type':
+          type: string
+          default: CreativeWork
+          enum:
+          - CreativeWork
+          - TextDigitalDocument
+          - ImageObject
+          - AudioObject
+          - VideoObject
+          description: The type of digital content according to schema.org classes (TextDigitalDocument,
+            ImageObject, AudioObject, VideoObject).
+        $schema:
+          type: string
+          format: uri
+          example: http://purl.org/iscc/schema/0.4.0.json
+          description: The [JSON Schema](https://json-schema.org/) URI for ISCC metadata.
+        iscc:
+          type: string
+          description: An **ISCC-CODE** in canonical representation. This is the minimal required
+            field for a valid ISCC Metadata object.
+          example: ISCC:KACYPXW445FTYNJ3CYSXHAFJMA2HUWULUNRFE3BLHRSCXYH2M5AEGQY
+          minLength: 15
+          maxLength: 73
+          pattern: ^ISCC:[A-Z2-7]{10,73}$
+    InlineMetadata:
+      type: object
+      description: Metadata intended to be embedded into the media asset.
+      properties:
         name:
-          description: The title or name of creative work.
           type: string
-          example: "Example Title"
+          maxLength: 128
+          example: The Never Ending Story
+          description: The title or name of the intangible creation manifested by the identified
+            *digital content*. **Used as input for ISCC Meta-Code generation**.
         description:
-          description: Description of the createive work.
           type: string
-          example: "Example disambiguating description."
+          example: a 1984 fantasy film co-written and directed by *Wolfgang Petersen*
+          maxLength: 4096
+          description: Description of the *digital content* identified by the **ISCC**. **Used
+            as input for ISCC Meta-Code generation**. Any user presentable text string (including
+            Markdown text) indicative of the identity  of the referent may be used.
         meta:
-          description: Subject, industry, or use-case specific metadata. (Encoded as JSON string or Data-URL)
           type: string
-          example: "data:application/json;charset=utf-8;base64,eyJleHRlbmRlZCI6Im1ldGFkYXRhIn0="
+          maxLength: 16384
+          example: data:application/json;charset=utf-8;base64,eyJleHRlbmRlZCI6Im1ldGFkYXRhIn0=
+          description: Subject, industry, or use-case specific metadata encoded as Data-URL.
+        creator:
+          description: An entity primarily responsible for making the resource.
+          type: string
+          example: Joanne K. Rowling
+        license:
+          type: string
+          description: URI of license for the identified *digital content*.
+          example: https://example.com/license-terms-for-this-item
+        acquire:
+          type: string
+          format: uri
+          description: This field must contain a valid URL referring to a page showing information
+            about how one can acquire a license for the item. This may be a page of a web
+            shop or NFT marketplace ready for providing a license.
+          example: https://example.com/buy-license-for-item-here
+        credit:
+          type: string
+          description: A line of text that you expect users of the image (such as Google Images)
+            to display alongside the image.
+          example: Frank Farian - Getty Images
+        rights:
+          type: string
+          description: Contains any necessary copyright notice and should identify the current
+            owner of the copyright of this work with associated intellectual property rights.
+          example: Copyright 2022 ISCC Foundation - www.iscc.codes
+    TechnicalMetadata:
+      type: object
+      description: Technical ISCC Metadata automaticaly inferred from the media file by the
+        ISCC processor
+      properties:
+        mode:
+          description: The perceptual mode used to create the ISCC-CODE.
+          type: string
+          enum:
+          - text
+          - image
+          - audio
+          - video
+          - mixed
+          example: image
+        filename:
+          description: Filename of the referenced **digital content**
+          type: string
+          example: your-media-file.jpg
+        filesize:
+          description: File size of media asset in number of bytes.
+          type: integer
+        mediatype:
+          description: An [IANA Media Type](https://www.iana.org/assignments/media-types/media-types.xhtml)
+            (MIME type)
+          type: string
+          example: image/jpeg
+        duration:
+          description: Duration of audio-visual media in seconds.
+          type: integer
+          example: 60
+        fps:
+          description: Frames per second of video assets.
+          type: number
+          format: float
+          example: 24
+          minimum: 1
+        width:
+          description: Width of visual media in number of pixels.
+          type: integer
+          format: int32
+          example: 640
+        height:
+          description: Height of visual media in number of pixels.
+          type: integer
+          format: int32
+          example: 480
+          minimum: 1
+        characters:
+          description: Number of text characters (code points after Unicode normalization)
+          type: integer
+          example: 55689
+        language:
+          description: Primary language of content [BCP 47](https://tools.ietf.org/search/bcp47).
+          type: string
+          example: en-US
+        thumbnail:
+          description: URI an autogenerated user-presentable thumbnail-image that serves as
+            a preview of the digital content. The URI may be a Data-URL RFC2397.
+          type: string
+          format: uri
+          example: https://picsum.photos/200/300.jpg

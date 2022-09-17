@@ -43,19 +43,23 @@
         li.appendChild(a)
 
         document.querySelector(elForUploadedFiles).appendChild(li)
+        console.log(response)
     }
 
 
-    const uppyOne = new Uppy({debug: true, autoProceed: true})
+    const uppyOne = new Uppy({
+        debug: true, autoProceed: true,
+    })
     uppyOne
         .use(DragDrop, {target: '.example-one .for-DragDrop'})
         .use(XHRUpload, {
-            endpoint: 'http://localhost:8000/api/v1/media',
+            endpoint: 'http://localhost:8000/api/v1/iscc_code',
             formData: false,
+            responseUrlFieldName: "content",
+            timeout: 0,
             headers: file => ({
                 'X-Upload-Filename': Base64.encode(file.name)
-            })
-
+            }),
         })
         .use(ProgressBar, {target: '.example-one .for-ProgressBar', hideAfterFinish: false})
         .on('upload-success', onUploadSuccess('.example-one .uploaded-files ol'))

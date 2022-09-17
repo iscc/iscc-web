@@ -42,13 +42,13 @@ disable-timestamp = true
 target-python-version = "3.8"
 
 [tool.poe.tasks]
-formatyaml = { cmd = "poetry run python -m develop.format_yaml", help = "Reformat yaml files"}
+formatopenapi = { cmd = "poetry run python -m develop.format_openapi", help = "Reformat openapi.yaml"}
 codegen = { cmd = "datamodel-codegen", help="Build code from OpenAPI Schema"}
 format = { cmd = "poetry run black .", help = "Code style formating with black" }
 lf = { cmd = "poetry run python -m develop.lf", help = "Convert line endings to LF" }
 test = { cmd = "poetry run pytest", help = "Run tests" }
 run = { cmd = "uvicorn iscc_web.asgi:application --reload", help = "Run dev server"}
-all = ["formatyaml", "codegen", "format", "lf", "test"]
+all = ["formatopenapi", "codegen", "format", "lf", "test"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

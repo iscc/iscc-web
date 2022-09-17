@@ -81,6 +81,9 @@ class Iscc_Code(ApiController, FileHandler):
             )
         except CalledProcessError:
             return self.status_code(422, "ISCC processsing error.")
+        except idk.IsccUnsupportedMediatype:
+            return self.status_code(422, "ISCC unsupported mediatype.")
+
         # Store ISCC processing result
         result_path = package_dir / f"{media_id}.iscc.json"
         async with aiofile.async_open(result_path, "wb") as outfile:

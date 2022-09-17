@@ -4,6 +4,8 @@ import aiofiles
 from aiofiles.ospath import exists
 from blacksheep import Request
 from blacksheep.server.controllers import ApiController, post, get, delete
+from blake3 import blake3
+
 from iscc_web import opts
 from iscc_web.api.mixins import FileHandler
 from iscc_web.api.models import UploadMeta
@@ -42,8 +44,8 @@ class Media(ApiController, FileHandler):
         media_id, package_dir = await self.create_package()
 
         # Store file metadata
-        ip = request.client_ip
-        file_meta_obj = UploadMeta(file_name=file_name, content_type=content_type, client_ip=ip)
+        user = blake3(request.client_ip.encode("ascii")).hexdigest()
+        file_meta_obj = UploadMeta(file_name=file_name, content_type=content_type, user=user)
         await self.write_meta(media_id, file_meta_obj)
 
         location_header = f"/api/v1/media/{media_id}".encode("ascii")

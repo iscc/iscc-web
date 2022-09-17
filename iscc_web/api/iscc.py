@@ -12,6 +12,7 @@ from iscc_web.api.models import UploadMeta
 from iscc_web.api.pool import Pool
 from iscc_web.api.mixins import FileHandler
 import iscc_sdk as idk
+from blake3 import blake3
 
 
 class Iscc_Code(ApiController, FileHandler):
@@ -63,8 +64,8 @@ class Iscc_Code(ApiController, FileHandler):
         media_id, package_dir = await self.create_package()
 
         # Store file metadata
-        ip = request.client_ip
-        file_meta_obj = UploadMeta(file_name=file_name, content_type=content_type, client_ip=ip)
+        user = blake3(request.client_ip.encode("ascii")).hexdigest()
+        file_meta_obj = UploadMeta(file_name=file_name, content_type=content_type, user=user)
         await self.write_meta(media_id, file_meta_obj)
 
         # Store file upload

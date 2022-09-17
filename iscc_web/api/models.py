@@ -6,7 +6,7 @@ from pathvalidate import sanitize_filename
 class UploadMeta(BaseModel):
     file_name: str
     content_type: str
-    client_ip: str
+    user: str
 
     @property
     def clean_file_name(self):

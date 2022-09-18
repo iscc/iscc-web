@@ -54,7 +54,7 @@ class BasicMetadata(BaseModel):
     iscc: Optional[constr(regex=r"^ISCC:[A-Z2-7]{10,73}$", min_length=15, max_length=73)] = Field(
         None,
         description=(
-            "An **ISCC-CODE** in canonical representation. This is the minimal required field for a"
+            "An **ISCC** in canonical representation. This is the minimal required field for a"
             " valid ISCC Metadata object."
         ),
         example="ISCC:KACYPXW445FTYNJ3CYSXHAFJMA2HUWULUNRFE3BLHRSCXYH2M5AEGQY",
@@ -131,7 +131,7 @@ class Mode(Enum):
 
 class TechnicalMetadata(BaseModel):
     mode: Optional[Mode] = Field(
-        None, description="The perceptual mode used to create the ISCC-CODE.", example="image"
+        None, description="The perceptual mode used to create the ISCC.", example="image"
     )
     filename: Optional[str] = Field(
         None,

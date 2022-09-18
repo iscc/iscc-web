@@ -4,13 +4,13 @@ from iscc_samples import images
 import base64
 
 
-def test_create_iscc_code_location_and_result(api):
+def test_create_iscc_location_and_result(api):
     content = images()[0].open("rb").read()
     headers = {
         "X-Upload-Filename": base64.b64encode("test-image.jpg".encode("utf-8")),
         "Content-Type": "image/jpeg",
     }
-    response = api.post("/iscc_code", content=content, headers=headers)
+    response = api.post("/iscc", content=content, headers=headers)
 
     assert response.headers.get("Location").startswith("/api/v1/media/")
 
@@ -35,8 +35,8 @@ def test_create_iscc_code_location_and_result(api):
     }
 
 
-def test_get_iscc_code_ok(api):
-    response = api.get("/iscc_code/061knt35ejv6o")
+def test_get_iscc_ok(api):
+    response = api.get("/iscc/061knt35ejv6o")
     assert response.status_code == codes.OK
     assert response.json() == {
         "$schema": "http://purl.org/iscc/schema/0.3.9.json",
@@ -56,6 +56,6 @@ def test_get_iscc_code_ok(api):
     }
 
 
-def test_get_iscc_code_not_found(api):
-    response = api.get("/iscc_code/061ko3i97hshu")
+def test_get_iscc_not_found(api):
+    response = api.get("/iscc/061ko3i97hshu")
     assert response.status_code == codes.NOT_FOUND

@@ -1,25 +1,44 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html> <!-- Important: must specify -->
+<html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta
-    name="description"
-    content="SwaggerUI"
-  />
-  <title>ISCC-WEB Generator API - OpenAPI Swagger Documentation</title>
-  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@4.5.0/swagger-ui.css" />
+    <meta charset="utf-8"> <!-- Important: rapi-doc uses utf8 characters -->
+    <script type="module" src="https://unpkg.com/rapidoc/dist/rapidoc-min.js"></script>
 </head>
 <body>
-<div id="swagger-ui"></div>
-<script src="https://unpkg.com/swagger-ui-dist@4.5.0/swagger-ui-bundle.js" crossorigin></script>
-<script>
-  window.onload = () => {
-    window.ui = SwaggerUIBundle({
-      url: '/docs/openapi.yaml',
-      dom_id: '#swagger-ui',
-    });
-  };
-</script>
+<rapi-doc
+    spec-url="/docs/openapi.yaml"
+    theme=dark
+    sort-tags=false
+    sort-endpoints-by="none"
+    bg-color=#2E303E
+    nav-bg-color=#0054b2
+    nav-accent-color=#a6db50
+    primary-color=#f56169
+    header-color=#123663
+    regular-font="Readex Pro"
+    mono-font="JetBrains Mono"
+    font-size=large
+    fill-request-fields-with-example=false
+    show-method-in-nav-bar=false
+    layout=row
+    render-style=focused
+    allow-authentication=false
+    allow-spec-url-load=false
+    allow-spec-file-load=false
+    allow-server-selection=false
+    schema-style=table
+    schema-description-expanded=true
+    allow-schema-description-expand-toggle=false
+    use-path-in-nav-bar=false
+    on-nav-tag-click=show-description
+    info-description-headings-in-navbar=false
+    show-components=true
+    show-header=true
+    allow-search=true
+    allow-server-selection=true
+>
+    <img slot="logo" src="/images/iscc-logo-extended-white.svg" style="width:100%; margin-left: 10px"/>
+
+</rapi-doc>
 </body>
 </html>

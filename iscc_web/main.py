@@ -11,7 +11,8 @@ STATIC = HERE / "static"
 
 app = Application(show_error_details=False, debug=True)
 app.serve_files(STATIC)
-app.serve_files(STATIC / "docs", root_path="/docs", extensions={".html", ".yaml"}, cache_time=0)
+app.serve_files(STATIC / "docs", root_path="/docs", extensions={".html", ".yaml"})
+app.serve_files(STATIC / "images", root_path="/images")
 app.services.add_singleton(Pool)
 Route.value_patterns["mid"] = r"[a-v0-9]{13}$"
 

@@ -4,22 +4,22 @@ info:
   description: Simple ISCC Generator Service
   version: 0.1.0
 servers:
-- url: http://localhost:8000/api/v1
+- url: /api/v1
 tags:
-- name: iscc-code
-  description: Create ISCCs from media files.
+- name: iscc
+  description: Create standard ISCCs from media files.
 - name: media
   description: Upload, download or delete media files.
 - name: metadata
   description: Extract or embed metadata in media files.
 paths:
-  /iscc_code:
+  /iscc:
     post:
-      operationId: create-iscc-code
-      summary: Create ISCC-CODE
+      operationId: create-iscc
+      summary: Create ISCC
       description: Upload a file for ISCC processing.
       tags:
-      - iscc-code
+      - iscc
       parameters:
       - name: X-Upload-Filename
         in: header
@@ -54,13 +54,13 @@ paths:
           description: Bad Request
         422:
           description: Unprocessable Entity - ISCC processsing error.
-  /iscc_code/{media_id}:
+  /iscc/{media_id}:
     get:
-      operationId: get-iscc-code
-      summary: Get ISCC-CODE
-      description: Get ISCC-CODE for media_id
+      operationId: get-iscc
+      summary: Get ISCC
+      description: Get ISCC for media_id
       tags:
-      - iscc-code
+      - iscc
       parameters:
       - name: media_id
         in: path
@@ -260,7 +260,7 @@ components:
           description: The [JSON Schema](https://json-schema.org/) URI for ISCC metadata.
         iscc:
           type: string
-          description: An **ISCC-CODE** in canonical representation. This is the minimal required
+          description: An **ISCC** in canonical representation. This is the minimal required
             field for a valid ISCC Metadata object.
           example: ISCC:KACYPXW445FTYNJ3CYSXHAFJMA2HUWULUNRFE3BLHRSCXYH2M5AEGQY
           minLength: 15
@@ -319,7 +319,7 @@ components:
         ISCC processor
       properties:
         mode:
-          description: The perceptual mode used to create the ISCC-CODE.
+          description: The perceptual mode used to create the ISCC.
           type: string
           enum:
           - text

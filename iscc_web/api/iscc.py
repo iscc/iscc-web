@@ -15,13 +15,13 @@ import iscc_sdk as idk
 from blake3 import blake3
 
 
-class Iscc_Code(ApiController, FileHandler):
+class Iscc(ApiController, FileHandler):
     @classmethod
     def version(cls) -> str:
         return "v1"
 
     @get("{mid:media_id}")
-    async def get_iscc_code(self, media_id: str):
+    async def get_iscc(self, media_id: str):
         """Get previously calculated ISCC-CODE for media file."""
         try:
             async with aiofile.async_open(self.iscc_path(media_id), "rb") as infile:
@@ -35,7 +35,7 @@ class Iscc_Code(ApiController, FileHandler):
         )
 
     @post()
-    async def create_iscc_code(self, request: Request, pool: Pool):
+    async def create_iscc(self, request: Request, pool: Pool):
         """Upload and create ISCC-CODE for media asset."""
 
         # Read and check header data

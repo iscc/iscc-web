@@ -15,6 +15,7 @@ app.serve_files(STATIC / "docs", root_path="/docs", extensions={".html", ".yaml"
 app.serve_files(STATIC / "images", root_path="/images")
 app.services.add_singleton(Pool)
 Route.value_patterns["mid"] = r"[a-v0-9]{13}$"
+Route.value_patterns["iscc"] = r"ISCC:[A-Z2-7]{10,73}$"
 
 
 def main():

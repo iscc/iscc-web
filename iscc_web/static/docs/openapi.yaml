@@ -12,6 +12,8 @@ tags:
   description: Upload, download or delete media files.
 - name: metadata
   description: Extract or embed metadata in media files.
+- name: explain
+  description: Decompose ISCC and return various representations.
 paths:
   /iscc:
     post:
@@ -208,6 +210,24 @@ paths:
           description: Bad Request
         404:
           description: Not Found
+  /explain/{iscc}:
+    get:
+      operationId: explain-iscc
+      summary: Explain ISCC
+      description: Decomposes and shows the structure of an ISCC
+      tags:
+      - explain
+      parameters:
+      - name: iscc
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/BasicMetadata/properties/iscc'
+      responses:
+        200:
+          description: Ok
+        400:
+          description: Bad Request
 components:
   schemas:
     MediaID:

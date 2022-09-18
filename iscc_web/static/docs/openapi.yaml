@@ -4,7 +4,7 @@ info:
   description: Simple ISCC Generator Service
   version: 0.1.0
 servers:
-- url: http://localhost:8000/api/v1
+- url: /api/v1
 tags:
 - name: iscc
   description: Create standard ISCCs from media files.

@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
-import asyncio
-from subprocess import CalledProcessError
 import aiofile
 from blacksheep import Request, ContentDispositionType, Response
 from blacksheep.server.controllers import ApiController, post, get
 from iscc_web.options import opts
 from iscc_web.api.pool import Pool
 from iscc_web.api.mixins import FileHandler
-import iscc_sdk as idk
 
 
 class Iscc(ApiController, FileHandler):
@@ -40,25 +37,13 @@ class Iscc(ApiController, FileHandler):
         package_dir = self.package_dir(result.media_id)
         file_path = package_dir / result.clean_file_name
 
-        # Process ISCC
-        loop = asyncio.get_event_loop()
-        try:
-            iscc_obj = await loop.run_in_executor(
-                pool.executor, idk.code_iscc, file_path.as_posix()
-            )
-        except CalledProcessError:
-            return self.status_code(422, "ISCC processsing error.")
-        except idk.IsccUnsupportedMediatype:
-            return self.status_code(422, "ISCC unsupported mediatype.")
-
-        # Store ISCC processing result
-        result_path = package_dir / f"{result.media_id}.iscc.json"
-        async with aiofile.async_open(result_path, "wb") as outfile:
-            await outfile.write(iscc_obj.json(indent=2).encode("utf-8"))
+        proc_result = await self.process_iscc(file_path)
+        if isinstance(proc_result, Response):
+            return proc_result
 
         # Create response
         location_header = f"/api/v1/media/{result.media_id}".encode("ascii")
         location = f"{opts.base_url}/media/{result.media_id}"
-        iscc_obj.media_id = result.media_id
-        iscc_obj.content = location
-        return self.created(location=location_header, value=iscc_obj.dict(skip_defaults=False))
+        proc_result.media_id = result.media_id
+        proc_result.content = location
+        return self.created(location=location_header, value=proc_result.dict(skip_defaults=False))

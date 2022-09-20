@@ -1,16 +1,22 @@
 # -*- coding: utf-8 -*-
+import asyncio
 import base64
 import binascii
 from pathlib import Path
+from subprocess import CalledProcessError
 from blacksheep import Request, Response
 from blake3 import blake3
+from iscc_sdk import IsccMeta
 from iscc_web import opts
+from iscc_web.api.pool import Pool
 from iscc_web.api.models import UploadMeta
 import iscc_core as ic
 import shutil
 from aiofiles.os import wrap, mkdir, rename
 import aiofile
 from typing import Tuple, Union
+from iscc_web.main import app
+import iscc_sdk as idk
 
 
 copyfile = wrap(shutil.copyfile)
@@ -84,7 +90,17 @@ class FileHandler:
         - Returns either UploadMeta on success or Response on failure
         """
         # Read and check header data
-        file_name_base64 = request.get_single_header(b"X-Upload-Filename")
+        content_length = request.get_first_header(b"Content-Length")
+        if content_length:
+            cl = int(content_length)
+            if cl < 1 or cl > opts.max_upload_size:
+                return self.status_code(
+                    400, f"Bad Request - Content-Length must be > 0 and < {opts.max_upload_size}"
+                )
+
+        file_name_base64 = request.get_first_header(b"X-Upload-Filename")
+        if not file_name_base64:
+            return self.status_code(400, "Bad Request - Missing header X-Upload-Filename.")
         try:
             file_name_data = base64.b64decode(file_name_base64, validate=True)
         except binascii.Error:
@@ -125,3 +141,24 @@ class FileHandler:
                 await outfile.write(chunk)
 
         return upload_meta
+
+    async def process_iscc(self, file_path: Path) -> Union[IsccMeta, Response]:
+        """Process an ISCC for file at `file_path`."""
+
+        loop = asyncio.get_event_loop()
+        pool = app.service_provider[Pool]
+        try:
+            iscc_obj = await loop.run_in_executor(
+                pool.executor, idk.code_iscc, file_path.as_posix()
+            )
+        except CalledProcessError:
+            return self.status_code(422, "ISCC processsing error.")
+        except idk.IsccUnsupportedMediatype:
+            return self.status_code(422, "ISCC unsupported mediatype.")
+
+        # Store ISCC processing result
+        result_path = file_path.parent / f"{file_path.parent.name}.iscc.json"
+        async with aiofile.async_open(result_path, "wb") as outfile:
+            await outfile.write(iscc_obj.json(indent=2).encode("utf-8"))
+
+        return iscc_obj

@@ -12,6 +12,8 @@ tags:
   description: Upload, download or delete media files.
 - name: metadata
   description: Extract or embed metadata in media files.
+- name: explain
+  description: Decompose ISCC and return various representations.
 paths:
   /iscc:
     post:
@@ -208,6 +210,28 @@ paths:
           description: Bad Request
         404:
           description: Not Found
+  /explain/{iscc}:
+    get:
+      operationId: explain-iscc
+      summary: Explain ISCC
+      description: Decomposes and shows the structure of an ISCC
+      tags:
+      - explain
+      parameters:
+      - name: iscc
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Iscc'
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IsccDetail'
+        400:
+          description: Bad Request
 components:
   schemas:
     MediaID:
@@ -217,6 +241,14 @@ components:
       maxLength: 13
       pattern: '[a-v0-9]{13}$'
       example: 061kcmrj55fi8
+    Iscc:
+      type: string
+      description: An **ISCC** in canonical representation. This is the minimal required field
+        for a valid ISCC Metadata object.
+      example: ISCC:KACYPXW445FTYNJ3CYSXHAFJMA2HUWULUNRFE3BLHRSCXYH2M5AEGQY
+      minLength: 15
+      maxLength: 73
+      pattern: ^ISCC:[A-Z2-7]{10,73}$
     UploadResponse:
       description: Information required to download the newly created media resource.
       type: object
@@ -259,13 +291,7 @@ components:
           example: http://purl.org/iscc/schema/0.4.0.json
           description: The [JSON Schema](https://json-schema.org/) URI for ISCC metadata.
         iscc:
-          type: string
-          description: An **ISCC** in canonical representation. This is the minimal required
-            field for a valid ISCC Metadata object.
-          example: ISCC:KACYPXW445FTYNJ3CYSXHAFJMA2HUWULUNRFE3BLHRSCXYH2M5AEGQY
-          minLength: 15
-          maxLength: 73
-          pattern: ^ISCC:[A-Z2-7]{10,73}$
+          $ref: '#/components/schemas/Iscc'
     InlineMetadata:
       type: object
       description: Metadata intended to be embedded into the media asset.
@@ -375,3 +401,48 @@ components:
           type: string
           format: uri
           example: https://picsum.photos/200/300.jpg
+    IsccDetail:
+      type: object
+      description: Detailed decomposition of an ISCC
+      properties:
+        iscc:
+          $ref: '#/components/schemas/Iscc'
+        readable:
+          description: Human readable version of ISCC
+          type: string
+          example: ISCC-VIDEO-V0-MSDI-c8a70639eb1167b367a9c3787c65c1e582e2e662f728b4fa42485e3a0a5d2f34
+        multiformat:
+          description: Multiformats representation base64url representation of ISCC
+          type: string
+          example: uzAFTBsinBjnrEWezZ6nDeHxlweWC4uZi9yi0-kJIXjoKXS80
+        decomposed:
+          description: ISCC decomomposed into a dash seperated secquence of ISCC-UNITs
+          type: string
+          example: AAA4RJYGHHVRCZ5T-CMAWPKODPB6GLQPF-GAAYFYXGML3SRNH2-IAAUESC6HIFF2LZU
+        units:
+          description: Different representations of the individial units of the ISCC
+          type: array
+          items:
+            type: object
+            description: An ISCC-UNIT in different representations
+            properties:
+              iscc_unit:
+                description: Canonical representation of ISCC-UNIT
+                type: string
+                example: ISCC:AAA4RJYGHHVRCZ5T
+              readable:
+                description: Human readable version of ISCC-UNIT
+                type: string
+                example: META-NONE-V0-64-c8a70639eb1167b3
+              hash_hex:
+                description: Hex representation of ISCC-BODY
+                type: string
+                example: e1fb7dc4e3dbb4be
+              hash_uint:
+                description: Unsigned integer representation of ISCC-BODY
+                type: string
+                example: '16283747162278048958'
+              hash_bits:
+                description: Bitpattern of ISCC-BODY
+                type: string
+                example: "1110000111111011011111011100010011100011110110111011010010111110"

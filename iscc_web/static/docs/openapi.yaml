@@ -176,7 +176,10 @@ paths:
     post:
       operationId: embed-metadata
       summary: Embed Metadata
-      description: Embed metadata into media file.
+      description: Embed metadata into media file and reproccess ISCC. The original media
+        file will not be modified. Instead a copy is created with a new `media_id`. The link
+        to the new media file is in the `content` field of the response. **You should offer
+        the user a way to download the new media file that has the metadata embedded**.
       tags:
       - metadata
       parameters:
@@ -205,11 +208,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UploadResponse'
+                $ref: '#/components/schemas/IsccMetadata'
         400:
           description: Bad Request
         404:
           description: Not Found
+        422:
+          description: Unprocessable Entity - ISCC processsing error.
   /explain/{iscc}:
     get:
       operationId: explain-iscc
@@ -263,6 +268,7 @@ components:
       description: '[ISCC Metadata](https://schema.iscc.codes) (JSON-LD)'
       allOf:
       - $ref: '#/components/schemas/BasicMetadata'
+      - $ref: '#/components/schemas/UploadResponse'
       - $ref: '#/components/schemas/InlineMetadata'
       - $ref: '#/components/schemas/TechnicalMetadata'
     BasicMetadata:

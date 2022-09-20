@@ -233,5 +233,5 @@ class IsccDetail(BaseModel):
     )
 
 
-class IsccMetadata(BasicMetadata, InlineMetadata, TechnicalMetadata):
+class IsccMetadata(BasicMetadata, UploadResponse, InlineMetadata, TechnicalMetadata):
     pass

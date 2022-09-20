@@ -13,9 +13,10 @@ class IsccWebOptions(BaseSettings):
         env_prefix = "ISCC_WEB_"
         env_file_encoding = "utf-8"
 
+    environment: str = "development"
     scheme: str = "http"
     host: str = "localhost"
-    port: Optional[str] = "8000"
+    port: str = "8000"
     media_path: Path = HERE.parent.absolute() / "media"
     max_upload_size: int = 1_073_741_824  # 1 GB
     io_read_size: int = 2_097_152  # 2 MB

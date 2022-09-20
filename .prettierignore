@@ -1,0 +1,4 @@
+.pytest_cache
+iscc_web/static/dist
+media/
+pnpm-lock.yaml

@@ -205,7 +205,7 @@ class Unit(BaseModel):
     hash_bits: Optional[str] = Field(
         None,
         description="Bitpattern of ISCC-BODY",
-        example=1110000111111011011111011100010011100011110110111011010010111110,
+        example="1110000111111011011111011100010011100011110110111011010010111110",
     )
 
 
@@ -233,5 +233,5 @@ class IsccDetail(BaseModel):
     )
 
 
-class IsccMetadata(BasicMetadata, InlineMetadata, TechnicalMetadata):
+class IsccMetadata(BasicMetadata, UploadResponse, InlineMetadata, TechnicalMetadata):
     pass

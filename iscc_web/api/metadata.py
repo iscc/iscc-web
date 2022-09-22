@@ -1,6 +1,7 @@
 import asyncio
 
 from aiofiles.ospath import exists
+from blacksheep import Response
 from blacksheep.server.controllers import ApiController, get, post
 from iscc_web.api.schema import InlineMetadata
 from iscc_web.api.pool import Pool
@@ -47,30 +48,40 @@ class Metadata(ApiController, FileHandler):
         """Embed metadata in media file.
 
         TODO: Can only be called by original uploader
-        TODO: Should return a list of actually embedded fields
         """
         try:
-            file_path = await self.file_path(media_id)
+            upload_meta = await self.read_meta(media_id)
         except FileNotFoundError:
             return self.not_found("File metadata not found")
 
+        file_path = self.package_dir(media_id) / upload_meta.clean_file_name
         if not await exists(file_path):
             return self.not_found("File not found")
 
-        # embed metadata
+        # Embed metadata
         loop = asyncio.get_event_loop()
-        genfile = await loop.run_in_executor(pool.executor, idk.embed_metadata, file_path, meta)
+        try:
+            genfile = await loop.run_in_executor(pool.executor, idk.embed_metadata, file_path, meta)
+        except Exception as e:
+            return self.status_code(422, f"Unprocessable Entity - Failed to embed metadata {e}")
 
-        # move to new media file
+        # Move to new media file
         new_media_id, media_dir = await self.create_package()
-        outfile = media_dir / file_path.name
-        await self.move_file(genfile, outfile)
+        new_file_path = media_dir / upload_meta.clean_file_name
+        await self.move_file(genfile, new_file_path)
 
-        # copy upload metadata
-        src, dst = self.meta_path(media_id), self.meta_path(new_media_id)
-        await self.copy_file(src, dst)
+        # Store upload metadata for new file
+        upload_meta.media_id = new_media_id
+        await self.write_meta(new_media_id, upload_meta)
+
+        # Process ISCC for new media file
+        proc_result = await self.process_iscc(new_file_path)
+        if isinstance(proc_result, Response):
+            return proc_result
+
+        # Create response
         location = f"{opts.base_url}/media/{new_media_id}"
         location_header = f"/api/v1/media/{new_media_id}".encode("ascii")
-        return self.created(
-            location=location_header, value={"content": location, "media_id": new_media_id}
-        )
+        proc_result.media_id = new_media_id
+        proc_result.content = location
+        return self.created(location=location_header, value=proc_result.dict(skip_defaults=False))

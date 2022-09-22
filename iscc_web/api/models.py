@@ -4,6 +4,7 @@ from pathvalidate import sanitize_filename
 
 
 class UploadMeta(BaseModel):
+    media_id: str
     file_name: str
     content_type: str
     user: str

@@ -1,12 +1,23 @@
 # -*- coding: utf-8 -*-
+import asyncio
+import base64
+import binascii
 from pathlib import Path
+from subprocess import CalledProcessError
+from blacksheep import Request, Response
+from blake3 import blake3
+from iscc_sdk import IsccMeta
 from iscc_web import opts
+from iscc_web.api.pool import Pool
 from iscc_web.api.models import UploadMeta
 import iscc_core as ic
 import shutil
 from aiofiles.os import wrap, mkdir, rename
 import aiofile
-from typing import Tuple
+from typing import Tuple, Union
+from iscc_web.main import app
+import iscc_sdk as idk
+
 
 copyfile = wrap(shutil.copyfile)
 rmtree = wrap(shutil.rmtree)
@@ -67,3 +78,87 @@ class FileHandler:
     async def copy_file(src, dst):
         """Copy file from source to destination"""
         await copyfile(src, dst)
+
+    async def handle_upload(self, request: Request) -> Union[UploadMeta, Response]:
+        """
+        Handle file upload.
+
+        - Validates header data
+        - Creates a new package dir as upload location
+        - Stores upload metadata from the header in the package directory
+        - Stores the upload file in the package directory
+        - Returns either UploadMeta on success or Response on failure
+        """
+        # Read and check header data
+        content_length = request.get_first_header(b"Content-Length")
+        if content_length:
+            cl = int(content_length)
+            if cl < 1 or cl > opts.max_upload_size:
+                return self.status_code(
+                    400, f"Bad Request - Content-Length must be > 0 and < {opts.max_upload_size}"
+                )
+
+        file_name_base64 = request.get_first_header(b"X-Upload-Filename")
+        if not file_name_base64:
+            return self.status_code(400, "Bad Request - Missing header X-Upload-Filename.")
+        try:
+            file_name_data = base64.b64decode(file_name_base64, validate=True)
+        except binascii.Error:
+            return self.status_code(400, "Bad Request - X-Upload-Filename is not base64.")
+
+        try:
+            file_name = file_name_data.decode("utf-8", "strict")
+        except UnicodeDecodeError:
+            return self.status_code(400, "Bad Request - X-Uploaded-Filename is not UTF-8 encoded")
+
+        if not file_name:
+            return self.status_code(400, "Bad Request - X-Upload-Filename is empty")
+
+        try:
+            content_type = request.content_type().decode("ascii")
+        except AttributeError:
+            content_type = ""
+
+        # TODO check Content-Length
+
+        # Create package directory
+        media_id, package_dir = await self.create_package()
+
+        # Store file metadata
+        user = blake3(request.client_ip.encode("ascii")).hexdigest()
+        upload_meta = UploadMeta(
+            media_id=media_id,
+            file_name=file_name,
+            content_type=content_type,
+            user=user,
+        )
+        await self.write_meta(media_id, upload_meta)
+
+        # Store file upload
+        file_path = package_dir / upload_meta.clean_file_name
+        async with aiofile.async_open(file_path, "wb") as outfile:
+            async for chunk in request.stream():
+                await outfile.write(chunk)
+
+        return upload_meta
+
+    async def process_iscc(self, file_path: Path) -> Union[IsccMeta, Response]:
+        """Process an ISCC for file at `file_path`."""
+
+        loop = asyncio.get_event_loop()
+        pool = app.service_provider[Pool]
+        try:
+            iscc_obj = await loop.run_in_executor(
+                pool.executor, idk.code_iscc, file_path.as_posix()
+            )
+        except CalledProcessError:
+            return self.status_code(422, "ISCC processsing error.")
+        except idk.IsccUnsupportedMediatype:
+            return self.status_code(422, "ISCC unsupported mediatype.")
+
+        # Store ISCC processing result
+        result_path = file_path.parent / f"{file_path.parent.name}.iscc.json"
+        async with aiofile.async_open(result_path, "wb") as outfile:
+            await outfile.write(iscc_obj.json(indent=2).encode("utf-8"))
+
+        return iscc_obj

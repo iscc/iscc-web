@@ -14,21 +14,27 @@ jobs:
           push: false
           load: true
           tags: |
-            ghcr.io/iscc/iscc-service-generator:${{ github.sha }}
+            ghcr.io/iscc/iscc-web:${{ github.sha }}
           cache-from: type=gha,scope=app
           cache-to: type=gha,scope=app,mode=max
       - name: Fetch index
         run: |
           # start container
-          container_id=$(docker run --rm -d -p 8000:8000 ghcr.io/iscc/iscc-web:${{ github.sha }})
+          docker run --name=iscc-web -d -p 8000:8000 ghcr.io/iscc/iscc-web:${{ github.sha }}
+
+          cleanup() {
+            docker logs iscc-web
+            docker kill iscc-web
+          }
+          trap cleanup EXIT INT TERM
 
           # check if the service returns HTTP 200
-          curl -o /dev/null -w "%{http_code}" \
-            --connect-timeout 5 \
-            --max-time 10 \
-            --retry 5 \
-            --retry-delay 5 \
-            --retry-max-time 40 \
-            --retry-all-errors http://localhost:8000 | grep '^200$'
+          wget --retry-connrefused --waitretry=1 --read-timeout=1 --timeout=1 -t 10 http://localhost:8000
 
-          docker kill $container_id
+          if [ $? = 0 ]; then
+            echo "Fetching index successful"
+          else
+            echo "Fetching index failed!"
+            exit 1
+          fi
+

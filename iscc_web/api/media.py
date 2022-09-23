@@ -2,7 +2,8 @@ import aiofiles
 from aiofiles.ospath import exists
 from blacksheep import Request, Response
 from blacksheep.server.controllers import ApiController, post, get, delete
-from iscc_web import opts
+from iscc_web.options import opts
+from iscc_web.api.common import base_url
 from iscc_web.api.mixins import FileHandler
 
 
@@ -22,7 +23,7 @@ class Media(ApiController, FileHandler):
         media_id = result.media_id
 
         location_header = f"/api/v1/media/{media_id}".encode("ascii")
-        location = f"{opts.base_url}/media/{media_id}"
+        location = f"{base_url(request)}/media/{media_id}"
 
         return self.created(
             location=location_header, value={"content": location, "media_id": media_id}

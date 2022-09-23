@@ -1,12 +1,12 @@
 import asyncio
 
 from aiofiles.ospath import exists
-from blacksheep import Response
+from blacksheep import Response, Request
 from blacksheep.server.controllers import ApiController, get, post
+from iscc_web.api.common import base_url
 from iscc_web.api.schema import InlineMetadata
 from iscc_web.api.pool import Pool
 from iscc_web.api.mixins import FileHandler
-from iscc_web.options import opts
 import iscc_sdk as idk
 
 
@@ -44,9 +44,8 @@ class Metadata(ApiController, FileHandler):
         return self.json(obj.dict(exclude_none=True))
 
     @post("{mid:media_id}")
-    async def embed(self, media_id: str, meta: InlineMetadata, pool: Pool):
+    async def embed(self, request: Request, media_id: str, meta: InlineMetadata, pool: Pool):
         """Embed metadata in media file.
-
         TODO: Can only be called by original uploader
         """
         try:
@@ -80,7 +79,7 @@ class Metadata(ApiController, FileHandler):
             return proc_result
 
         # Create response
-        location = f"{opts.base_url}/media/{new_media_id}"
+        location = f"{base_url(request)}/media/{new_media_id}"
         location_header = f"/api/v1/media/{new_media_id}".encode("ascii")
         proc_result.media_id = new_media_id
         proc_result.content = location

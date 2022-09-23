@@ -5,6 +5,7 @@ from blacksheep.server.controllers import ApiController, post, get
 from iscc_web.options import opts
 from iscc_web.api.pool import Pool
 from iscc_web.api.mixins import FileHandler
+from iscc_web.api.common import base_url
 
 
 class Iscc(ApiController, FileHandler):
@@ -43,7 +44,7 @@ class Iscc(ApiController, FileHandler):
 
         # Create response
         location_header = f"/api/v1/media/{result.media_id}".encode("ascii")
-        location = f"{opts.base_url}/media/{result.media_id}"
+        location = f"{base_url(request)}/media/{result.media_id}"
         proc_result.media_id = result.media_id
         proc_result.content = location
         return self.created(location=location_header, value=proc_result.dict(skip_defaults=False))

@@ -21,13 +21,5 @@ class IsccWebOptions(BaseSettings):
     max_upload_size: int = 1_073_741_824  # 1 GB
     io_read_size: int = 2_097_152  # 2 MB
 
-    @property
-    def base_url(self):
-        url = f"{self.scheme}://{self.host}"
-        if self.port:
-            url = f"{url}:{self.port}"
-        url = f"{url}/api/v1"
-        return url
-
 
 opts = IsccWebOptions()

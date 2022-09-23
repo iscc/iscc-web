@@ -1,0 +1,4 @@
+ignored:
+  - DL3008  # We don't want to pin apt package versions
+  - DL3016  # We don't want to pin npm package versions
+

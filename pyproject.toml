@@ -16,6 +16,8 @@ iscc_sdk = "*"
 httpx = "^0.23.0"
 pathvalidate = "^2.5.2"
 aiofile = "^3.8.1"
+jinja2-simple-tags = "^0.4.0"
+gunicorn = "^20.1.0"
 
 [tool.poetry.scripts]
 iscc-web = 'iscc_web.main:main'

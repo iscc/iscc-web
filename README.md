@@ -1,5 +1,19 @@
 # iscc-web - Minimal ISCC Generator Web Application
 
+# Configuration
+
+Configuration is handled by environment variables:
+
+**Backend:**
+
+-   `ISCC_WEB_HOST`: defines on which host the HTTP server will bind to (default: localhost)
+-   `ISCC_WEB_PORT`: the port the HTTP server will bind to (default: 8000)
+-   `ISCC_WEB_ENVIRONMENT`: `development` or `production` (default: `development`)
+-   `ISCC_WEB_PRIVATE_FILES`: restrict file downloads to original uploader (default: true)
+
+The production Dockerfile also supports `PORT` to configure gunicorns default port. (see [gunicorn
+docs](https://docs.gunicorn.org/en/stable/settings.html?highlight=PORT#bind) for details)
+
 # Development
 
 Both the backend and frontend servers need to run in parallel.

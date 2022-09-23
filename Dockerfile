@@ -74,8 +74,8 @@ ENV PYTHONUNBUFFERED=1
 ENV PATH="/venv/bin:$PATH"
 ENV VIRTUAL_ENV=/venv
 
-ENV ISCC_WEB_HOST=0.0.0.0
 ENV ISCC_WEB_ENVIRONMENT=production
+ENV PORT=8000
 
 COPY --from=prod-build /root/.local/share/iscc-sdk /root/.local/share/iscc-sdk
 COPY --from=prod-build /root/.ipfs /root/.ipfs
@@ -86,4 +86,4 @@ WORKDIR /app
 
 EXPOSE 8000/tcp
 
-CMD ["poetry", "run", "gunicorn", "iscc_web.main:app", "--bind=0.0.0.0:8000", "-k", "uvicorn.workers.UvicornWorker"]
+CMD ["gunicorn", "iscc_web.main:app", "-k", "uvicorn.workers.UvicornWorker"]

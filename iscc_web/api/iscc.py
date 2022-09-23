@@ -2,7 +2,6 @@
 import aiofile
 from blacksheep import Request, ContentDispositionType, Response
 from blacksheep.server.controllers import ApiController, post, get
-from iscc_web.options import opts
 from iscc_web.api.pool import Pool
 from iscc_web.api.mixins import FileHandler
 from iscc_web.api.common import base_url

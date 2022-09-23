@@ -86,4 +86,4 @@ WORKDIR /app
 
 EXPOSE 8000/tcp
 
-CMD ["python", "-m", "iscc_web.main"]
+CMD ["poetry", "run", "gunicorn", "iscc_web.main:app", "--bind=0.0.0.0:8000", "-k", "uvicorn.workers.UvicornWorker"]

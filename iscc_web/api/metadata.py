@@ -1,5 +1,5 @@
 import asyncio
-
+from blake3 import blake3
 from aiofiles.ospath import exists
 from blacksheep import Response, Request
 from blacksheep.server.controllers import ApiController, get, post
@@ -7,6 +7,7 @@ from iscc_web.api.common import base_url
 from iscc_web.api.schema import InlineMetadata
 from iscc_web.api.pool import Pool
 from iscc_web.api.mixins import FileHandler
+from iscc_web.options import opts
 import iscc_sdk as idk
 
 
@@ -45,13 +46,15 @@ class Metadata(ApiController, FileHandler):
 
     @post("{mid:media_id}")
     async def embed(self, request: Request, media_id: str, meta: InlineMetadata, pool: Pool):
-        """Embed metadata in media file.
-        TODO: Can only be called by original uploader
-        """
+        """Embed metadata in media file."""
         try:
             upload_meta = await self.read_meta(media_id)
         except FileNotFoundError:
             return self.not_found("File metadata not found")
+
+        if opts.private_files:
+            if upload_meta.user != blake3(request.client_ip.encode("ascii")).hexdigest():
+                return self.forbidden("Forbidden - Only accessible by original uploader.")
 
         file_path = self.package_dir(media_id) / upload_meta.clean_file_name
         if not await exists(file_path):

@@ -1,4 +1,3 @@
-import os
 from multiprocessing import Process
 from time import sleep
 import pytest
@@ -10,6 +9,7 @@ import os
 os.environ["ISCC_WEB_SCHEME"] = "http"
 os.environ["ISCC_WEB_HOST"] = "localhost"
 os.environ["ISCC_WEB_PORT"] = "44555"
+os.environ["ISCC_WEB_PRIVATE_FILES"] = "false"
 
 
 server_host = "localhost"

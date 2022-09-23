@@ -9,6 +9,7 @@ Configuration is handled by environment variables:
 - `ISCC_WEB_HOST`: defines on which host the HTTP server will bind to (default: localhost)
 - `ISCC_WEB_PORT`: the port the HTTP server will bind to (default: 8000)
 - `ISCC_WEB_ENVIRONMENT`: `development` or `production` (default: `development`)
+- `ISCC_WEB_PRIVATE_FILES`: restrict file downloads to original uploader (default: true)
 
 # Development
 

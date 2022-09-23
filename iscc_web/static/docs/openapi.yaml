@@ -133,6 +133,10 @@ paths:
       responses:
         200:
           description: Ok
+        403:
+          description: Forbidden - If the server is configured with `ISCC_WEB_PRIVATE_FILES=true`
+            you will get a 403 Forbidden error if you try to download a file that was not
+            uploaded by you.
         404:
           description: File not found
     delete:
@@ -149,6 +153,8 @@ paths:
       responses:
         204:
           description: No Content
+        403:
+          description: Forbidden
         404:
           description: File not found
   /metadata/{media_id}:
@@ -211,6 +217,8 @@ paths:
                 $ref: '#/components/schemas/IsccMetadata'
         400:
           description: Bad Request
+        403:
+          description: Forbidden
         404:
           description: Not Found
         422:

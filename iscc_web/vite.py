@@ -79,7 +79,7 @@ def register_extensions(app):
 
 
 def generate_script_tag(src):
-    return f'<script type="module" src="{src}"></script>'
+    return f'<script type="module" crossorigin="" src="{src}"></script>'
 
 
 def generate_stylesheet_tag(href):

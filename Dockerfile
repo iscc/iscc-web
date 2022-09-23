@@ -81,6 +81,7 @@ COPY --from=prod-build /root/.local/share/iscc-sdk /root/.local/share/iscc-sdk
 COPY --from=prod-build /root/.ipfs /root/.ipfs
 COPY --from=prod-build /app /app
 COPY --from=prod-build /venv /venv
+COPY --from=frontend-build /app/iscc_web/static/dist /app/iscc_web/static/dist
 
 WORKDIR /app
 

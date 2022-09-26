@@ -5,6 +5,7 @@ from blacksheep.server.controllers import ApiController, post, get
 from iscc_web.api.pool import Pool
 from iscc_web.api.mixins import FileHandler
 from iscc_web.api.common import base_url
+from loguru import logger as log
 
 
 class Iscc(ApiController, FileHandler):
@@ -37,6 +38,7 @@ class Iscc(ApiController, FileHandler):
         package_dir = self.package_dir(result.media_id)
         file_path = package_dir / result.clean_file_name
 
+        log.debug(f"Processing: {result.clean_file_name}", enqueue=True)
         proc_result = await self.process_iscc(file_path)
         if isinstance(proc_result, Response):
             return proc_result

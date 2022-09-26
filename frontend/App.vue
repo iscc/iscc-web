@@ -6,16 +6,25 @@ import vueLogo from "./assets/vue.svg";
 import viteLogo from "./assets/vite.svg";
 </script>
 
-<template>
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img :src="viteLogo" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img :src="vueLogo" class="logo vue" alt="Vue logo" />
-    </a>
-  </div>
-  <HelloWorld msg="Vite + Vue" />
+<template lang="pug">
+.container
+  .row
+    .col.text-center
+      a(
+        href="https://vitejs.dev"
+        target="_blank"
+        v-tooltip="'Vite'"
+      )
+        img.logo(:src="viteLogo" alt="Vite logo")
+      a(
+        href="https://vuejs.org/"
+        target="_blank"
+        v-tooltip="'Vue'"
+      )
+        img.logo.vue(:src="vueLogo" alt="Vue logo")
+  .row
+    .col
+      HelloWorld(msg="Vite + Vue")
 </template>
 
 <style scoped lang="css">

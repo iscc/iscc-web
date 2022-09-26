@@ -24,7 +24,9 @@ class IsccWebOptions(BaseSettings):
     storage_expiry: int = Field(
         3600, description="Number of seconds after which uploaded files are deleted"
     )
-    cleanup_interval: int = Field(600, description="Interval in seconds for running file cleanup")
+    cleanup_interval: int = Field(
+        600, description="Interval in seconds for running file cleanup. Use 0 to deactivate"
+    )
     log_level: str = Field("DEBUG", description="Set logging level")
 
 

@@ -43,34 +43,37 @@ class ViteAssetExtension(StandaloneTag):
             raise RuntimeError(f"Cannot find {asset_path} in manifest at {VITE_MANIFEST_PATH}")
 
         manifest_entry = VITE_MANIFEST[asset_path]
-        tags = []
+        generated_tags = []
 
-        tags.extend(self.__generate_css_tags(asset_path))
+        generated_tags.extend(self.__generate_css_tags(asset_path))
 
-        tags.append(generate_script_tag(urljoin(VITE_STATIC_URL, manifest_entry["file"])))
+        generated_tags.append(generate_script_tag(urljoin(VITE_STATIC_URL, manifest_entry["file"])))
 
-        return "\n".join(tags)
+        return "\n".join(generated_tags)
 
-    def __generate_css_tags(self, asset_path: str, seen_tags=set()):
+    def __generate_css_tags(self, asset_path: str, seen_tags=None):
         if not VITE_MANIFEST or asset_path not in VITE_MANIFEST:
             raise RuntimeError(f"Cannot find {asset_path} in manifest at {VITE_MANIFEST_PATH}")
 
+        if seen_tags is None:
+            seen_tags = set()
+
         manifest_entry = VITE_MANIFEST[asset_path]
-        tags = []
+        generated_tags = []
 
         if "imports" in manifest_entry:
             for import_path in manifest_entry["imports"]:
-                tags.extend(self.__generate_css_tags(import_path, seen_tags))
+                generated_tags.extend(self.__generate_css_tags(import_path, seen_tags))
 
         if "css" in manifest_entry:
             for css_path in manifest_entry["css"]:
                 tag = generate_stylesheet_tag(urljoin(VITE_STATIC_URL, css_path))
 
                 if tag not in seen_tags:
-                    tags.append(tag)
+                    generated_tags.append(tag)
                     seen_tags.add(tag)
 
-        return tags
+        return generated_tags
 
 
 def register_extensions(app):

@@ -1,7 +1,17 @@
 """Common helper functions"""
 from blacksheep import Request
+import shutil
+from aiofiles.os import wrap
 
-__all__ = ["base_url"]
+__all__ = [
+    "copyfile",
+    "rmtree",
+    "base_url",
+]
+
+
+copyfile = wrap(shutil.copyfile)
+rmtree = wrap(shutil.rmtree)
 
 
 def base_url(r: Request) -> str:

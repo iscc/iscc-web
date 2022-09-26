@@ -6,10 +6,13 @@ Configuration is handled by environment variables:
 
 **Backend:**
 
--   `ISCC_WEB_HOST`: defines on which host the HTTP server will bind to (default: localhost)
--   `ISCC_WEB_PORT`: the port the HTTP server will bind to (default: 8000)
--   `ISCC_WEB_ENVIRONMENT`: `development` or `production` (default: `development`)
--   `ISCC_WEB_PRIVATE_FILES`: restrict file downloads to original uploader (default: true)
+-   `ISCC_WEB_HOST`: defines on which host the HTTP server will bind to (default: localhost).
+-   `ISCC_WEB_PORT`: the port the HTTP server will bind to (default: 8000).
+-   `ISCC_WEB_ENVIRONMENT`: `development` or `production` (default: `development`).
+-   `ISCC_WEB_PRIVATE_FILES`: restrict file downloads to original uploader (default: true).
+-   `ISCC_WEB_STORAGE_EXPIRY`: delete uploaded files after x seconds (default 3600).
+-   `ISCC_WEB_CLEANUP_INTERVAL`: interval in seconds to run file cleanup task. Use 0 to deactivate (default: 600).
+-   `ISCC_WEB_LOG_LEVEL`: Set log level (default: `DEBUG`).
 
 The production Dockerfile also supports `PORT` to configure gunicorns default port. (see [gunicorn
 docs](https://docs.gunicorn.org/en/stable/settings.html?highlight=PORT#bind) for details)

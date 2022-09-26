@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import asyncio
 import uvicorn
 from blacksheep import Application, Route
 from blacksheep.server.templating import use_templates
@@ -7,6 +8,8 @@ import pathlib
 from .vite import register_extensions
 from .options import opts
 from iscc_web.api.pool import Pool
+from loguru import logger as log
+from iscc_web.cleanup import cleanup_task
 
 __all__ = ["app"]
 HERE = pathlib.Path(__file__).parent.absolute()
@@ -30,6 +33,37 @@ register_extensions(app)
 @get("/")
 async def index():
     return await view("index", {})
+
+
+async def logging_sink(msg):
+    print(msg, end="")
+
+
+@app.on_start
+async def configure_logging(application: Application) -> None:
+    log.remove()
+    fmt = "{level: <10}{time:YYYY-MM-DDTHH:mm:ss} - {function}:{line} - {message}"
+    log.add(logging_sink, format=fmt, level=opts.log_level)
+
+
+@app.on_start
+async def configure_cleanup(application):
+    if opts.cleanup_interval == 0:
+        log.warning("Upload cleanup deactivated", enqueue=True)
+    else:
+        log.info(
+            f"Install cleanup task with {opts.cleanup_interval} seconds interval", enqueue=True
+        )
+        asyncio.get_event_loop().create_task(cleanup_task())
+
+
+@app.on_stop
+async def shutdown(application) -> None:
+    log.info("Shutdown initiated. Waiting to finish pool", enqueue=True)
+    service = app.service_provider[Pool]
+    service.executor.shutdown(wait=True)
+    log.info("Pool finished", enqueue=True)
+    await log.complete()
 
 
 def main():

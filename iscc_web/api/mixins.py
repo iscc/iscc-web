@@ -11,16 +11,12 @@ from iscc_web import opts
 from iscc_web.api.pool import Pool
 from iscc_web.api.models import UploadMeta
 import iscc_core as ic
-import shutil
-from aiofiles.os import wrap, mkdir, rename
+from aiofiles.os import mkdir, rename
 import aiofile
 from typing import Tuple, Union
 from iscc_web.main import app
 import iscc_sdk as idk
-
-
-copyfile = wrap(shutil.copyfile)
-rmtree = wrap(shutil.rmtree)
+from iscc_web.api.common import rmtree, copyfile
 
 
 class FileHandler:

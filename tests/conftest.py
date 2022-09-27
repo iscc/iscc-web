@@ -31,7 +31,9 @@ def _start_server():
 
 @pytest.fixture(scope="session")
 def api() -> httpx.Client:
-    return httpx.Client(base_url=f"http://{server_host}:{server_port}/{server_api_path}")
+    return httpx.Client(
+        base_url=f"http://{server_host}:{server_port}/{server_api_path}", timeout=None
+    )
 
 
 @pytest.fixture(scope="session", autouse=True)

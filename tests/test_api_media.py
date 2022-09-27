@@ -22,16 +22,15 @@ def test_upload_and_delete_file(api):
     media_id = response.json()["media_id"]
     assert media_id in response.headers.get("location")
 
+    # download
+    response = api.get(f"/media/{media_id}")
+    assert response.status_code == codes.OK
+
     # delete
     response = api.delete(f"/media/{media_id}")
     assert response.status_code == codes.NO_CONTENT
 
 
-def test_download_file(api):
-    response = api.get(f"/media/061knt35ejv6o")
-    assert response.status_code == codes.OK
-
-
 def test_download_missing(api):
-    response = api.get(f"/media/161knt35ejv6o")
+    response = api.get(f"/media/161knt35ej404")
     assert response.status_code == codes.NOT_FOUND

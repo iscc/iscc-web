@@ -8,6 +8,9 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
 
+      - name: Install Taglib
+        run: sudo apt-get install -y libtag1-dev
+
       - name: Install Poetry
         uses: abatilo/actions-poetry@v2.0.0
         with:
@@ -16,5 +19,5 @@ jobs:
       - name: Install Dependencies
         run: poetry install
 
-      - name: Run Tests (Pure Python with coverage)
+      - name: Run Tests
         run: poetry run pytest

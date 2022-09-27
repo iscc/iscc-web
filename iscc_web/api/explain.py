@@ -15,7 +15,7 @@ class Explain(ApiController):
         try:
             norm = ic.iscc_normalize(iscc)
             ic.iscc_validate(norm)
-        except Exception as e:
+        except ValueError as e:
             return self.bad_request(f"Invalid ISCC - {e}")
 
         result = IsccDetail()
@@ -24,9 +24,14 @@ class Explain(ApiController):
         units = []
         for unit in decomposed:
             uc = ic.Code(unit)
+            # TODO should be caught by `iscc_validate` - fix in iscc-core lib (ISCC:CE22222222)
+            try:
+                readable = uc.explain
+            except ValueError as e:
+                return self.bad_request(f"Invalid ISCC - {e}")
             unit = Unit(
                 iscc_unit=f"ISCC:{uc.code}",
-                readable=uc.explain,
+                readable=readable,
                 hash_hex=uc.hash_hex,
                 hash_uint=str(uc.hash_uint),
                 hash_bits=uc.hash_bits,

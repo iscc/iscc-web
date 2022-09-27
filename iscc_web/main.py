@@ -5,8 +5,8 @@ from blacksheep import Application, Route
 from blacksheep.server.templating import use_templates
 from jinja2 import PackageLoader
 import pathlib
-from .vite import register_extensions
-from .options import opts
+from iscc_web.vite import register_extensions
+from iscc_web.options import opts
 from iscc_web.api.pool import Pool
 from loguru import logger as log
 from iscc_web.cleanup import cleanup_task

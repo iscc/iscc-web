@@ -13,10 +13,11 @@ from iscc_web.api.models import UploadMeta
 import iscc_core as ic
 from aiofiles.os import mkdir, rename
 import aiofile
-from typing import Tuple, Union
+from typing import Tuple, Union, Optional
 from iscc_web.main import app
 import iscc_sdk as idk
 from iscc_web.api.common import rmtree, copyfile
+from loguru import logger as log
 
 
 class FileHandler:
@@ -143,14 +144,11 @@ class FileHandler:
 
         loop = asyncio.get_event_loop()
         pool = app.service_provider[Pool]
-        try:
-            iscc_obj = await loop.run_in_executor(
-                pool.executor, idk.code_iscc, file_path.as_posix()
-            )
-        except CalledProcessError:
+        iscc_obj = await loop.run_in_executor(
+            pool.executor, guarded_iscc_processing, file_path.as_posix()
+        )
+        if iscc_obj is None:
             return self.status_code(422, "ISCC processsing error.")
-        except idk.IsccUnsupportedMediatype:
-            return self.status_code(422, "ISCC unsupported mediatype.")
 
         # Store ISCC processing result
         result_path = file_path.parent / f"{file_path.parent.name}.iscc.json"
@@ -158,3 +156,12 @@ class FileHandler:
             await outfile.write(iscc_obj.json(indent=2).encode("utf-8"))
 
         return iscc_obj
+
+
+def guarded_iscc_processing(file_path) -> Optional[IsccMeta]:
+    """Run iscc proccessing in a catchall try/except to protect pool process"""
+    try:
+        return idk.code_iscc(file_path)
+    except Exception as e:
+        log.error(f"ISCC processing error: {e}")
+        return None

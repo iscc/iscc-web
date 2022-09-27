@@ -15,7 +15,8 @@ class Explain(ApiController):
         try:
             norm = ic.iscc_normalize(iscc)
             ic.iscc_validate(norm)
-        except ValueError as e:
+        # TODO remove IndexError with next iscc-core release
+        except (ValueError, IndexError) as e:
             return self.bad_request(f"Invalid ISCC - {e}")
 
         result = IsccDetail()

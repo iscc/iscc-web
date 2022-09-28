@@ -69,8 +69,8 @@ async def shutdown(application) -> None:
 def main():
     uvicorn.run(
         "iscc_web.main:app",
-        host=opts.host,
-        port=int(opts.port),
+        host=opts.site_address.host,
+        port=int(opts.site_address.port),
         log_level="debug",
         reload=True if opts.environment == "development" else False,
         server_header=False,

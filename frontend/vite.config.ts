@@ -16,7 +16,7 @@ export default defineConfig(({ command }) => ({
   build: {
     manifest: true,
     rollupOptions: {
-      input: "frontend/main.ts",
+      input: (command == "build" ? "frontend/" : "") + "main.ts",
     },
     outDir: "../iscc_web/static/dist/",
     emptyOutDir: true,

@@ -3,7 +3,7 @@ import pathlib
 from urllib.parse import urljoin
 from jinja2_simple_tags import StandaloneTag
 from typing import Optional
-from .options import opts
+from iscc_web.options import opts
 
 
 PROJECT_DIR = pathlib.Path(__file__).parent.parent

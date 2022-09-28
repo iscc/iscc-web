@@ -38,9 +38,9 @@ class Iscc(ApiController, FileHandler):
         package_dir = self.package_dir(result.media_id)
         file_path = package_dir / result.clean_file_name
 
-        log.debug(f"Start Processing: {result.media_id}", enqueue=True)
+        log.info(f"Start Processing: {result.media_id}", enqueue=True)
         proc_result = await self.process_iscc(file_path)
-        log.debug(f"Finished Processing: {result.media_id}", enqueue=True)
+        log.info(f"Finished Processing: {result.media_id}", enqueue=True)
 
         if isinstance(proc_result, Response):
             return proc_result

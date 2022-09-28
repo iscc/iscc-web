@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from pathlib import Path
-from pydantic import BaseSettings, Field
+from pydantic import BaseSettings, Field, AnyHttpUrl
 
 
 HERE = Path(__file__).parent.absolute()
@@ -12,9 +12,7 @@ class IsccWebOptions(BaseSettings):
         env_file_encoding = "utf-8"
 
     environment: str = "development"
-    scheme: str = "http"
-    host: str = "localhost"
-    port: str = "8000"
+    site_address: AnyHttpUrl = "http://localhost:8000"
     media_path: Path = HERE.parent.absolute() / "media"
     max_upload_size: int = 1_073_741_824  # 1 GB
     io_read_size: int = 2_097_152  # 2 MB

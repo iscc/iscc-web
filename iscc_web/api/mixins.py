@@ -162,6 +162,6 @@ def guarded_iscc_processing(file_path) -> Optional[IsccMeta]:
     """Run iscc proccessing in a catchall try/except to protect pool process"""
     try:
         return idk.code_iscc(file_path)
-    except Exception as e:
-        log.error(f"ISCC processing error: {e}")
+    except BaseException as e:
+        log.error(f"ISCC processing error: {e}", enqueue=True)
         return None

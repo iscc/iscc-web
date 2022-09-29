@@ -16,7 +16,7 @@ HERE = pathlib.Path(__file__).parent.absolute()
 STATIC = HERE / "static"
 
 
-app = Application(show_error_details=False, debug=True)
+app = Application(show_error_details=opts.debug, debug=opts.debug)
 app.serve_files(STATIC, root_path="/static")
 app.serve_files(STATIC / "docs", root_path="/docs", extensions={".html", ".yaml"})
 app.serve_files(STATIC / "images", root_path="/images")

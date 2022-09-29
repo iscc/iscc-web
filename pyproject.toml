@@ -13,11 +13,12 @@ blacksheep = "^1.2"
 uvicorn = "^0.18"
 aiofiles = "^22.1"
 iscc_sdk = "*"
-httpx = "^0.23.0"
-pathvalidate = "^2.5.2"
-aiofile = "^3.8.1"
-jinja2-simple-tags = "^0.4.0"
-gunicorn = "^20.1.0"
+httpx = "^0.23"
+pathvalidate = "^2.5"
+aiofile = "^3.8"
+jinja2-simple-tags = "^0.4"
+gunicorn = "^20.1"
+sentry-sdk = "^1.9"
 
 [tool.poetry.scripts]
 iscc-web = 'iscc_web.main:main'
@@ -26,10 +27,10 @@ iscc-web = 'iscc_web.main:main'
 pytest = "^7.1"
 black = "^22.8"
 poethepoet = "^0.16"
-pytest-asyncio = "^0.19.0"
-schemathesis = "^3.17.2"
-datamodel-code-generator = "^0.13.1"
-iscc-samples = "^0.4.0"
+pytest-asyncio = "^0.19"
+schemathesis = "^3.17"
+datamodel-code-generator = "^0.13"
+iscc-samples = "^0.4"
 
 [tool.black]
 line-length = 100

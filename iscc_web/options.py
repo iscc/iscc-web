@@ -31,6 +31,20 @@ class IsccWebOptions(BaseSettings):
         600, description="Interval in seconds for running file cleanup. Use 0 to deactivate"
     )
     log_level: str = Field("DEBUG", description="Set logging level")
+    sentry_dsn: Optional[str] = Field(default="", description="Sentry DSN for error reporting")
+
+    @property
+    def debug(self):
+        return self.environment == "development"
 
 
 opts = IsccWebOptions()
+
+if opts.sentry_dsn:
+    import sentry_sdk
+
+    sentry_sdk.init(
+        dsn=opts.sentry_dsn,
+        environment=opts.environment,
+        traces_sample_rate=0,
+    )

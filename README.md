@@ -14,6 +14,8 @@ Configuration is handled by environment variables:
 -   `ISCC_WEB_CLEANUP_INTERVAL`: interval in seconds to run file cleanup task. Use 0 to deactivate (default: 600).
 -   `ISCC_WEB_LOG_LEVEL`: set log level (default: `DEBUG`).
 -   `ISCC_WEB_IO_READ_SIZE`: file read chunk size (default: 2097152).
+-   `ISCC_WEB_SENTRY_DSN`: optional sentry dsn for error reporting (default: emtpy string).
+
 
 The production Dockerfile also supports `PORT` to configure gunicorns default port. (see [gunicorn
 docs](https://docs.gunicorn.org/en/stable/settings.html?highlight=PORT#bind) for details)

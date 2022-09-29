@@ -20,6 +20,7 @@ const uppy = computed(() =>
     .use(XhrUpload, {
       endpoint: "/api/v1/iscc",
       formData: false,
+      timeout: 0,
       headers: (file) => ({ "X-Upload-Filename": Base64.encode(file.name) }),
     })
     .on("upload-success", (_file, response) => {

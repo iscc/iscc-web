@@ -28,7 +28,7 @@ class Iscc(ApiController, FileHandler):
         )
 
     @post()
-    async def create_iscc(self, request: Request, pool: Pool):
+    async def create_iscc(self, request: Request):
         """Upload and create ISCC-CODE for media asset."""
 
         result = await self.handle_upload(request)

@@ -61,7 +61,7 @@ async def configure_cleanup(application):
 async def shutdown(application) -> None:
     log.info("Shutdown initiated. Waiting to finish pool", enqueue=True)
     service = app.service_provider[Pool]
-    service.executor.shutdown(wait=True)
+    service.shutdown(wait=True)
     log.info("Pool finished", enqueue=True)
     await log.complete()
 

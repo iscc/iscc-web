@@ -7,6 +7,7 @@ import "@uppy/dashboard/dist/style.css";
 import Uppy from "@uppy/core";
 import Webcam from "@uppy/webcam";
 import XhrUpload from "@uppy/xhr-upload";
+import UppyDashboard from "@uppy/dashboard";
 import { Base64 } from "js-base64";
 import { computed, onUnmounted } from "vue";
 
@@ -16,6 +17,7 @@ const emit = defineEmits<{
 
 const uppy = computed(() =>
   new Uppy()
+    .use(UppyDashboard)
     .use(Webcam)
     .use(XhrUpload, {
       endpoint: "/api/v1/iscc",

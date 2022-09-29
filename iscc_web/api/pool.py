@@ -14,10 +14,10 @@ class Pool:
             return self._executor.submit(__fn, *args, **kwargs)
         except BrokenProcessPool as e:
             log.error(f"Failed {__fn} pool execution: {e}", enqueue=True)
-            log.info("Restarting pool", enqueue=True)
+            log.info("Restarting pool and retrying", enqueue=True)
             self._executor.shutdown(wait=False, cancel_futures=True)
             self._executor = ProcessPoolExecutor(max_workers=opts.max_workers)
-            return None
+            return self._executor.submit(__fn, *args, **kwargs)
 
     def shutdown(self, wait=True, *, cancel_futures=False):
         return self._executor.shutdown(wait=wait, cancel_futures=cancel_futures)

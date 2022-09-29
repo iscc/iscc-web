@@ -28,7 +28,7 @@ class Metadata(ApiController, FileHandler):
             return self.not_found("File not found")
 
         loop = asyncio.get_event_loop()
-        metadata = await loop.run_in_executor(pool.executor, idk.extract_metadata, file_path)
+        metadata = await loop.run_in_executor(pool, idk.extract_metadata, file_path)
         cleaned = metadata.dict(
             include={
                 "name",
@@ -63,7 +63,7 @@ class Metadata(ApiController, FileHandler):
         # Embed metadata
         loop = asyncio.get_event_loop()
         try:
-            genfile = await loop.run_in_executor(pool.executor, idk.embed_metadata, file_path, meta)
+            genfile = await loop.run_in_executor(pool, idk.embed_metadata, file_path, meta)
         except Exception as e:
             return self.status_code(422, f"Unprocessable Entity - Failed to embed metadata {e}")
 

@@ -3,7 +3,6 @@ import asyncio
 import base64
 import binascii
 from pathlib import Path
-from subprocess import CalledProcessError
 from blacksheep import Request, Response
 from blake3 import blake3
 from iscc_sdk import IsccMeta
@@ -144,9 +143,7 @@ class FileHandler:
 
         loop = asyncio.get_event_loop()
         pool = app.service_provider[Pool]
-        iscc_obj = await loop.run_in_executor(
-            pool.executor, guarded_iscc_processing, file_path.as_posix()
-        )
+        iscc_obj = await loop.run_in_executor(pool, idk.code_iscc, file_path.as_posix())
         if iscc_obj is None:
             return self.status_code(422, "ISCC processsing error.")
 
@@ -156,12 +153,3 @@ class FileHandler:
             await outfile.write(iscc_obj.json(indent=2).encode("utf-8"))
 
         return iscc_obj
-
-
-def guarded_iscc_processing(file_path) -> Optional[IsccMeta]:
-    """Run iscc proccessing in a catchall try/except to protect pool process"""
-    try:
-        return idk.code_iscc(file_path)
-    except BaseException as e:
-        log.error(f"ISCC processing error: {e}", enqueue=True)
-        return None

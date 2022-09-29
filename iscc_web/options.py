@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from pathlib import Path
+from typing import Optional
+
 from pydantic import BaseSettings, Field, AnyHttpUrl
 
 
@@ -14,6 +16,9 @@ class IsccWebOptions(BaseSettings):
     environment: str = "development"
     site_address: AnyHttpUrl = "http://localhost:8000"
     media_path: Path = HERE.parent.absolute() / "media"
+    max_workers: Optional[int] = Field(
+        None, description="Max number of iscc worker processes (defaults to CPU count)"
+    )
     max_upload_size: int = 1_073_741_824  # 1 GB
     io_read_size: int = 2_097_152  # 2 MB
     private_files: bool = Field(

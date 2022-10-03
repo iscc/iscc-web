@@ -1,42 +1,42 @@
 <script setup lang="ts">
-// This starter template is using Vue 3 <script setup> SFCs
-// Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
-import HelloWorld from "./components/HelloWorld.vue";
-import vueLogo from "./assets/vue.svg";
-import viteLogo from "./assets/vite.svg";
+import { ref } from "vue";
+
+import IsccHeader from "./components/IsccHeader.vue";
+import UploadZone from "./components/UploadZone.vue";
+
+const uploadedMediaFiles = ref<Array<Api.IsccMetadata>>([]);
+
+const onUploadSuccess = (isccMetadata: Api.IsccMetadata) => {
+  uploadedMediaFiles.value.push(isccMetadata);
+};
 </script>
 
 <template lang="pug">
-.container
-  .row
-    .col.text-center
-      a(
-        href="https://vitejs.dev"
-        target="_blank"
-        v-tooltip="'Vite'"
-      )
-        img.logo(:src="viteLogo" alt="Vite logo")
-      a(
-        href="https://vuejs.org/"
-        target="_blank"
-        v-tooltip="'Vue'"
-      )
-        img.logo.vue(:src="vueLogo" alt="Vue logo")
-  .row
-    .col
-      HelloWorld(msg="Vite + Vue")
+div
+  IsccHeader.mb-3
+  .container
+    .row
+      .col
+        hr
+  UploadZone(@upload-success="onUploadSuccess")
+  .container
+    .row
+      .col
+        hr
+  .container
+    .row.g-3
+      .col-12.col-lg-6(v-for="isccMetadata in uploadedMediaFiles" :key="isccMetadata.media_id")
+        .card
+          .card-body
+            h5.card-title(v-text="isccMetadata.media_id")
+            h6.card-subtitle.text-muted(v-text="isccMetadata.name" :if="isccMetadata.name")
+            p.card-text.overflow-scroll
+              pre
+                code(v-text="JSON.stringify(isccMetadata, null, 2)")
 </template>
 
-<style scoped lang="css">
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
+<style scoped lang="scss">
+code {
+  font-size: 0.75rem;
 }
 </style>

@@ -3,12 +3,17 @@ import { ref } from "vue";
 
 import IsccHeader from "./components/IsccHeader.vue";
 import UploadZone from "./components/UploadZone.vue";
+import UploadedFile from "./components/UploadedFile.vue";
 
 const uploadedMediaFiles = ref<Array<Api.IsccMetadata>>([]);
 
 const onUploadSuccess = (isccMetadata: Api.IsccMetadata) => {
-  uploadedMediaFiles.value.push(isccMetadata);
+  uploadedMediaFiles.value.unshift(isccMetadata);
 };
+
+const onRemoveUploadedFile = (mediaId: string) => {
+  uploadedMediaFiles.value = uploadedMediaFiles.value.filter((v) => v.media_id !== mediaId);
+}
 </script>
 
 <template lang="pug">
@@ -24,15 +29,9 @@ div
       .col
         hr
   .container
-    .row.g-3
-      .col-12.col-lg-6(v-for="isccMetadata in uploadedMediaFiles" :key="isccMetadata.media_id")
-        .card
-          .card-body
-            h5.card-title(v-text="isccMetadata.media_id")
-            h6.card-subtitle.text-muted(v-text="isccMetadata.name" :if="isccMetadata.name")
-            p.card-text.overflow-scroll
-              pre
-                code(v-text="JSON.stringify(isccMetadata, null, 2)")
+    .row.mb-3(v-for="isccMetadata in uploadedMediaFiles" :key="isccMetadata.media_id")
+      .col
+        UploadedFile(:isccMetadata="isccMetadata" @remove-uploaded-file="onRemoveUploadedFile")
 </template>
 
 <style scoped lang="scss">

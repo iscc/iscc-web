@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/jetbrains-mono": "^4.5.11",
     "@fontsource/readex-pro": "^4.5.10",
     "@popperjs/core": "^2.11.6",
     "@uppy/core": "^3.0.2",

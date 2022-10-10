@@ -1,6 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@fontsource/jetbrains-mono': ^4.5.11
   '@fontsource/readex-pro': ^4.5.10
   '@popperjs/core': ^2.11.6
   '@prettier/plugin-pug': ^2.2.0
@@ -30,6 +31,7 @@ specifiers:
   vue-tsc: ^0.40.4
 
 dependencies:
+  '@fontsource/jetbrains-mono': 4.5.11
   '@fontsource/readex-pro': 4.5.10
   '@popperjs/core': 2.11.6
   '@uppy/core': 3.0.2
@@ -110,6 +112,10 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+
+  /@fontsource/jetbrains-mono/4.5.11:
+    resolution: {integrity: sha512-IW1qgWGkjlN1O6Jf+6LWF9DpcdXhyQEXhTlzfVKrWHX+ProuOT5FcrEAj34AR+19CgAb9Sheda2slORnybBsdw==}
+    dev: false
 
   /@fontsource/readex-pro/4.5.10:
     resolution: {integrity: sha512-+wekULLD/OuJRtyXL0kwRq22gUp9v3aS6TEhYRBYU9hcRlsq716nEn9Ul7KrgyhmGpDoCbjNp/qqc8LFP+1ZTw==}

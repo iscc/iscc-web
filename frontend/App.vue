@@ -13,7 +13,7 @@ const onUploadSuccess = (isccMetadata: Api.IsccMetadata) => {
 
 const onRemoveUploadedFile = (mediaId: string) => {
   uploadedMediaFiles.value = uploadedMediaFiles.value.filter((v) => v.media_id !== mediaId);
-}
+};
 </script>
 
 <template lang="pug">

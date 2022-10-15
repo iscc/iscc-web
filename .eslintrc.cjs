@@ -6,4 +6,5 @@ module.exports = {
   rules: {
     "@typescript-eslint/no-unused-vars": "off",
   },
+  ignorePatterns: ["frontend/vite-env.d.ts"],
 };

@@ -1,20 +1,38 @@
 name: Test Backend
-on: [push, pull_request]
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+# https://github.com/actions/runner-images/issues/6185
+env:
+  PYTHON_KEYRING_BACKEND: keyring.backends.null.Keyring
 
 jobs:
   test_backend:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-
-      - name: Install Taglib
-        run: sudo apt-get install -y libtag1-dev
+      - uses: actions/checkout@v3
 
       - name: Install Poetry
         uses: abatilo/actions-poetry@v2.0.0
         with:
           poetry-version: 1.2.1
+
+      - name: Get python version
+        run: |
+          python_version=$(grep -oP 'python \K(.*)' .tool-versions)
+          echo "PYTHON_VERSION=${python_version}" >> $GITHUB_ENV
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: poetry
+
+      - name: Install Taglib
+        run: sudo apt-get install -y libtag1-dev
 
       - name: Install Dependencies
         run: poetry install

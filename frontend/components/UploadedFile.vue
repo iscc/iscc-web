@@ -1,15 +1,21 @@
 <script setup lang="ts">
+import { computed } from "vue";
+
 const props = defineProps<{
-  isccMetadata: Api.IsccMetadata;
+  file: IsccWeb.FileUpload;
 }>();
 
 const emit = defineEmits<{
-  (e: "remove-uploaded-file", mediaId: string): void;
+  (e: "remove-uploaded-file", file: IsccWeb.FileUpload): void;
 }>();
 
 const onCloseClick = () => {
-  emit("remove-uploaded-file", props.isccMetadata.media_id);
+  emit("remove-uploaded-file", props.file);
 };
+
+const working = computed(() => {
+  return props.file.status !== "PROCESSED";
+});
 </script>
 
 <template lang="pug">
@@ -29,34 +35,44 @@ const onCloseClick = () => {
   .card-body
     .row.g-3
       .col
-        h6.text-muted.mb-3(v-text="isccMetadata.filename")
-        .input-group.mb-3
+        h6.text-muted.mb-3(v-text="file.name")
+    .row.g-3
+      .col-12(v-if="file.status === 'PROCESSING' || file.status === 'UPLOADING'")
+        .progress(style="height: 40px")
+          .progress-bar.progress-bar-striped.progress-bar-animated(
+            style="width: 100%"
+            v-if="file.status === 'PROCESSING'"
+          ) Upload finished, processing...
+          .progress-bar(v-if="file.status === 'UPLOADING'" :style="`width: ${file.progress || 0}%`") Uploading...
+      .col-12(v-if="file.isccMetadata?.iscc")
+        .input-group
           .input-group-text ISCC-CODE
           input.form-control.font-monospace(
             type="text"
             readonly
-            :value="isccMetadata.iscc"
+            :value="file.isccMetadata?.iscc"
           )
-    .row.g-3
-      .col-12.col-md-3(v-if="isccMetadata.thumbnail")
-        img.img-thumbnail(:src="isccMetadata.thumbnail")
-      .col
+      .col-12.col-md-3(v-if="file.isccMetadata?.thumbnail")
+        img.img-thumbnail(:src="file.isccMetadata.thumbnail")
+      .col(v-if="file.isccMetadata")
         .form-floating.mb-3
           input.form-control(
             type="text"
-            :id="`name[${isccMetadata.media_id}]`"
-            :value="isccMetadata.name"
+            :id="`name[${file.id}]`"
+            :value="file.isccMetadata?.name"
+            :disabled="working"
             placeholder="Name"
           )
-          label(:for="`name[${isccMetadata.media_id}]`") Name or title of the work
+          label(:for="`name[${file.id}]`") Name or title of the work
         .form-floating
           input.form-control(
             type="text"
-            :id="`description[${isccMetadata.media_id}]`"
-            :value="isccMetadata.description"
+            :id="`description[${file.id}]`"
+            :value="file.isccMetadata?.description"
+            :disabled="working"
             placeholder="Description"
           )
-          label(:for="`description[${isccMetadata.media_id}]`") Description of the work
+          label(:for="`description[${file.id}]`") Description of the work
 </template>
 
 <style scoped lang="scss">

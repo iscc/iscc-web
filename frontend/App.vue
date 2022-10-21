@@ -53,21 +53,13 @@ const onRemoveUploadedFile = (file: IsccWeb.FileUpload) => {
 <template lang="pug">
 div
   IsccHeader.mb-3
-  .container
-    .row
-      .col
-        hr
   UploadZone(
     @upload-success="onUploadSuccess"
     @upload-progress="onUploadProgress"
     @file-added="onFileAdded"
     @upload-error="onUploadError"
   )
-  .container
-    .row
-      .col
-        hr
-  .container
+  .container.mt-4
     .row.mb-3(v-for="file in uploadedMediaFiles" :key="file.id")
       .col
         UploadedFile(:file="file" @remove-uploaded-file="onRemoveUploadedFile")

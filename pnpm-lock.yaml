@@ -7,7 +7,7 @@ specifiers:
   '@prettier/plugin-pug': ^2.2.0
   '@rushstack/eslint-patch': ^1.2.0
   '@types/bootstrap': ^5.2.5
-  '@types/node': 18.8.0
+  '@types/node': ^18.11.3
   '@uppy/core': ^3.0.2
   '@uppy/dashboard': ^3.1.0
   '@uppy/drag-drop': ^3.0.1
@@ -50,7 +50,7 @@ devDependencies:
   '@prettier/plugin-pug': 2.2.0_prettier@2.7.1
   '@rushstack/eslint-patch': 1.2.0
   '@types/bootstrap': 5.2.5
-  '@types/node': 18.8.0
+  '@types/node': 18.11.3
   '@vitejs/plugin-vue': 3.1.2_vite@3.1.7+vue@3.2.40
   '@volar/vue-language-plugin-pug': 1.0.6
   '@vue/eslint-config-prettier': 7.0.0_znq2sm4m5bonjw4qqm6mwhbe2q
@@ -208,8 +208,8 @@ packages:
     resolution: {integrity: sha512-wOuvG1SN4Us4rez+tylwwwCV1psiNVOkJeM3AUWUNWg/jDQY2+HE/444y5gc+jBmRqASOm2Oeh5c1axHobwRKQ==}
     dev: true
 
-  /@types/node/18.8.0:
-    resolution: {integrity: sha512-u+h43R6U8xXDt2vzUaVP3VwjjLyOJk6uEciZS8OSyziUQGOwmk+l+4drxcsDboHXwyTaqS1INebghmWMRxq3LA==}
+  /@types/node/18.11.3:
+    resolution: {integrity: sha512-fNjDQzzOsZeKZu5NATgXUPsaFaTxeRgFXoosrHivTl8RGeV733OLawXsGfEk9a8/tySyZUyiZ6E8LcjPFZ2y1A==}
     dev: true
 
   /@typescript-eslint/eslint-plugin/5.40.0_25sstg4uu2sk4pm7xcyzuov7xq:

@@ -23,12 +23,11 @@
     "js-base64": "^3.7.2",
     "vue": "^3.2.40"
   },
-  "//": "@types/node:18.8.0 -> https://github.com/vuejs/core/pull/6855",
   "devDependencies": {
     "@prettier/plugin-pug": "^2.2.0",
     "@rushstack/eslint-patch": "^1.2.0",
     "@types/bootstrap": "^5.2.5",
-    "@types/node": "18.8.0",
+    "@types/node": "^18.11.3",
     "@vitejs/plugin-vue": "^3.1.2",
     "@volar/vue-language-plugin-pug": "^1.0.6",
     "@vue/eslint-config-prettier": "^7.0.0",

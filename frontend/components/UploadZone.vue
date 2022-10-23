@@ -50,9 +50,7 @@ const uppy = computed(() =>
 );
 
 onUnmounted(() => {
-  // fix tupes: https://github.com/transloadit/uppy/issues/4126
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (uppy.value.close as any)({ reason: "unmount" });
+  uppy.value.close({ reason: "unmount" });
 });
 
 const onInputChange = () => {

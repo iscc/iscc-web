@@ -3,8 +3,13 @@ declare namespace IsccWeb {
     id: string;
     name: string;
     progress: number;
-    status: "UPLOADING" | "PROCESSING" | "PROCESSED" | "ERROR";
+    status: "UPLOADING" | "PROCESSING" | "PROCESSED" | "UPDATING_METADATA" | "ERROR";
     isccMetadata: Nullable<Api.IsccMetadata>;
     error: Nullable<Error>;
+  }
+
+  export interface MetadataFormData {
+    name: string;
+    description: string;
   }
 }

@@ -67,6 +67,9 @@ class Metadata(ApiController, FileHandler):
         except Exception as e:
             return self.status_code(422, f"Unprocessable Entity - Failed to embed metadata {e}")
 
+        if genfile is None:
+            return self.status_code(422, f"Unprocessable Entity - Failed to embed metadata.")
+
         # Move to new media file
         new_media_id, media_dir = await self.create_package()
         new_file_path = media_dir / upload_meta.clean_file_name

@@ -5,8 +5,22 @@ import IsccHeader from "./components/IsccHeader.vue";
 import UploadZone from "./components/UploadZone.vue";
 import UploadedFile from "./components/UploadedFile.vue";
 import type { UppyFile } from "@uppy/core";
+import { apiService } from "./services/api.service";
 
 const uploadedMediaFiles = ref<Array<IsccWeb.FileUpload>>([]);
+
+const updateUploadedMediaFile = (fileId: string, data: Partial<IsccWeb.FileUpload>) => {
+  uploadedMediaFiles.value = uploadedMediaFiles.value.map((f) => {
+    if (f.id == fileId) {
+      return {
+        ...f,
+        ...data,
+      };
+    }
+
+    return f;
+  });
+};
 
 const onFileAdded = (file: UppyFile) => {
   uploadedMediaFiles.value.unshift({
@@ -20,33 +34,54 @@ const onFileAdded = (file: UppyFile) => {
 };
 
 const onUploadProgress = (file: UppyFile, percentage: number) => {
-  uploadedMediaFiles.value.forEach((f) => {
-    if (f.id == file.id) {
-      f.progress = percentage;
+  const data: Partial<IsccWeb.FileUpload> = {
+    progress: percentage,
+  };
 
-      if (percentage > 99) {
-        f.status = "PROCESSING";
-      }
-    }
+  if (percentage > 99) {
+    data.status = "PROCESSING";
+  }
+
+  updateUploadedMediaFile(file.id, data);
+};
+
+const onUploadError = (file: UppyFile, error: Error) => {
+  updateUploadedMediaFile(file.id, {
+    status: "ERROR",
+    error: error,
   });
 };
 
-const onUploadError = (_file: UppyFile, error: Error) => {
-  alert(`${error.name}: ${error.message}`);
-};
-
 const onUploadSuccess = (file: UppyFile, isccMetadata: Api.IsccMetadata) => {
-  uploadedMediaFiles.value.forEach((f) => {
-    if (f.id == file.id) {
-      f.isccMetadata = isccMetadata;
-      f.progress = 100;
-      f.status = "PROCESSED";
-    }
+  updateUploadedMediaFile(file.id, {
+    progress: 100,
+    status: "PROCESSED",
+    isccMetadata: isccMetadata,
   });
 };
 
 const onRemoveUploadedFile = (file: IsccWeb.FileUpload) => {
   uploadedMediaFiles.value = uploadedMediaFiles.value.filter((v) => v.id !== file.id);
+};
+
+const onUpdateMetadata = async (file: IsccWeb.FileUpload, formData: IsccWeb.MetadataFormData) => {
+  updateUploadedMediaFile(file.id, {
+    status: "UPDATING_METADATA",
+  });
+
+  try {
+    const newMetadata = await apiService.embedMetadata(file.isccMetadata?.media_id, formData);
+
+    updateUploadedMediaFile(file.id, {
+      isccMetadata: newMetadata,
+      status: "PROCESSED",
+    });
+  } catch (e) {
+    updateUploadedMediaFile(file.id, {
+      status: "ERROR",
+      error: e,
+    });
+  }
 };
 </script>
 
@@ -62,7 +97,11 @@ div
   .container.mt-4
     .row.mb-3(v-for="file in uploadedMediaFiles" :key="file.id")
       .col
-        UploadedFile(:file="file" @remove-uploaded-file="onRemoveUploadedFile")
+        UploadedFile(
+          :file="file"
+          @remove-uploaded-file="onRemoveUploadedFile"
+          @update-metadata="onUpdateMetadata"
+        )
 </template>
 
 <style scoped lang="scss">

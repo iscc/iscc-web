@@ -21,6 +21,13 @@ const uppy = computed(() =>
       formData: false,
       timeout: 0,
       headers: (file) => ({ "X-Upload-Filename": Base64.encode(file.name) }),
+      getResponseError: (responseText, response: unknown) => {
+        if (response instanceof XMLHttpRequest) {
+          return new Error(`${(response as XMLHttpRequest).status}: ${responseText}`);
+        }
+
+        return new Error(responseText);
+      },
     })
     .on("file-added", (file) => {
       emit("file-added", file);

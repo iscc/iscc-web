@@ -29,6 +29,8 @@ const formData = ref<IsccWeb.MetadataFormData>({
   description: props.file.isccMetadata?.description,
 });
 
+const currentTab = ref<"iscc" | "dna">("iscc");
+
 watch(
   () => props.file,
   (newFile, oldFile) => {
@@ -48,9 +50,17 @@ watch(
   .card-header
     ul.nav.nav-tabs.card-header-tabs
       li.nav-item
-        a.nav-link.active(href="#") ISCC
+        a.nav-link(
+          href="#"
+          @click="currentTab = 'iscc'"
+          :class="currentTab === 'iscc' ? 'active' : ''"
+        ) ISCC
       li.nav-item
-        a.nav-link.disabled(href="#") DNA
+        a.nav-link(
+          href="#"
+          @click="currentTab = 'dna'"
+          :class="currentTab === 'dna' ? 'active' : ''"
+        ) DNA
     .btn-close-container
       button.btn-close(
         aria-label="Close"
@@ -73,47 +83,57 @@ watch(
           .progress-bar(v-if="file.status === 'UPLOADING'" :style="`width: ${file.progress || 0}%`") Uploading...
       .col-12(v-if="file.isccMetadata?.iscc")
         .font-monospace.iscc-code(v-text="file.isccMetadata?.iscc")
-      .col-12.col-sm-3.col-lg-2(v-if="file.isccMetadata?.thumbnail")
-        img.img-thumbnail(:src="file.isccMetadata.thumbnail")
-      .col(v-if="file.isccMetadata")
-        .form-floating.mb-3
-          input.form-control(
-            type="text"
-            :id="`name[${file.id}]`"
-            :disabled="working"
-            v-model="formData.name"
-            placeholder="Name"
-          )
-          label(:for="`name[${file.id}]`") Name or title of the work
-        .form-floating.mb-3
-          input.form-control(
-            type="text"
-            :id="`description[${file.id}]`"
-            :disabled="working"
-            v-model="formData.description"
-            placeholder="Description"
-          )
-          label(:for="`description[${file.id}]`") Description of the work
-        .row.g-3
-          .col-6
-            button.btn.btn-primary.w-100.d-flex.flex-row.align-items-center.justify-content-center(
-              @click="onUpdateMetadataClick"
+      v-template(v-if="currentTab === 'iscc'")
+        .col-12.col-sm-3.col-lg-2(v-if="file.isccMetadata?.thumbnail")
+          img.img-thumbnail(:src="file.isccMetadata.thumbnail")
+        .col(v-if="file.isccMetadata")
+          .form-floating.mb-3
+            input.form-control(
+              type="text"
+              :id="`name[${file.id}]`"
               :disabled="working"
+              v-model="formData.name"
+              placeholder="Name"
             )
-              SvgIcon.me-1(
-                type="mdi"
-                :path="mdiContentSave"
-                size="16"
+            label(:for="`name[${file.id}]`") Name or title of the work
+          .form-floating.mb-3
+            input.form-control(
+              type="text"
+              :id="`description[${file.id}]`"
+              :disabled="working"
+              v-model="formData.description"
+              placeholder="Description"
+            )
+            label(:for="`description[${file.id}]`") Description of the work
+          .row.g-3
+            .col-6
+              button.btn.btn-primary.w-100.d-flex.flex-row.align-items-center.justify-content-center(
+                @click="onUpdateMetadataClick"
+                :disabled="working"
               )
-              span Update metadata & generate ISCC
-          .col-6
-            button.btn.w-100(:disabled="true") Download updated file
+                SvgIcon.me-1(
+                  type="mdi"
+                  :path="mdiContentSave"
+                  size="16"
+                )
+                span Update metadata & generate ISCC
+            .col-6
+              button.btn.w-100(:disabled="true") Download updated file
+      .dna.d-flex.justify-content-center(v-else)
+        .hash-bits(v-if="file.hashBits")
+          .hash-bit(
+            v-for="(hashBit, index) in file.hashBits"
+            v-text="hashBit"
+            :class="`pos-${index}`"
+          )
+        p(v-else) Loading...
 </template>
 
 <style scoped lang="scss">
 @import "~bootstrap/scss/_functions";
 @import "~bootstrap/scss/_variables";
 @import "~bootstrap/scss/mixins/_border-radius";
+@import "~bootstrap/scss/mixins/_breakpoints";
 
 .card-header {
   display: flex;
@@ -141,6 +161,46 @@ watch(
     padding: $input-padding-y $input-padding-x;
     border: $input-border-width solid $input-border-color;
     @include border-radius($input-border-radius, 0);
+  }
+
+  .dna {
+    .hash-bits {
+      @include media-breakpoint-up(md) {
+        width: 500px;
+      }
+      @include media-breakpoint-down(md) {
+        flex-grow: 1;
+      }
+
+      .hash-bit {
+        color: black;
+        background-color: lightgray;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        float: left;
+        margin: 0.4%;
+        width: 5.4%;
+        font-size: 1rem;
+        aspect-ratio: 1 / 1;
+        overflow: hidden;
+
+        @include media-breakpoint-down(md) {
+          font-size: 0.8rem;
+        }
+        @include media-breakpoint-down(sm) {
+          font-size: 2.75vw;
+        }
+
+        @for $i from 1 through 16 {
+          $pos: calc($i * 16);
+
+          &.pos-#{$pos} {
+            clear: left;
+          }
+        }
+      }
+    }
   }
 }
 </style>

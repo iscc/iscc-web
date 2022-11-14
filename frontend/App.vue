@@ -22,6 +22,13 @@ const updateUploadedMediaFile = (fileId: string, data: Partial<IsccWeb.FileUploa
   });
 };
 
+const loadHashBitsForFile = async (fileId: string, iscc: string) => {
+  const isccDecomposition = await apiService.explainIscc(iscc);
+  const hashBits = isccDecomposition.units.map((unit) => unit.hash_bits).join("");
+
+  updateUploadedMediaFile(fileId, { hashBits });
+};
+
 const onFileAdded = (file: UppyFile) => {
   uploadedMediaFiles.value.unshift({
     id: file.id,
@@ -30,6 +37,7 @@ const onFileAdded = (file: UppyFile) => {
     status: "UPLOADING",
     isccMetadata: null,
     error: null,
+    hashBits: null,
   });
 };
 
@@ -52,12 +60,14 @@ const onUploadError = (file: UppyFile, error: Error) => {
   });
 };
 
-const onUploadSuccess = (file: UppyFile, isccMetadata: Api.IsccMetadata) => {
+const onUploadSuccess = async (file: UppyFile, isccMetadata: Api.IsccMetadata) => {
   updateUploadedMediaFile(file.id, {
     progress: 100,
     status: "PROCESSED",
     isccMetadata: isccMetadata,
   });
+
+  await loadHashBitsForFile(file.id, isccMetadata.iscc);
 };
 
 const onRemoveUploadedFile = (file: IsccWeb.FileUpload) => {
@@ -75,7 +85,10 @@ const onUpdateMetadata = async (file: IsccWeb.FileUpload, formData: IsccWeb.Meta
     updateUploadedMediaFile(file.id, {
       isccMetadata: newMetadata,
       status: "PROCESSED",
+      hashBits: null,
     });
+
+    await loadHashBitsForFile(file.id, newMetadata.iscc);
   } catch (e) {
     updateUploadedMediaFile(file.id, {
       status: "ERROR",

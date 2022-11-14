@@ -26,4 +26,20 @@ declare namespace Api {
     language: string;
     thumbnail: string;
   }
+
+  export interface IsccUnit {
+    iscc_unit: string;
+    readable: string;
+    hash_hex: string;
+    hash_uint: string;
+    hash_bits: string;
+  }
+
+  export interface IsccDecomposition {
+    iscc: string;
+    readable: string;
+    multiformat: string;
+    decomposed: string;
+    units: Array<Api.IsccUnit>;
+  }
 }

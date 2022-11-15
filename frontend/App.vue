@@ -4,6 +4,7 @@ import { ref } from "vue";
 import IsccHeader from "./components/IsccHeader.vue";
 import UploadZone from "./components/UploadZone.vue";
 import UploadedFile from "./components/UploadedFile.vue";
+import IsccFooter from "./components/IsccFooter.vue";
 import type { UppyFile } from "@uppy/core";
 import { apiService } from "./services/api.service";
 
@@ -117,6 +118,7 @@ div
           @remove-uploaded-file="onRemoveUploadedFile"
           @update-metadata="onUpdateMetadata"
         )
+    IsccFooter
 </template>
 
 <style scoped lang="scss">

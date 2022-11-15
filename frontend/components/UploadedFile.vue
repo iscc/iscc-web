@@ -83,7 +83,7 @@ watch(
           .progress-bar(v-if="file.status === 'UPLOADING'" :style="`width: ${file.progress || 0}%`") Uploading...
       .col-12(v-if="file.isccMetadata?.iscc")
         .font-monospace.iscc-code(v-text="file.isccMetadata?.iscc")
-      v-template(v-if="currentTab === 'iscc'")
+      template(v-if="currentTab === 'iscc'")
         .col-12.col-sm-3.col-lg-2(v-if="file.isccMetadata?.thumbnail")
           img.img-thumbnail(:src="file.isccMetadata.thumbnail")
         .col(v-if="file.isccMetadata")

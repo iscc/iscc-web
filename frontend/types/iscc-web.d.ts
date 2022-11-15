@@ -6,6 +6,7 @@ declare namespace IsccWeb {
     status: "UPLOADING" | "PROCESSING" | "PROCESSED" | "UPDATING_METADATA" | "ERROR";
     isccMetadata: Nullable<Api.IsccMetadata>;
     error: Nullable<Error>;
+    hashBits: Nullable<string>;
   }
 
   export interface MetadataFormData {

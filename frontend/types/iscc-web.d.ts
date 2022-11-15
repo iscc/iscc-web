@@ -5,6 +5,7 @@ declare namespace IsccWeb {
     progress: number;
     status: "UPLOADING" | "PROCESSING" | "PROCESSED" | "UPDATING_METADATA" | "ERROR";
     isccMetadata: Nullable<Api.IsccMetadata>;
+    metadataChanged: boolean;
     error: Nullable<Error>;
     hashBits: Nullable<string>;
   }

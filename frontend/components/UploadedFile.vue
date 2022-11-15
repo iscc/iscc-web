@@ -20,6 +20,10 @@ const onUpdateMetadataClick = async () => {
   emit("update-metadata", props.file, formData.value);
 };
 
+const onDownloadClick = () => {
+  window.location.href = `/api/v1/media/${props.file.isccMetadata.media_id}`;
+};
+
 const working = computed(() => {
   return props.file.status !== "PROCESSED" && props.file.status !== "ERROR";
 });
@@ -106,7 +110,7 @@ watch(
             )
             label(:for="`description[${file.id}]`") Description of the work
           .row.g-3
-            .col-6
+            .col
               button.btn.btn-primary.w-100.d-flex.flex-row.align-items-center.justify-content-center(
                 @click="onUpdateMetadataClick"
                 :disabled="working"
@@ -117,8 +121,8 @@ watch(
                   size="16"
                 )
                 span Update metadata & generate ISCC
-            .col-6
-              button.btn.w-100(:disabled="true") Download updated file
+            .col-6(v-if="file.metadataChanged")
+              btn.btn.btn-primary.w-100(@click="onDownloadClick" :disabled="working") Download updated file
       .dna.d-flex.justify-content-center(v-else)
         .hash-bits(v-if="file.hashBits")
           .hash-bit(

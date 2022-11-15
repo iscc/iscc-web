@@ -36,6 +36,7 @@ const onFileAdded = (file: UppyFile) => {
     progress: 0,
     status: "UPLOADING",
     isccMetadata: null,
+    metadataChanged: false,
     error: null,
     hashBits: null,
   });
@@ -84,6 +85,7 @@ const onUpdateMetadata = async (file: IsccWeb.FileUpload, formData: IsccWeb.Meta
 
     updateUploadedMediaFile(file.id, {
       isccMetadata: newMetadata,
+      metadataChanged: true,
       status: "PROCESSED",
       hashBits: null,
     });

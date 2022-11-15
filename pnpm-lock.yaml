@@ -3,6 +3,7 @@ lockfileVersion: 5.4
 specifiers:
   '@fontsource/jetbrains-mono': ^4.5.11
   '@fontsource/readex-pro': ^4.5.11
+  '@highlightjs/vue-plugin': ^2.1.0
   '@jamescoyle/vue-icon': ^0.1.2
   '@mdi/js': ^7.0.96
   '@popperjs/core': ^2.11.6
@@ -19,6 +20,7 @@ specifiers:
   bootstrap: ^5.2.2
   eslint: ^8.26.0
   eslint-plugin-vue: ^9.6.0
+  highlight.js: ^11.6.0
   js-base64: ^3.7.2
   prettier: ^2.7.1
   pug: ^3.0.2
@@ -31,12 +33,14 @@ specifiers:
 dependencies:
   '@fontsource/jetbrains-mono': 4.5.11
   '@fontsource/readex-pro': 4.5.11
+  '@highlightjs/vue-plugin': 2.1.0_hl3gzkyqlzdh7aehohf5zirukm
   '@jamescoyle/vue-icon': 0.1.2
   '@mdi/js': 7.0.96
   '@popperjs/core': 2.11.6
   '@uppy/core': 3.0.3
   '@uppy/xhr-upload': 3.0.3_@uppy+core@3.0.3
   bootstrap: 5.2.2_@popperjs+core@2.11.6
+  highlight.js: 11.6.0
   js-base64: 3.7.2
   vue: 3.2.41
 
@@ -141,6 +145,16 @@ packages:
 
   /@fontsource/readex-pro/4.5.11:
     resolution: {integrity: sha512-vfM6xW/NbAtSGPLzL931smgprvnOPDexHbLbeIOnF1oKCaLDp8RhViDtN/6ehz8e+OnJtFnRzcIsjXFuJDbIFg==}
+    dev: false
+
+  /@highlightjs/vue-plugin/2.1.0_hl3gzkyqlzdh7aehohf5zirukm:
+    resolution: {integrity: sha512-E+bmk4ncca+hBEYRV2a+1aIzIV0VSY/e5ArjpuSN9IO7wBJrzUE2u4ESCwrbQD7sAy+jWQjkV5qCCWgc+pu7CQ==}
+    peerDependencies:
+      highlight.js: ^11.0.1
+      vue: ^3
+    dependencies:
+      highlight.js: 11.6.0
+      vue: 3.2.41
     dev: false
 
   /@humanwhocodes/config-array/0.11.6:
@@ -1472,6 +1486,11 @@ packages:
     resolution: {integrity: sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==}
     hasBin: true
     dev: true
+
+  /highlight.js/11.6.0:
+    resolution: {integrity: sha512-ig1eqDzJaB0pqEvlPVIpSSyMaO92bH1N2rJpLMN/nX396wTpDA4Eq0uK+7I/2XG17pFaaKE0kjV/XPeGt7Evjw==}
+    engines: {node: '>=12.0.0'}
+    dev: false
 
   /ignore/5.2.0:
     resolution: {integrity: sha512-CmxgYGiEPCLhfLnpPp1MoRmifwEIOgjcHXxOBjv7mY96c+eWScsOP9c112ZyLdWHi0FxHjI+4uVhKYp/gcdRmQ==}

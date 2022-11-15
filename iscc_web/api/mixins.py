@@ -143,7 +143,11 @@ class FileHandler:
 
         loop = asyncio.get_event_loop()
         pool = app.service_provider[Pool]
-        iscc_obj = await loop.run_in_executor(pool, idk.code_iscc, file_path.as_posix())
+        try:
+            iscc_obj = await loop.run_in_executor(pool, idk.code_iscc, file_path.as_posix())
+        except Exception as e:
+            return self.status_code(422, str(e))
+
         if iscc_obj is None:
             return self.status_code(422, "ISCC processsing error.")
 

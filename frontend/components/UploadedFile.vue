@@ -2,6 +2,7 @@
 import { computed, ref, watch } from "vue";
 import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiContentSave } from "@mdi/js";
+import "highlight.js/styles/github.css";
 
 const props = defineProps<{
   file: IsccWeb.FileUpload;
@@ -33,7 +34,7 @@ const formData = ref<IsccWeb.MetadataFormData>({
   description: props.file.isccMetadata?.description,
 });
 
-const currentTab = ref<"iscc" | "dna">("iscc");
+const currentTab = ref<"iscc" | "dna" | "raw-metadata">("iscc");
 
 watch(
   () => props.file,
@@ -65,6 +66,12 @@ watch(
           @click="currentTab = 'dna'"
           :class="currentTab === 'dna' ? 'active' : ''"
         ) DNA
+      li.nav-item
+        a.nav-link(
+          href="#"
+          @click="currentTab = 'raw-metadata'"
+          :class="currentTab === 'raw-metadata' ? 'active' : ''"
+        ) Raw ISCC metadata
     .btn-close-container
       button.btn-close(
         aria-label="Close"
@@ -123,7 +130,7 @@ watch(
                 span Update metadata & generate ISCC
             .col-6(v-if="file.metadataChanged")
               btn.btn.btn-primary.w-100(@click="onDownloadClick" :disabled="working") Download updated file
-      .dna.d-flex.justify-content-center(v-else)
+      .dna.d-flex.justify-content-center(v-else-if="currentTab === 'dna'")
         .hash-bits(v-if="file.hashBits")
           .hash-bit(
             v-for="(hashBit, index) in file.hashBits"
@@ -131,6 +138,8 @@ watch(
             :class="`pos-${index}`"
           )
         p(v-else) Loading...
+      .raw-metadata(v-else)
+        highlightjs(language="json" :code="JSON.stringify(file.isccMetadata, null, 2)")
 </template>
 
 <style scoped lang="scss">

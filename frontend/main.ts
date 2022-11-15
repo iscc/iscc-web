@@ -7,4 +7,10 @@ import { tooltip } from "./directives/tooltip";
 
 import "vite/modulepreload-polyfill";
 
-createApp(App).directive("tooltip", tooltip).mount("#app");
+import hljs from "highlight.js/lib/core";
+import json from "highlight.js/lib/languages/json";
+import hljsVuePlugin from "@highlightjs/vue-plugin";
+
+hljs.registerLanguage("json", json);
+
+createApp(App).use(hljsVuePlugin).directive("tooltip", tooltip).mount("#app");

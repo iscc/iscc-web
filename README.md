@@ -1,4 +1,38 @@
-# iscc-web - Minimal ISCC Generator Web Application
+# ISCC - Generator Microservice
+
+[![Tests](https://github.com/iscc/iscc-web/actions/workflows/test-backend.yaml/badge.svg)](https://github.com/iscc/iscc-web/actions/workflows/test-backend.yaml)
+
+## About `iscc-web`
+
+`iscc-web` is a microservice for generating **International Standard Content Codes**
+([ISCC](https://iscc.codes)) for media files. A public instance of this service is available at
+https://iscc.io
+
+## Overview
+
+<img align="left" width="200" src="docs/iscc-web-rest-api.jpg?raw=true">
+
+**REST API**
+
+The microservice provides a REST API for generating ISCCs. The endpoints support:
+
+- uploading and downloading media assets
+- extracting and embedding metadata
+- decomposing ISCCs
+
+Files uploaded for processing are automatically deleted after a configurable timeout.
+An interactive API documentation is available at [/docs](https://iscc.io/docs)
+
+<img align="left" width="200" src="docs/iscc-web-vue-frontend.jpg?raw=true">
+
+**Demo Frontend**
+
+The service also hosts a [Vue.js](https://vuejs.org/) based demo frontend that shows how to:
+
+- upload media files
+- geneerate ISCCs
+- embed metadata
+- compare ISCCs
 
 ## Configuration
 

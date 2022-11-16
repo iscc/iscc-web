@@ -15,7 +15,7 @@ https://iscc.io
 **REST API**
 
 The microservice provides a REST API for generating ISCCs. The endpoints support file
-upload/download, metadata extraction/embedding and ISCC processing.
+upload/download, metadata extraction/embedding and ISCC processing.<br><br>
 
 Files uploaded for processing are automatically deleted after a configurable timeout.
 An interactive API documentation is available at [/docs](https://iscc.io/docs)
@@ -25,7 +25,7 @@ An interactive API documentation is available at [/docs](https://iscc.io/docs)
 **Demo Frontend**
 
 The service also hosts a [Vue.js](https://vuejs.org/) based demo frontend that shows how to
-upload media files, geneerate ISCCs, embed metadata, and compare ISCCs.
+upload media files, geneerate ISCCs, embed metadata, and compare ISCCs.<br><br>
 
 ## Configuration
 

@@ -25,7 +25,7 @@ An interactive API documentation is available at [/docs](https://iscc.io/docs)
 **Demo Frontend**
 
 The service also hosts a [Vue.js](https://vuejs.org/) based demo frontend that shows how to
-upload media files, geneerate ISCCs, embed metadata, and compare ISCCs.<br><br>
+upload media files, geneerate ISCCs, embed metadata, and compare ISCCs.<br><br><br>
 
 ## Configuration
 

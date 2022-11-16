@@ -99,6 +99,23 @@ const onUpdateMetadata = async (file: IsccWeb.FileUpload, formData: IsccWeb.Meta
     });
   }
 };
+
+const buildComparisonForFileAtIndex = (index: number) => {
+  if (uploadedMediaFiles.value.length < 2) {
+    return;
+  }
+
+  if (index > 1) {
+    return;
+  }
+
+  const comparisonFileUpload = uploadedMediaFiles.value[index === 0 ? 1 : 0];
+
+  return {
+    name: comparisonFileUpload.name,
+    hashBits: comparisonFileUpload.hashBits,
+  };
+};
 </script>
 
 <template lang="pug">
@@ -111,10 +128,13 @@ div
     @upload-error="onUploadError"
   )
   .container.mt-4
-    .row.mb-3(v-for="file in uploadedMediaFiles" :key="file.id")
+    .row.mb-3(v-for="(file, index) in uploadedMediaFiles" :key="file.id")
+      h2(v-if="uploadedMediaFiles.length > 1 && index == 0") Comparison
+      h2(v-if="uploadedMediaFiles.length > 2 && index == 2") Previous uploads
       .col
         UploadedFile(
           :file="file"
+          :comparison="buildComparisonForFileAtIndex(index)"
           @remove-uploaded-file="onRemoveUploadedFile"
           @update-metadata="onUpdateMetadata"
         )

@@ -6,6 +6,10 @@ import "highlight.js/styles/github.css";
 
 const props = defineProps<{
   file: IsccWeb.FileUpload;
+  comparison?: {
+    name: string;
+    hashBits?: Array<string>;
+  };
 }>();
 
 const emit = defineEmits<{
@@ -48,6 +52,18 @@ watch(
   },
   { deep: true }
 );
+
+const hashBitComparisonClass = (hashBit: string, index: number) => {
+  if (!props.comparison || !props.comparison.hashBits) {
+    return "";
+  }
+
+  if (props.comparison.hashBits[index] !== hashBit) {
+    return "unequal";
+  } else {
+    return "equal";
+  }
+};
 </script>
 
 <template lang="pug">
@@ -129,13 +145,15 @@ watch(
                 )
                 span Update metadata & generate ISCC
             .col-6(v-if="file.metadataChanged")
-              btn.btn.btn-primary.w-100(@click="onDownloadClick" :disabled="working") Download updated file
-      .dna.d-flex.justify-content-center(v-else-if="currentTab === 'dna'")
+              button.btn.btn-primary.w-100(@click="onDownloadClick" :disabled="working") Download updated file
+      .dna.d-flex.flex-column.align-items-center.justify-content-center(v-else-if="currentTab === 'dna'")
+        .comparison(v-if="comparison")
+          span(v-text="`Compared to ${comparison.name}. Green = equal bit, red = unequal bit.`")
         .hash-bits(v-if="file.hashBits")
           .hash-bit(
             v-for="(hashBit, index) in file.hashBits"
             v-text="hashBit"
-            :class="`pos-${index}`"
+            :class="`pos-${index} ${hashBitComparisonClass(hashBit, index)}`"
           )
         p(v-else) Loading...
       .raw-metadata(v-else)
@@ -197,6 +215,16 @@ watch(
         font-size: 1rem;
         aspect-ratio: 1 / 1;
         overflow: hidden;
+
+        &.equal {
+          background-color: green;
+          color: white;
+        }
+
+        &.unequal {
+          background-color: red;
+          color: white;
+        }
 
         @include media-breakpoint-down(md) {
           font-size: 0.8rem;

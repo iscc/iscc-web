@@ -1,7 +1,7 @@
 {
-  "@context": "http://purl.org/iscc/context/0.3.9.jsonld",
+  "@context": "http://purl.org/iscc/context/0.4.0.jsonld",
   "@type": "ImageObject",
-  "$schema": "http://purl.org/iscc/schema/0.3.9.json",
+  "$schema": "http://purl.org/iscc/schema/0.4.0.json",
   "iscc": "ISCC:KECXNDSZVTTX2LDQVXGTITPTHQYDJJZQLCUWSZT62C2GWISX23DCJDY",
   "name": "test image",
   "mode": "image",

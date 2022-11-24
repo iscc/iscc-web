@@ -36,8 +36,8 @@ def test_upload_extract_embed_download(api):
     result = response.json()
     media_id = result["media_id"]
     assert result == {
-        "$schema": "http://purl.org/iscc/schema/0.3.9.json",
-        "@context": "http://purl.org/iscc/context/0.3.9.jsonld",
+        "$schema": "http://purl.org/iscc/schema/0.4.0.json",
+        "@context": "http://purl.org/iscc/context/0.4.0.jsonld",
         "@type": "ImageObject",
         "acquire": "https://example.com/buy-license-for-item-here",
         "content": f"http://localhost:44555/api/v1/media/{media_id}",

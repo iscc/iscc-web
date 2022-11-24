@@ -18,8 +18,8 @@ def test_create_iscc_location_and_result(api):
     del result["media_id"]
     del result["content"]
     assert result == {
-        "$schema": "http://purl.org/iscc/schema/0.3.9.json",
-        "@context": "http://purl.org/iscc/context/0.3.9.jsonld",
+        "$schema": "http://purl.org/iscc/schema/0.4.0.json",
+        "@context": "http://purl.org/iscc/context/0.4.0.jsonld",
         "@type": "ImageObject",
         "datahash": "1e209db4c0d9e68c5203dc8c2fefe52fa5d54671be3a3253e06888cace7c60e5a743",
         "filename": "test-image.jpg",
@@ -39,8 +39,8 @@ def test_get_iscc_ok(api):
     response = api.get("/iscc/061knt35ejv6o")
     assert response.status_code == codes.OK
     assert response.json() == {
-        "$schema": "http://purl.org/iscc/schema/0.3.9.json",
-        "@context": "http://purl.org/iscc/context/0.3.9.jsonld",
+        "$schema": "http://purl.org/iscc/schema/0.4.0.json",
+        "@context": "http://purl.org/iscc/context/0.4.0.jsonld",
         "@type": "ImageObject",
         "datahash": "1e20b46b2257d6c6248f0b2130affc644088cc07f31219394f28523e7742441e91fd",
         "filename": "test-image.jpg",

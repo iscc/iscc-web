@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import aiofile
+import requests
 from blacksheep import Request, ContentDispositionType, Response
 from blacksheep.server.controllers import ApiController, post, get
 from iscc_web.api.pool import Pool
@@ -31,9 +32,15 @@ class Iscc(ApiController, FileHandler):
     async def create_iscc(self, request: Request):
         """Upload and create ISCC-CODE for media asset."""
 
-        result = await self.handle_upload(request)
-        if isinstance(result, Response):
-            return result
+        file_name_base64 = request.get_first_header(b"X-Upload-Filename")
+        if not file_name_base64:
+            result = await self.handle_url(request)
+            if isinstance(result, Response):
+                return result
+        else:
+            result = await self.handle_upload(request)
+            if isinstance(result, Response):
+                return result
 
         package_dir = self.package_dir(result.media_id)
         file_path = package_dir / result.clean_file_name

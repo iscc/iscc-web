@@ -30,7 +30,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v3
         with:
-          images: ghcr.io/iscc/iscc-web
+          images: ghcr.io/relves/iscc-web
           tags: |
             type=ref,event=branch
             type=semver,pattern={{version}}

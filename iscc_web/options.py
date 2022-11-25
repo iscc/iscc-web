@@ -14,7 +14,7 @@ class IsccWebOptions(BaseSettings):
         env_file_encoding = "utf-8"
 
     environment: str = "development"
-    site_address: AnyHttpUrl = "http://localhost:8000"
+    site_address: AnyHttpUrl = "http://127.0.0.1:8000"
     media_path: Path = HERE.parent.absolute() / "media"
     max_workers: Optional[int] = Field(
         None, description="Max number of iscc worker processes (defaults to CPU count)"

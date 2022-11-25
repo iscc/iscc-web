@@ -2,6 +2,9 @@
 import asyncio
 import base64
 import binascii
+import os
+import requests
+from urllib.parse import urlparse
 from pathlib import Path
 from blacksheep import Request, Response
 from blake3 import blake3
@@ -135,6 +138,74 @@ class FileHandler:
         async with aiofile.async_open(file_path, "wb") as outfile:
             async for chunk in request.stream():
                 await outfile.write(chunk)
+
+        return upload_meta
+
+    async def download_file(self, url, local_filename):
+        try:
+            with requests.head(url) as h:
+                content_length = h.headers.get("Content-Length")
+                if content_length:
+                    cl = int(content_length)
+                    log.info(
+                        f"Content Length: {content_length} (max: {opts.max_upload_size})",
+                        enqueue=True,
+                    )
+                    if cl < 1 or cl > opts.max_upload_size:
+                        log.info(f"File too large.", enqueue=True)
+                        return self.status_code(
+                            400,
+                            "Bad Request - Content-Length must be > 0 and <"
+                            f" {opts.max_upload_size}",
+                        )
+            with requests.get(url, stream=True) as r:
+                r.raise_for_status()
+                with open(local_filename, "wb") as f:
+                    for chunk in r.iter_content(chunk_size=8192):
+                        f.write(chunk)
+                return None
+        except Exception as e:
+            return self.status_code(422, str(e))
+
+    async def handle_url(self, request: Request):
+        """Download from provided URL and create ISCC-CODE for media asset."""
+        data = await request.json()
+        if data is None:
+            return self.status_code(400, "Missing url in json payload")
+        try:
+            if data is None:
+                return self.status_code(400, "Missing url in json payload")
+            url = data["url"]
+            if url is None or url == "":
+                return self.status_code(400, "Url provided was invalid")
+        except Exception as e:
+            return self.status_code(400, "Something malformed with the json payload.")
+
+        log.info(f"Requesting iscc code for URL: {url}", enqueue=True)
+        parsed_url = urlparse(url)
+        file_name = os.path.basename(parsed_url.path)
+        log.info(f"Requesting iscc code for FILE: {file_name}", enqueue=True)
+
+        # Create package directory
+        media_id, package_dir = await self.create_package()
+
+        # Store file metadata
+        user = blake3(request.client_ip.encode("ascii")).hexdigest()
+        upload_meta = UploadMeta(
+            media_id=media_id,
+            file_name=file_name,
+            content_type="",
+            user=user,
+        )
+        await self.write_meta(media_id, upload_meta)
+
+        # Store file upload
+        file_path = package_dir / upload_meta.clean_file_name
+
+        result = await self.download_file(url, file_path)
+        if result is not None:
+            log.info(f"RETURNING RESULT", enqueue=True)
+            return result
 
         return upload_meta
 

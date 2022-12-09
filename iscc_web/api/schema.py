@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from pydantic import AnyUrl, BaseModel, Field, confloat, conint, constr
 
@@ -122,6 +122,13 @@ class InlineMetadata(BaseModel):
             " copyright of this work with associated intellectual property rights."
         ),
         example="Copyright 2022 ISCC Foundation - www.iscc.codes",
+    )
+    keywords: Optional[Union[str, List[str]]] = Field(
+        None,
+        description=(
+            "Keywords or tags used to describe this content. Multiple entries in a keywords list"
+            " are typically delimited by commas."
+        ),
     )
 
 

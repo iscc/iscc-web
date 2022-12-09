@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "iscc-web"
-version = "0.1.0"
+version = "0.2.0"
 description = "ISCC - Generator Web Application"
 authors = ["Titusz <tp@py7.de>"]
 license = "Apache-2.0"
@@ -12,7 +12,7 @@ python = ">=3.8,<3.11"
 blacksheep = "^1.2"
 uvicorn = "^0.18"
 aiofiles = "^22.1"
-iscc_sdk = "*"
+iscc-sdk = "0.5.1"
 httpx = "^0.23"
 pathvalidate = "^2.5"
 aiofile = "^3.8"
@@ -41,7 +41,7 @@ preview = true
 [tool.datamodel-codegen]
 input = "iscc_web/static/docs/openapi.yaml"
 output = "iscc_web/api/schema.py"
-encoding = "utf-8"
+encoding = "UTF-8"
 disable-timestamp = true
 target-python-version = "3.8"
 

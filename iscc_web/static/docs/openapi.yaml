@@ -353,6 +353,14 @@ components:
           description: Contains any necessary copyright notice and should identify the current
             owner of the copyright of this work with associated intellectual property rights.
           example: Copyright 2022 ISCC Foundation - www.iscc.codes
+        keywords:
+          oneOf:
+          - type: string
+          - type: array
+            items:
+            - type: string
+          description: Keywords or tags used to describe this content. Multiple entries in
+            a keywords list are typically delimited by commas.
     TechnicalMetadata:
       type: object
       description: Technical ISCC Metadata automaticaly inferred from the media file by the

@@ -117,6 +117,18 @@ ISCC_WEB_IO_READ_SIZE=2097152
 FORWARDED_ALLOW_IPS=*
 ```
 
+You can also configure iscc-core and iscc-sdk dependencies. For example to acitvate generation
+of granulare fingerprints (currently only implemented for text) add the following to your .env:
+
+```.env
+ISCC_SDK_GRANULAR=true
+```
+
+For available environment variables see:
+
+- https://sdk.iscc.codes/options/
+- https://core.iscc.codes/options/options/
+
 ### docker-compose.yaml
 
 ```yaml

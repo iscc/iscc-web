@@ -117,8 +117,8 @@ ISCC_WEB_IO_READ_SIZE=2097152
 FORWARDED_ALLOW_IPS=*
 ```
 
-You can also configure iscc-core and iscc-sdk dependencies. For example to acitvate generation
-of granulare fingerprints (currently only implemented for text) add the following to your .env:
+You can also configure iscc-core and iscc-sdk dependencies. For example to activate generation
+of granular fingerprints (currently only implemented for text) add the following to your .env:
 
 ```.env
 ISCC_SDK_GRANULAR=true

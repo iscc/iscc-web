@@ -57,7 +57,7 @@ class FileHandler:
     async def write_meta(self, media_id: str, file_meta: UploadMeta) -> None:
         """Write file metadata."""
         async with aiofile.async_open(self.meta_path(media_id), "wb") as infile:
-            await infile.write(file_meta.json(indent=2).encode("utf-8"))
+            await infile.write(file_meta.model_dump_json(indent=2).encode("utf-8"))
 
     async def read_meta(self, media_id) -> UploadMeta:
         """Read file metadata."""

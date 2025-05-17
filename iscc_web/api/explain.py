@@ -19,7 +19,6 @@ class Explain(ApiController):
         except (ValueError, IndexError) as e:
             return self.bad_request(f"Invalid ISCC - {e}")
 
-        result = IsccDetail()
         decomposed = ic.iscc_decompose(norm)
         code = ic.Code(norm)
         units = []
@@ -39,9 +38,11 @@ class Explain(ApiController):
             )
             units.append(unit)
 
-        result.iscc = norm
-        result.readable = code.explain
-        result.multiformat = code.mf_base64url
-        result.decomposed = "-".join(decomposed)
-        result.units = units
+        result = IsccDetail(
+            iscc=norm,
+            readable=code.explain,
+            multiformat=code.mf_base64url,
+            decomposed="-".join(decomposed),
+            units=units,
+        )
         return result

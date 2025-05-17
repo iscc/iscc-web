@@ -2,8 +2,8 @@
 from pathlib import Path
 from typing import Optional
 
-from pydantic import BaseSettings, Field, AnyHttpUrl
-
+from pydantic import Field, AnyHttpUrl
+from pydantic_settings import BaseSettings
 
 HERE = Path(__file__).parent.absolute()
 

@@ -328,6 +328,10 @@ components:
           maxLength: 16384
           example: data:application/json;charset=utf-8;base64,eyJleHRlbmRlZCI6Im1ldGFkYXRhIn0=
           description: Subject, industry, or use-case specific metadata encoded as Data-URL.
+        identifier:
+          type: string
+          description: Other identifier(s) referencing the work, product or other abstraction
+            of which the referenced **digital content** is a full or partial manifestation.
         creator:
           description: An entity primarily responsible for making the resource.
           type: string

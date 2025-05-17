@@ -107,6 +107,13 @@ class InlineMetadata(BaseModel):
         description="Subject, industry, or use-case specific metadata encoded as Data-URL.",
         examples=["data:application/json;charset=utf-8;base64,eyJleHRlbmRlZCI6Im1ldGFkYXRhIn0="],
     )
+    identifier: Optional[str] = Field(
+        None,
+        description=(
+            "Other identifier(s) referencing the work, product or other abstraction of which the"
+            " referenced **digital content** is a full or partial manifestation."
+        ),
+    )
     creator: Optional[str] = Field(
         None,
         description="An entity primarily responsible for making the resource.",

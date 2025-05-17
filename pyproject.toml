@@ -51,6 +51,10 @@ target-python-version = "3.11"
 use-schema-description = true
 
 
+[tool.pytest.ini_options]
+addopts = "-p no:warnings"
+
+
 [tool.poe.tasks]
 formatopenapi = { cmd = "poetry run python -m develop.format_openapi", help = "Reformat openapi.yaml"}
 codegen = { cmd = "datamodel-codegen", help="Build code from OpenAPI Schema"}

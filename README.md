@@ -53,13 +53,13 @@ Both the backend and frontend servers need to run in parallel.
 
 ### Backend
 
-Having a [Python](https://python.org) 3.8+ environment with [Poetry](https://python-poetry.org/) do:
+Having a [Python](https://python.org) 3.10+ environment with [uv](https://docs.astral.sh/uv/) do:
 
 ```shell
 git clone https://github.com/iscc/iscc-web.git
 cd iscc-web
-poetry install
-iscc-web
+uv sync
+uv run iscc-web
 ```
 
 Access the app at http://localhost:8000

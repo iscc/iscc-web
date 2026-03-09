@@ -1,38 +1,55 @@
-[tool.poetry]
+[project]
 name = "iscc-web"
 version = "0.2.0"
 description = "ISCC - Generator Web Application"
-authors = ["Titusz <tp@py7.de>"]
-license = "Apache-2.0"
+authors = [{ name = "Titusz", email = "tp@py7.de" }]
+requires-python = ">=3.10,<3.13"
 readme = "README.md"
-homepage = "https://github.com/iscc/iscc-web"
+license = "Apache-2.0"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "blacksheep",
+    "uvicorn",
+    "aiofiles",
+    "iscc-sdk",
+    "httpx",
+    "pathvalidate",
+    "aiofile",
+    "jinja2-simple-tags",
+    "gunicorn",
+    "sentry-sdk",
+    "watchfiles",
+    "pydantic-settings",
+]
 
-[tool.poetry.dependencies]
-python = ">=3.10,<3.12"
-blacksheep = "^1.2"
-uvicorn = "^0.18"
-aiofiles = "^22.1"
-iscc-sdk = "^0.8.5"
-httpx = "^0.23"
-pathvalidate = "^2.5"
-aiofile = "^3.8"
-jinja2-simple-tags = "^0.4"
-gunicorn = "^20.1"
-sentry-sdk = "^1.9"
-watchfiles = "^0.17.0"
-pydantic-settings = "^2.9.1"
+[project.urls]
+Homepage = "https://github.com/iscc/iscc-web"
 
-[tool.poetry.scripts]
-iscc-web = 'iscc_web.main:main'
+[project.scripts]
+iscc-web = "iscc_web.main:main"
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^7.1"
-black = "^22.8"
-poethepoet = "^0.16"
-pytest-asyncio = "^0.19"
-schemathesis = "^3.17"
-datamodel-code-generator = "*"
-iscc-samples = "^0.4"
+[dependency-groups]
+dev = [
+    "pytest",
+    "black",
+    "poethepoet",
+    "pytest-asyncio",
+    "schemathesis",
+    "datamodel-code-generator",
+    "iscc-samples",
+]
+
+[tool.uv]
+default-groups = "all"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.black]
 line-length = 100
@@ -56,14 +73,10 @@ addopts = "-p no:warnings"
 
 
 [tool.poe.tasks]
-formatopenapi = { cmd = "poetry run python -m develop.format_openapi", help = "Reformat openapi.yaml"}
-codegen = { cmd = "datamodel-codegen", help="Build code from OpenAPI Schema"}
-format = { cmd = "poetry run black .", help = "Code style formating with black" }
-lf = { cmd = "poetry run python -m develop.lf", help = "Convert line endings to LF" }
-test = { cmd = "poetry run pytest", help = "Run tests" }
-run = { cmd = "uvicorn iscc_web.asgi:application --reload", help = "Run dev server"}
+formatopenapi = { cmd = "uv run python -m develop.format_openapi", help = "Reformat openapi.yaml"}
+codegen = { cmd = "uv run datamodel-codegen", help="Build code from OpenAPI Schema"}
+format = { cmd = "uv run black .", help = "Code style formating with black" }
+lf = { cmd = "uv run python -m develop.lf", help = "Convert line endings to LF" }
+test = { cmd = "uv run pytest", help = "Run tests" }
+run = { cmd = "uv run uvicorn iscc_web.asgi:application --reload", help = "Run dev server"}
 all = ["formatopenapi", "codegen", "format", "lf", "test"]
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"

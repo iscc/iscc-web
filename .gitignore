@@ -171,3 +171,9 @@ dist-ssr
 *.sln
 *.sw?
 .aider*
+
+# Agentic Coding
+CLAUDE.local.md
+
+# Bubbling, alchemical, where secret raw ingredients transform ;)
+cauldron/

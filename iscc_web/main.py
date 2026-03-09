@@ -19,7 +19,9 @@ STATIC = HERE / "static"
 
 
 app = Application(show_error_details=opts.debug)
-html_settings.use(JinjaRenderer(loader=PackageLoader("iscc_web", "templates"), enable_async=True))
+renderer = JinjaRenderer(loader=PackageLoader("iscc_web", "templates"), enable_async=True)
+register_extensions(renderer.env)
+html_settings.use(renderer)
 app.serve_files(STATIC, root_path="/static")
 app.serve_files(STATIC / "docs", root_path="/docs", extensions={".html", ".yaml"})
 app.serve_files(STATIC / "images", root_path="/images")
@@ -28,8 +30,6 @@ Route.value_patterns["mid"] = r"[a-v0-9]{13}$"
 Route.value_patterns["iscc"] = r"ISCC:[A-Z2-7]{10,73}$"
 
 get = app.router.get
-
-register_extensions(app)
 
 
 @get("/")
@@ -62,7 +62,7 @@ async def configure_cleanup(application):
 @app.on_stop
 async def shutdown(application) -> None:
     log.info("Shutdown initiated. Waiting to finish pool", enqueue=True)
-    service = app.service_provider[Pool]
+    service = app.services.provider[Pool]
     service.shutdown(wait=True)
     log.info("Pool finished", enqueue=True)
     await log.complete()

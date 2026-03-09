@@ -17,6 +17,7 @@ dependencies = [
     "uvicorn",
     "aiofiles",
     "iscc-sdk",
+    "iscc-core",
     "httpx",
     "pathvalidate",
     "aiofile",

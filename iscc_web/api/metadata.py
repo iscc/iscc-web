@@ -2,7 +2,7 @@ import asyncio
 from blake3 import blake3
 from aiofiles.ospath import exists
 from blacksheep import Response, Request
-from blacksheep.server.controllers import ApiController, get, post
+from blacksheep.server.controllers import APIController, get, post
 from iscc_web.api.common import base_url
 from iscc_web.api.schema import InlineMetadata
 from iscc_web.api.pool import Pool
@@ -11,7 +11,7 @@ from iscc_web.options import opts
 import iscc_sdk as idk
 
 
-class Metadata(ApiController, FileHandler):
+class Metadata(APIController, FileHandler):
     @classmethod
     def version(cls) -> str:
         return "v1"

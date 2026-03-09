@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from blacksheep.server.controllers import ApiController, get
+from blacksheep.server.controllers import APIController, get
 import iscc_core as ic
 from iscc_web.api.schema import IsccDetail, Unit
 
 
-class Explain(ApiController):
+class Explain(APIController):
     @classmethod
     def version(cls) -> str:
         return "v1"

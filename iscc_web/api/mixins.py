@@ -138,11 +138,12 @@ class FileHandler:
 
         return upload_meta
 
-    async def process_iscc(self, file_path: Path) -> Union[IsccMeta, Response]:
+    async def process_iscc(self, file_path: Path, pool: Pool = None) -> Union[IsccMeta, Response]:
         """Process an ISCC for file at `file_path`."""
 
         loop = asyncio.get_event_loop()
-        pool = app.service_provider[Pool]
+        if pool is None:
+            pool = app.services.provider[Pool]
         try:
             iscc_obj = await loop.run_in_executor(pool, idk.code_iscc, file_path.as_posix())
         except Exception as e:

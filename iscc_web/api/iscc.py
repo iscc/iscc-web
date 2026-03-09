@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 import aiofile
 from blacksheep import Request, ContentDispositionType, Response
-from blacksheep.server.controllers import ApiController, post, get
+from blacksheep.server.controllers import APIController, post, get
 from iscc_web.api.pool import Pool
 from iscc_web.api.mixins import FileHandler
 from iscc_web.api.common import base_url
 from loguru import logger as log
 
 
-class Iscc(ApiController, FileHandler):
+class Iscc(APIController, FileHandler):
     @classmethod
     def version(cls) -> str:
         return "v1"

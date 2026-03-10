@@ -22,5 +22,12 @@ export default defineConfig(({ command }) => ({
     outDir: "../iscc_web/static/dist/",
     emptyOutDir: true,
   },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        silenceDeprecations: ["legacy-js-api", "if-function", "color-functions", "import", "global-builtin"],
+      },
+    },
+  },
   plugins: [vue()],
 }));

@@ -1,6 +1,9 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
-import * as path from "path";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => ({
@@ -15,7 +18,7 @@ export default defineConfig(({ command }) => ({
     },
   },
   build: {
-    manifest: true,
+    manifest: "manifest.json",
     rollupOptions: {
       input: (command == "build" ? "frontend/" : "") + "main.ts",
     },
@@ -25,7 +28,7 @@ export default defineConfig(({ command }) => ({
   css: {
     preprocessorOptions: {
       scss: {
-        silenceDeprecations: ["legacy-js-api", "if-function", "color-functions", "import", "global-builtin"],
+        silenceDeprecations: ["if-function", "color-functions", "import", "global-builtin"],
       },
     },
   },

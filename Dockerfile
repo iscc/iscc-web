@@ -31,9 +31,9 @@ COPY . /app/
 #
 # frontend-build
 #
-FROM node:16.17.0 AS frontend-build
+FROM node:22-slim AS frontend-build
 
-RUN npm install -g pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
 WORKDIR /app
 

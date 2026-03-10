@@ -50,7 +50,7 @@ watch(
     formData.value.name = newFile.isccMetadata.name;
     formData.value.description = newFile.isccMetadata.description;
   },
-  { deep: true }
+  { deep: true },
 );
 
 const hashBitComparisonClass = (hashBit: string, index: number) => {

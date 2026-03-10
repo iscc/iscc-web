@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Uppy from "@uppy/core";
-import type { UppyFile } from "@uppy/utils";
+import type { Meta, Body, UppyFile } from "@uppy/core";
 import XhrUpload from "@uppy/xhr-upload";
 import { Base64 } from "js-base64";
 import { computed, onUnmounted, ref } from "vue";
@@ -8,10 +8,10 @@ import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiFolderMultipleImage } from "@mdi/js";
 
 const emit = defineEmits<{
-  (e: "file-added", file: UppyFile): void;
-  (e: "upload-progress", file: UppyFile, percentage: number): void;
-  (e: "upload-error", file: UppyFile, error: Error): void;
-  (e: "upload-success", file: UppyFile, isccMetadata: Api.IsccMetadata): void;
+  (e: "file-added", file: UppyFile<Meta, Body>): void;
+  (e: "upload-progress", file: UppyFile<Meta, Body>, percentage: number): void;
+  (e: "upload-error", file: UppyFile<Meta, Body>, error: Error): void;
+  (e: "upload-success", file: UppyFile<Meta, Body>, isccMetadata: Api.IsccMetadata): void;
 }>();
 
 const uppy = computed(() =>
@@ -20,44 +20,35 @@ const uppy = computed(() =>
       endpoint: "/api/v1/iscc",
       formData: false,
       timeout: 0,
-      headers: (file) => ({ "X-Upload-Filename": Base64.encode(file.name) }),
-      getResponseError: (responseText, response: unknown) => {
-        if (response instanceof XMLHttpRequest) {
-          return new Error(`${(response as XMLHttpRequest).status}: ${responseText}`);
-        }
-
-        return new Error(responseText);
-      },
+      headers: (file) => ({ "X-Upload-Filename": Base64.encode(file.name ?? "") }),
     })
     .on("file-added", (file) => {
       emit("file-added", file);
     })
     .on("upload-success", (file, response) => {
-      if (!file) {
-        return;
-      }
-
-      const metadata: Api.IsccMetadata = response.body;
+      if (!file) return;
+      const metadata = response.body as unknown as Api.IsccMetadata;
       emit("upload-success", file, metadata);
     })
     .on("upload-progress", (file, progress) => {
-      if (!file) {
-        return;
-      }
-
-      emit("upload-progress", file, Math.floor((progress.bytesUploaded / progress.bytesTotal) * 100));
+      if (!file) return;
+      const total = progress.bytesTotal ?? 1;
+      emit("upload-progress", file, Math.floor((progress.bytesUploaded / total) * 100));
     })
     .on("upload-error", (file, error) => {
-      if (!file) {
-        return;
+      if (!file) return;
+      // Extract server error details from the XMLHttpRequest attached by Uppy
+      const xhr = (error as Error & { request?: XMLHttpRequest }).request;
+      if (xhr?.responseText) {
+        emit("upload-error", file, new Error(`${xhr.status}: ${xhr.responseText}`));
+      } else {
+        emit("upload-error", file, error);
       }
-
-      emit("upload-error", file, error);
-    })
+    }),
 );
 
 onUnmounted(() => {
-  uppy.value.close({ reason: "unmount" });
+  uppy.value.destroy();
 });
 
 const onInputChange = () => {
@@ -107,7 +98,7 @@ const handleFiles = (fl: FileList) => {
       meta: {
         relativePath: f.webkitRelativePath,
       },
-    }))
+    })),
   );
 };
 

@@ -6,7 +6,8 @@ import * as path from "path";
 export default defineConfig(({ command }) => ({
   base: command == "build" ? "/static/dist/" : "/",
   server: {
-    origin: "http://127.0.0.1:5173",
+    origin: "http://localhost:5173",
+    cors: true,
   },
   resolve: {
     alias: {

@@ -2,6 +2,7 @@ import json
 import pathlib
 from urllib.parse import urljoin
 from jinja2_simple_tags import StandaloneTag
+from markupsafe import Markup
 from typing import Optional
 from iscc_web.options import opts
 
@@ -83,8 +84,8 @@ def register_extensions(jinja_env):
 
 
 def generate_script_tag(src):
-    return f'<script type="module" crossorigin="" src="{src}"></script>'
+    return Markup(f'<script type="module" crossorigin="" src="{src}"></script>')
 
 
 def generate_stylesheet_tag(href):
-    return f'<link rel="stylesheet" href="{href}" />'
+    return Markup(f'<link rel="stylesheet" href="{href}" />')

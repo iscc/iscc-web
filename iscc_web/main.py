@@ -2,7 +2,7 @@
 import asyncio
 import uvicorn
 from blacksheep import Application, Route
-from blacksheep.server.responses import view
+from blacksheep.server.responses import view_async
 from jinja2 import PackageLoader
 import pathlib
 from iscc_web.vite import register_extensions
@@ -34,7 +34,7 @@ get = app.router.get
 
 @get("/")
 async def index():
-    return await view("index", {})
+    return await view_async("index", {})
 
 
 async def logging_sink(msg):

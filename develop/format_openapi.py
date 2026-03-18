@@ -2,7 +2,6 @@
 import pathlib
 import yaml
 
-
 HERE = pathlib.Path(__file__).parent.absolute()
 OPENAPI = HERE.parent / "iscc_web/static/docs/openapi.yaml"
 

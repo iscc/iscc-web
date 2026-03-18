@@ -29,7 +29,7 @@ class Metadata(APIController, FileHandler):
 
         loop = asyncio.get_event_loop()
         metadata = await loop.run_in_executor(pool, idk.extract_metadata, file_path)
-        cleaned = metadata.dict(
+        cleaned = metadata.model_dump(
             include={
                 "name",
                 "description",
@@ -42,7 +42,7 @@ class Metadata(APIController, FileHandler):
             }
         )
         obj = InlineMetadata(**cleaned)
-        return self.json(obj.dict(exclude_none=True))
+        return self.json(obj.model_dump(exclude_none=True))
 
     @post("{mid:media_id}")
     async def embed(self, request: Request, media_id: str, meta: InlineMetadata, pool: Pool):
@@ -89,4 +89,6 @@ class Metadata(APIController, FileHandler):
         location_header = f"/api/v1/media/{new_media_id}".encode("ascii")
         proc_result.media_id = new_media_id
         proc_result.content = location
-        return self.created(location=location_header, value=proc_result.dict(skip_defaults=False))
+        return self.created(
+            location=location_header, value=proc_result.model_dump(exclude_none=True, by_alias=True)
+        )

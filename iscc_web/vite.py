@@ -6,7 +6,6 @@ from markupsafe import Markup
 from typing import Optional
 from iscc_web.options import opts
 
-
 PROJECT_DIR = pathlib.Path(__file__).parent.parent
 
 VITE_DEV_MODE = opts.environment == "development"

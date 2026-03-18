@@ -50,4 +50,6 @@ class Iscc(APIController, FileHandler):
         location = f"{base_url(request)}/media/{result.media_id}"
         proc_result.media_id = result.media_id
         proc_result.content = location
-        return self.created(location=location_header, value=proc_result.dict(skip_defaults=False))
+        return self.created(
+            location=location_header, value=proc_result.model_dump(exclude_none=True, by_alias=True)
+        )

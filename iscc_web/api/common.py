@@ -5,13 +5,11 @@ import shutil
 from aiofiles.os import wrap
 
 __all__ = [
-    "copyfile",
     "rmtree",
     "base_url",
 ]
 
 
-copyfile = wrap(shutil.copyfile)
 rmtree = wrap(shutil.rmtree)
 
 

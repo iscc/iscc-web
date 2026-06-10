@@ -15,7 +15,7 @@ import aiofile
 from typing import Tuple, Union
 from iscc_web.main import app
 import iscc_sdk as idk
-from iscc_web.api.common import rmtree, copyfile
+from iscc_web.api.common import rmtree
 
 
 class FileHandler:
@@ -69,11 +69,6 @@ class FileHandler:
         """Move file from source to destination"""
         await rename(src, dst)
 
-    @staticmethod
-    async def copy_file(src, dst):
-        """Copy file from source to destination"""
-        await copyfile(src, dst)
-
     async def handle_upload(self, request: Request) -> Union[UploadMeta, Response]:
         """
         Handle file upload.
@@ -100,12 +95,11 @@ class FileHandler:
             return self.status_code(400, "Bad Request - X-Upload-Filename is not base64.")
 
         try:
+            # Note: an empty filename is impossible here - only empty base64 input decodes to an
+            # empty string, and an empty header value is already rejected as missing above.
             file_name = file_name_data.decode("utf-8", "strict")
         except UnicodeDecodeError:
             return self.status_code(400, "Bad Request - X-Uploaded-Filename is not UTF-8 encoded")
-
-        if not file_name:
-            return self.status_code(400, "Bad Request - X-Upload-Filename is empty")
 
         try:
             content_type = request.content_type().decode("ascii")

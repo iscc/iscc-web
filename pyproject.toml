@@ -75,11 +75,24 @@ line-ending = "lf"
 [tool.coverage.run]
 branch = true
 source = ["iscc_web"]
+# Tests run against a uvicorn server in a child process (tests/conftest.py); measure it too.
+parallel = true
+concurrency = ["thread", "multiprocessing"]
+sigterm = true
+# Process pool workers execute only iscc-sdk code and legitimately collect no iscc_web data.
+disable_warnings = ["no-data-collected"]
 
 [tool.coverage.report]
 skip_empty = true
-# Baseline measured at Stage 2 of the v0.3.0 modernization (45.15%); ratchets to 100 in Stage 5.
-fail_under = 45
+fail_under = 100
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+]
+omit = [
+    # Generated from openapi.yaml by datamodel-code-generator (uv run poe codegen) - never hand-edited.
+    "iscc_web/api/schema.py",
+]
 
 [tool.datamodel-codegen]
 input = "iscc_web/static/docs/openapi.yaml"

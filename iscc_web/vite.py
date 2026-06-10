@@ -13,15 +13,16 @@ VITE_DEV_MODE = opts.environment == "development"
 VITE_STATIC_URL = "/static/dist/"
 VITE_MANIFEST_PATH = PROJECT_DIR / "iscc_web" / "static" / "dist" / "manifest.json"
 
-VITE_MANIFEST: Optional[dict] = None
+
+def load_manifest(path: pathlib.Path = VITE_MANIFEST_PATH) -> dict:
+    """Load the Vite build manifest from `path` or raise RuntimeError if it does not exist."""
+    if path.exists():
+        with open(path, "r") as f:
+            return json.load(f)
+    raise RuntimeError("Could not find Vite manifest.json at " + str(path))
 
 
-if not VITE_DEV_MODE:
-    if VITE_MANIFEST_PATH.exists():
-        with open(VITE_MANIFEST_PATH, "r") as f:
-            VITE_MANIFEST = json.load(f)
-    else:
-        raise RuntimeError("Could not find Vite manifest.json at " + str(VITE_MANIFEST_PATH))
+VITE_MANIFEST: Optional[dict] = None if VITE_DEV_MODE else load_manifest()
 
 
 class ViteHmrClientExtension(StandaloneTag):

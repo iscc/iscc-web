@@ -1,4 +1,5 @@
-from multiprocessing import Process
+import threading
+from multiprocessing import Event, Process
 from time import sleep, time
 import socket
 import pytest
@@ -22,25 +23,35 @@ os.environ["ISCC_WEB_CLEANUP_INTERVAL"] = "0"
 # Each xdist worker runs its own server; one iscc worker process per server is enough for
 # tests and keeps total memory in check (iscc-sdk imports are heavyweight per process).
 os.environ["ISCC_WEB_MAX_WORKERS"] = "1"
+# Small enough that tests can exercise the oversize-upload rejection with an in-memory body,
+# large enough for all iscc-samples test files.
+os.environ["ISCC_WEB_MAX_UPLOAD_SIZE"] = "1000000"
 os.environ["OPENBLAS_NUM_THREADS"] = "1"
 
 
-def _start_server():
-    uvicorn.run(app, host=server_host, port=server_port, log_level="debug")
+def _start_server(stop_event):
+    """Serve the app until stop_event is set, then exit cleanly so coverage data gets flushed."""
+    config = uvicorn.Config(app, host=server_host, port=server_port, log_level="debug")
+    server = uvicorn.Server(config)
+    thread = threading.Thread(target=server.run)
+    thread.start()
+    stop_event.wait()
+    server.should_exit = True
+    thread.join()
 
 
-def _wait_for_server(server_process, timeout=30.0):
+def wait_for_server(server_process, host=server_host, port=server_port, timeout=30.0):
     """Block until the server accepts TCP connections (or fail fast if the process died)."""
     deadline = time() + timeout
     while time() < deadline:
         if not server_process.is_alive():
             raise RuntimeError(f"The server process did not start! exitcode={server_process.exitcode}")
         try:
-            with socket.create_connection((server_host, server_port), timeout=1):
+            with socket.create_connection((host, port), timeout=1):
                 return
         except OSError:
             sleep(0.1)
-    raise RuntimeError(f"Server on port {server_port} not reachable after {timeout}s")
+    raise RuntimeError(f"Server on port {port} not reachable after {timeout}s")
 
 
 @pytest.fixture(scope="session")
@@ -50,11 +61,12 @@ def api() -> httpx.Client:
 
 @pytest.fixture(scope="session", autouse=True)
 def server():
-    server_process = Process(target=_start_server)
+    stop_event = Event()
+    server_process = Process(target=_start_server, args=(stop_event,))
     server_process.start()
-    _wait_for_server(server_process)
+    wait_for_server(server_process)
 
     yield 1
 
-    sleep(1.2)
-    server_process.terminate()
+    stop_event.set()
+    server_process.join(timeout=30)

@@ -38,18 +38,19 @@ def test_upload_extract_embed_download(api):
     result = response.json()
     media_id = result["media_id"]
     assert result == {
-        "$schema": "http://purl.org/iscc/schema/0.4.0.json",
-        "@context": "http://purl.org/iscc/context/0.4.0.jsonld",
+        "$schema": "http://purl.org/iscc/schema/0.8.0.json",
+        "@context": "http://purl.org/iscc/context/0.8.0.jsonld",
         "@type": "ImageObject",
         "acquire": "https://example.com/buy-license-for-item-here",
         "content": f"http://{server_host}:{server_port}/{server_api_path}/media/{media_id}",
         "creator": "Another Cat Lover, Joanne K. Rowling",
-        "datahash": "1e201d022472b35f48c92ea376c620a6303901751a3839cce573178cb576968c3a4d",
+        "datahash": "1e20fb7d36b70fcba298fc286d1accd20798089c2f0e94d3f1fca31be03975a50baf",
         "description": "a 1984 fantasy film co-written and directed by *Wolfgang Petersen*",
         "filename": "test-image.jpg",
-        "filesize": 57540,
+        "filesize": 57528,
+        "generator": "iscc-sdk - v0.9.3",
         "height": 133,
-        "iscc": "ISCC:KECTN76LTY522ZPCYNBTBHR4T2HGO6RDNMLX4HWUMQOQEJDSWNPURSI",
+        "iscc": "ISCC:KECTN76LTY522ZPCYNBTBHR4T2HGO6RDNMJX4P6UMT5X2NVXB7F2FGA",
         "license": "https://example.com/license-terms-for-this-item",
         "media_id": media_id,
         "mediatype": "image/jpeg",
@@ -58,7 +59,7 @@ def test_upload_extract_embed_download(api):
         "mode": "image",
         "name": "The Never Ending Story",
         "rights": "Copyright 2022 ISCC Foundation - www.iscc.codes",
-        "thumbnail": "data:image/webp;base64,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",
+        "thumbnail": "data:image/webp;base64,UklGRsYFAABXRUJQVlA4ILoFAABwIgCdASqAAFUAPxFyr1KsJiQnrhkqYYAiCWcA0NO4SzE4K729xs0KGE3TPf58LAwDWfcLC3d0xi8kjSpMSal8MME9Dkc7+SfOysASz0517nKQJQhJnjLjM10EuxQsO338neNVD0h5ihTyOGuaMBa/aF0wgoQq+uBaGlVXrTlFOF08iTVVbRj+9f60o2MbQWOKnWpQfydPftRmdXgnBdZu/z/lqnnGCHlDJNr1t80zujPSolLYAodnFkiUYGrQMuMGCtJz5/D4JUvMF7mZ2vowhrj3N6BwAuxgfcX97HkmQIeYl3C3eg7dOoufvW24Am/i/iMmS6XnCMW3gbiN9S/4dTYJ/ZPa/dXE2Gz9dIFkEa/tYyQ418LhlQwh3AD+9xtO0Qfk17nyoJMFdziQFPZz1KYYlpfULSDIgbTRRDlGGBMi6k6nsi7OsQ0j1rnQhfua79tMCfO3jFeMoB4REOpkALW6V2ZpUYblhFqY/ZzM5twYPP1hNi33QUFwQP+oAFPSyfU4lV2YFN0Be5mqSvPsDrUBhI7XWr6R0xU9GEVSGqhPBEs69ysg2BaigCpHFOcqw+VrLtsISCI39BX55LdkTGcjnf6/QTBxHXtJ2M6duEKYl3sRWiMh4w1ma2JPqowcUuttr6czP4xMR4C39UViot0K+L9Fqzm+P8u4ezUqjX0VyKiFb8WEHm7/m7vBz5bwjE/F3t7AWzozfC2BWpggw6eCNloMT3+Qkf1wPMTg3REesutDjJG9vOc8Eu0pJgmIr4GJJNeiDCkJzZ/MZKO1XW7smwZiCK9Rp11+Nm8og35M02IXMdR/baDex1KB1zDCFCAPnPWtkzhr0pEDZ8EOb47Bh6sk7IGVWxjHpgRhSyEp+WacIMw00FNVhp7xvKgTcvCSBX2rTxmQv5K8Uku2Jk+Jp4AiQ2+NVWb311HTfifFcxOtKluSEZ3n4/WCFe+fvtCVjTzfR6fUlrUmFXQrDWLWXTep+ohjKhFL7vZKiMezMygeqfn2uztDMaI0xTDM2UrOCBNLBso/tMxB63aa3QsM+sfAl7gJfT16L62WgxNHf3QyYBaA465pYSNx5p5K72bosKtt1DZMJlrHczWNbrt+5nerLrTxcWVvU4IZ4ioezwuOgiakg7JkPZ72OMcoomVYiy6WgLLlfx4Sd786L+ppyAkpXOw1EDi8CTPhNwLoDhKtcgAMsuxrFZ46kMoZ5G7Pd8axW+/RR0IGDbHPSj9bjAK3SCxKMG/NVcApdR2atgYR49K+D7mZtTriKTlLR258TynrkZlYtJgyKFCF9TofxOCMD9x74az6M2Ohof2aXwKYtSkoISostsbddNgDvbhl6LM9GNHUoF2yxjGBzzI0BppJ6ZINh+oYSPLhepzoTqK+3Dayyk6vCRv56twMXTkZ5MOk9NPTGrpbnLjR9MpbeEqQrYP9UL8qbyIU9oduNJfQjdT1gz9ciSKSqXErzVqxJNrKIZzSyhbgzjJ/tgUntGTpiXJE5+xAGiiDTG4jQiZ7aTYzYCoxuRTt8qB2X7ZjyJdnLjtD+1TckrSKmtkjdEjNIams8jZgxJq0u16TQHS3lbrOTfLkKYD8JApK/d6rrl4i99Nxg71s4LAmIlVA26V1lBcUADlZHalf8dMiu1AkBH0+vzweOGSuWDXyasCCA1Hb1iNadLefcG5dyuGlawoGIdlOWz1fgiAbuF0i15lv0TFMzvJo6eL8A1FgnGJS9F4F25aRZ32Q7ACUfDif7bN4aUdUlpRsUIom4LjAbGSDrhYfVCPE4C+f0aaXtvjyJwdQgPPyoXKrkApy5+rzsfW3iOR/A0tu4/dG9Sug5QHOgS8MccWkaxtAIGSDUWOhkTTPHMZn/zyJH8HkpMALTdSsEQJW5j8kfh7pAeHoQJOp4TrazFJ1aJo1iReTFUge0uNHQnuZmFPYF7rAdFUkF0FNogAAAA==",
         "width": 200,
     }
 

@@ -2,7 +2,7 @@ import asyncio
 from blake3 import blake3
 from aiofiles.ospath import exists
 from blacksheep import Response, Request
-from blacksheep.server.controllers import ApiController, get, post
+from blacksheep.server.controllers import APIController, get, post
 from iscc_web.api.common import base_url
 from iscc_web.api.schema import InlineMetadata
 from iscc_web.api.pool import Pool
@@ -11,7 +11,7 @@ from iscc_web.options import opts
 import iscc_sdk as idk
 
 
-class Metadata(ApiController, FileHandler):
+class Metadata(APIController, FileHandler):
     @classmethod
     def version(cls) -> str:
         return "v1"
@@ -29,7 +29,7 @@ class Metadata(ApiController, FileHandler):
 
         loop = asyncio.get_event_loop()
         metadata = await loop.run_in_executor(pool, idk.extract_metadata, file_path)
-        cleaned = metadata.dict(
+        cleaned = metadata.model_dump(
             include={
                 "name",
                 "description",
@@ -42,7 +42,7 @@ class Metadata(ApiController, FileHandler):
             }
         )
         obj = InlineMetadata(**cleaned)
-        return self.json(obj.dict(exclude_none=True))
+        return self.json(obj.model_dump(exclude_none=True))
 
     @post("{mid:media_id}")
     async def embed(self, request: Request, media_id: str, meta: InlineMetadata, pool: Pool):
@@ -60,10 +60,11 @@ class Metadata(ApiController, FileHandler):
         if not await exists(file_path):
             return self.not_found("File not found")
 
-        # Embed metadata
+        # Embed metadata - convert to the SDK model (its URL fields are str-based, exiv2 needs str)
+        sdk_meta = idk.IsccMeta.model_validate(meta.model_dump(exclude_none=True, mode="json"))
         loop = asyncio.get_event_loop()
         try:
-            genfile = await loop.run_in_executor(pool, idk.embed_metadata, file_path, meta)
+            genfile = await loop.run_in_executor(pool, idk.embed_metadata, file_path, sdk_meta)
         except Exception as e:
             return self.status_code(422, f"Unprocessable Entity - Failed to embed metadata {e}")
 
@@ -89,4 +90,4 @@ class Metadata(ApiController, FileHandler):
         location_header = f"/api/v1/media/{new_media_id}".encode("ascii")
         proc_result.media_id = new_media_id
         proc_result.content = location
-        return self.created(location=location_header, value=proc_result.dict(skip_defaults=False))
+        return self.created(location=location_header, value=proc_result.model_dump(exclude_none=True, by_alias=True))

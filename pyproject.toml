@@ -3,26 +3,29 @@ name = "iscc-web"
 version = "0.2.0"
 description = "ISCC - Generator Web Application"
 authors = [{ name = "Titusz", email = "tp@py7.de" }]
-requires-python = ">=3.9,<3.11"
+requires-python = ">=3.13"
 readme = "README.md"
 license = "Apache-2.0"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-    "blacksheep>=1.2,<2",
-    "uvicorn>=0.18,<0.19",
-    "aiofiles>=22.1,<23",
-    "iscc-sdk==0.5.1",
-    "httpx>=0.23,<0.24",
-    "pathvalidate>=2.5,<3",
-    "aiofile>=3.8,<4",
-    "jinja2-simple-tags>=0.4,<0.5",
-    "gunicorn>=20.1,<21",
-    "sentry-sdk>=1.9,<2",
-    "watchfiles>=0.17.0,<0.18",
+    "blacksheep>=2.6,<3",
+    "uvicorn>=0.34",
+    "aiofiles>=24.1",
+    "iscc-sdk==0.9.3",
+    "iscc-core>=1.2.1",
+    "httpx>=0.28",
+    "pathvalidate>=3.2",
+    "aiofile>=3.9",
+    "jinja2-simple-tags>=0.6",
+    "pydantic>=2.10",
+    "pydantic-settings>=2.7",
+    "gunicorn>=23",
+    "uvicorn-worker>=0.3",
+    "sentry-sdk>=2.20",
+    "watchfiles>=0.21",
 ]
 
 [project.urls]
@@ -33,14 +36,13 @@ iscc-web = "iscc_web.main:main"
 
 [dependency-groups]
 dev = [
-    "pytest>=7.1,<8",
-    "poethepoet>=0.16,<0.17",
-    "pytest-asyncio>=0.19,<0.20",
-    "pytest-cov>=4.0",
-    "pytest-xdist>=3.0",
-    "schemathesis>=3.17,<4",
-    "datamodel-code-generator>=0.13,<0.14",
-    "iscc-samples>=0.4,<0.5",
+    "pytest>=8.4",
+    "poethepoet>=0.30",
+    "pytest-cov>=6.0",
+    "pytest-xdist>=3.6",
+    "schemathesis>=4.21",
+    "datamodel-code-generator>=0.61",
+    "iscc-samples>=0.6",
     "ruff>=0.15.1",
     "prek>=0.2.9",
     "radon>=6.0.1",
@@ -58,7 +60,7 @@ requires = ["uv_build>=0.11.7,<0.12.0"]
 build-backend = "uv_build"
 
 [tool.ruff]
-target-version = "py39"
+target-version = "py313"
 line-length = 120
 fix = true
 
@@ -82,9 +84,10 @@ fail_under = 45
 [tool.datamodel-codegen]
 input = "iscc_web/static/docs/openapi.yaml"
 output = "iscc_web/api/schema.py"
+output-model-type = "pydantic_v2.BaseModel"
 encoding = "UTF-8"
 disable-timestamp = true
-target-python-version = "3.8"
+target-python-version = "3.13"
 
 [tool.poe.tasks]
 formatopenapi = { cmd = "uv run python -m develop.format_openapi", help = "Reformat openapi.yaml" }

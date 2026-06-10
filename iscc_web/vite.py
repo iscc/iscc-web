@@ -2,6 +2,7 @@ import json
 import pathlib
 from urllib.parse import urljoin
 from jinja2_simple_tags import StandaloneTag
+from markupsafe import Markup
 from typing import Optional
 from iscc_web.options import opts
 
@@ -76,14 +77,15 @@ class ViteAssetExtension(StandaloneTag):
         return generated_tags
 
 
-def register_extensions(app):
-    app.jinja_environment.add_extension(ViteHmrClientExtension)
-    app.jinja_environment.add_extension(ViteAssetExtension)
+def register_extensions(jinja_env):
+    """Register Vite Jinja2 extensions on the given Jinja2 Environment."""
+    jinja_env.add_extension(ViteHmrClientExtension)
+    jinja_env.add_extension(ViteAssetExtension)
 
 
 def generate_script_tag(src):
-    return f'<script type="module" crossorigin="" src="{src}"></script>'
+    return Markup(f'<script type="module" crossorigin="" src="{src}"></script>')
 
 
 def generate_stylesheet_tag(href):
-    return f'<link rel="stylesheet" href="{href}" />'
+    return Markup(f'<link rel="stylesheet" href="{href}" />')

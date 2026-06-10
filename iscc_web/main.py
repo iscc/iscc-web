@@ -2,7 +2,7 @@
 import asyncio
 import uvicorn
 from blacksheep import Application, Route
-from blacksheep.server.templating import use_templates
+from blacksheep.server.responses import view_async
 from jinja2 import PackageLoader
 import pathlib
 from iscc_web.vite import register_extensions
@@ -10,13 +10,18 @@ from iscc_web.options import opts
 from iscc_web.api.pool import Pool
 from loguru import logger as log
 from iscc_web.cleanup import cleanup_task
+from blacksheep.server.rendering.jinja2 import JinjaRenderer
+from blacksheep.settings.html import html_settings
 
 __all__ = ["app"]
 HERE = pathlib.Path(__file__).parent.absolute()
 STATIC = HERE / "static"
 
 
-app = Application(show_error_details=opts.debug, debug=opts.debug)
+app = Application(show_error_details=opts.debug)
+renderer = JinjaRenderer(loader=PackageLoader("iscc_web", "templates"), enable_async=True)
+register_extensions(renderer.env)
+html_settings.use(renderer)
 app.serve_files(STATIC, root_path="/static")
 app.serve_files(STATIC / "docs", root_path="/docs", extensions={".html", ".yaml"})
 app.serve_files(STATIC / "images", root_path="/images")
@@ -26,13 +31,10 @@ Route.value_patterns["iscc"] = r"ISCC:[A-Z2-7]{10,73}$"
 
 get = app.router.get
 
-view = use_templates(app, loader=PackageLoader("iscc_web", "templates"), enable_async=True)
-register_extensions(app)
-
 
 @get("/")
 async def index():
-    return await view("index", {})
+    return await view_async("index", {})
 
 
 async def logging_sink(msg):
@@ -58,7 +60,7 @@ async def configure_cleanup(application):
 @app.on_stop
 async def shutdown(application) -> None:
     log.info("Shutdown initiated. Waiting to finish pool", enqueue=True)
-    service = app.service_provider[Pool]
+    service = app.services.provider[Pool]
     service.shutdown(wait=True)
     log.info("Pool finished", enqueue=True)
     await log.complete()

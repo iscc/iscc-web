@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 from httpx import codes
-import iscc_core as ic
 
 
 def test_explain_iscc(api):
-    response = api.get(f"/explain/{ic.Code.rnd(ic.MT.ISCC, bits=256).code}")
+    response = api.get("/explain/KMDMRJYGHHVRCZ5TM6U4G6D4MXA6LAXC4ZRPOKFU7JBEQXR2BJOS6NA")
     assert response.status_code == codes.OK
     assert response.json() == {
         "iscc": "ISCC:KMDMRJYGHHVRCZ5TM6U4G6D4MXA6LAXC4ZRPOKFU7JBEQXR2BJOS6NA",

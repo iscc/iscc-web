@@ -15,13 +15,14 @@ server_host = "localhost"
 server_port = 44555 + _port_offset
 server_api_path = "api/v1"
 
-os.environ["ISCC_WEB_SCHEME"] = "http"
-os.environ["ISCC_WEB_HOST"] = "localhost"
-os.environ["ISCC_WEB_PORT"] = str(server_port)
 os.environ["ISCC_WEB_PRIVATE_FILES"] = "false"
 # Workers share the media/ directory; disable the periodic cleanup task so parallel servers
 # do not race each other deleting expired package dirs.
 os.environ["ISCC_WEB_CLEANUP_INTERVAL"] = "0"
+# Each xdist worker runs its own server; one iscc worker process per server is enough for
+# tests and keeps total memory in check (iscc-sdk imports are heavyweight per process).
+os.environ["ISCC_WEB_MAX_WORKERS"] = "1"
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
 
 
 def _start_server():
@@ -33,7 +34,7 @@ def _wait_for_server(server_process, timeout=30.0):
     deadline = time() + timeout
     while time() < deadline:
         if not server_process.is_alive():
-            raise RuntimeError("The server process did not start!")
+            raise RuntimeError(f"The server process did not start! exitcode={server_process.exitcode}")
         try:
             with socket.create_connection((server_host, server_port), timeout=1):
                 return

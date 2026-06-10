@@ -286,7 +286,7 @@ components:
         '@context':
           type: string
           format: uri
-          example: http://purl.org/iscc/context/0.4.0.jsonld
+          example: http://purl.org/iscc/context/0.8.0.jsonld
           description: The [JSON-LD](https://json-ld.org/) Context URI for ISCC metadata.
         '@type':
           type: string
@@ -302,7 +302,7 @@ components:
         $schema:
           type: string
           format: uri
-          example: http://purl.org/iscc/schema/0.4.0.json
+          example: http://purl.org/iscc/schema/0.8.0.json
           description: The [JSON Schema](https://json-schema.org/) URI for ISCC metadata.
         iscc:
           $ref: '#/components/schemas/Iscc'
@@ -328,6 +328,10 @@ components:
           maxLength: 16384
           example: data:application/json;charset=utf-8;base64,eyJleHRlbmRlZCI6Im1ldGFkYXRhIn0=
           description: Subject, industry, or use-case specific metadata encoded as Data-URL.
+        identifier:
+          type: string
+          description: Other identifier(s) referencing the work, product or other abstraction
+            of which the referenced **digital content** is a full or partial manifestation.
         creator:
           description: An entity primarily responsible for making the resource.
           type: string

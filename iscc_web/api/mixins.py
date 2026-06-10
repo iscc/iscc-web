@@ -56,13 +56,13 @@ class FileHandler:
     async def write_meta(self, media_id: str, file_meta: UploadMeta) -> None:
         """Write file metadata."""
         async with aiofile.async_open(self.meta_path(media_id), "wb") as infile:
-            await infile.write(file_meta.json(indent=2).encode("utf-8"))
+            await infile.write(file_meta.model_dump_json(indent=2).encode("utf-8"))
 
     async def read_meta(self, media_id) -> UploadMeta:
         """Read file metadata."""
         async with aiofile.async_open(self.meta_path(media_id), "rb") as infile:
             data = await infile.read()
-        return UploadMeta.parse_raw(data)
+        return UploadMeta.model_validate_json(data)
 
     @staticmethod
     async def move_file(src: str, dst: str):
@@ -139,7 +139,7 @@ class FileHandler:
         """Process an ISCC for file at `file_path`."""
 
         loop = asyncio.get_event_loop()
-        pool = app.service_provider[Pool]
+        pool = app.services.provider[Pool]
         try:
             iscc_obj = await loop.run_in_executor(pool, idk.code_iscc, file_path.as_posix())
         except Exception as e:
@@ -150,7 +150,8 @@ class FileHandler:
 
         # Store ISCC processing result
         result_path = file_path.parent / f"{file_path.parent.name}.iscc.json"
+        result_json = iscc_obj.model_dump_json(indent=2, exclude_none=True, by_alias=True)
         async with aiofile.async_open(result_path, "wb") as outfile:
-            await outfile.write(iscc_obj.json(indent=2).encode("utf-8"))
+            await outfile.write(result_json.encode("utf-8"))
 
         return iscc_obj

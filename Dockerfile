@@ -1,4 +1,6 @@
-FROM python:3.9 AS builder
+# bookworm pin: current python:3.9 tags resolve to Debian trixie, whose taglib 2.0 breaks the
+# pytaglib 1.5.0 sdist build and which dropped the libmagic1/libtag1v5-vanilla runtime packages.
+FROM python:3.9-bookworm AS builder
 
 # Disable stdout/stderr buffering, can cause issues with Docker logs
 ENV PYTHONUNBUFFERED=1
@@ -9,7 +11,7 @@ RUN apt-get update && \
   rm -rf /var/lib/apt/lists
 
 # Install uv
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:0.11 /uv /uvx /bin/
 
 WORKDIR /app
 
@@ -49,7 +51,7 @@ RUN pnpm run build
 # prod-runtime
 #
 
-FROM python:3.9-slim AS prod-runtime
+FROM python:3.9-slim-bookworm AS prod-runtime
 
 LABEL org.opencontainers.image.source=https://github.com/iscc/iscc-web
 

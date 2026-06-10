@@ -9,7 +9,7 @@ Recorded 2026-06-10 on Windows 10, prior to any toolchain or code changes (tree 
 - Installer: Poetry 1.2.1 run via `uvx --prerelease=allow --python 3.9 --from "poetry==1.2.1"`
     (Poetry 2.x cannot read the lock-version 1.1 `poetry.lock`; Poetry 1.2.1 itself needs
     `--prerelease=allow` because its `cleo` dependency resolves to a yanked release)
-- `poetry install` succeeded with all 121 locked packages; Python 3.10 is NOT viable for the
+- `poetry install` succeeded with all 119 locked packages; Python 3.10 is NOT viable for the
     baseline (PyYAML 5.4.1 has no cp310 wheels and its sdist no longer builds under Cython 3)
 - Result: **16 passed in 36.77s** — zero failures
 

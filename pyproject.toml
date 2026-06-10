@@ -76,7 +76,7 @@ source = ["iscc_web"]
 
 [tool.coverage.report]
 skip_empty = true
-# Baseline measured at Stage 2 of the v0.3.0 modernization (45.32%); ratchets to 100 in Stage 5.
+# Baseline measured at Stage 2 of the v0.3.0 modernization (45.15%); ratchets to 100 in Stage 5.
 fail_under = 45
 
 [tool.datamodel-codegen]
@@ -90,8 +90,8 @@ target-python-version = "3.8"
 formatopenapi = { cmd = "uv run python -m develop.format_openapi", help = "Reformat openapi.yaml" }
 codegen = { shell = "uv run datamodel-codegen && uv run ruff format iscc_web/api/schema.py", help = "Build code from OpenAPI Schema" }
 format = { cmd = "uv run ruff format .", help = "Format code files" }
-precommit = { shell = "uv run prek run", help = "Run prek hooks on changed files" }
-test = { shell = "uv run python -m pytest -n auto --tb=line --no-header -q --cov --cov-config=pyproject.toml --cov-report=term-missing", help = "Test the code with pytest" }
-check-complexity = { shell = "uv run radon cc --min C --show-complexity --average iscc_web/", help = "Check code complexity with radon" }
+precommit = { cmd = "uv run prek run", help = "Run prek hooks on changed files" }
+test = { cmd = "uv run python -m pytest -n auto --tb=line --no-header -q --cov --cov-config=pyproject.toml --cov-report=term-missing", help = "Test the code with pytest" }
+check-complexity = { cmd = "uv run radon cc --min C --show-complexity --average iscc_web/", help = "Check code complexity with radon" }
 run = { cmd = "uv run uvicorn iscc_web.asgi:application --reload", help = "Run dev server" }
 all = { sequence = ["formatopenapi", "codegen", "format", "test", "check-complexity"], help = "Run all tasks" }

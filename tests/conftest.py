@@ -1,5 +1,6 @@
 from multiprocessing import Process
-from time import sleep
+from time import sleep, time
+import socket
 import pytest
 import uvicorn
 from iscc_web import app
@@ -18,18 +19,27 @@ os.environ["ISCC_WEB_SCHEME"] = "http"
 os.environ["ISCC_WEB_HOST"] = "localhost"
 os.environ["ISCC_WEB_PORT"] = str(server_port)
 os.environ["ISCC_WEB_PRIVATE_FILES"] = "false"
-
-
-def get_sleep_time():
-    # when starting a server process,
-    # a longer sleep time is necessary on Windows
-    if os.name == "nt":
-        return 1.5
-    return 0.5
+# Workers share the media/ directory; disable the periodic cleanup task so parallel servers
+# do not race each other deleting expired package dirs.
+os.environ["ISCC_WEB_CLEANUP_INTERVAL"] = "0"
 
 
 def _start_server():
     uvicorn.run(app, host=server_host, port=server_port, log_level="debug")
+
+
+def _wait_for_server(server_process, timeout=30.0):
+    """Block until the server accepts TCP connections (or fail fast if the process died)."""
+    deadline = time() + timeout
+    while time() < deadline:
+        if not server_process.is_alive():
+            raise RuntimeError("The server process did not start!")
+        try:
+            with socket.create_connection((server_host, server_port), timeout=1):
+                return
+        except OSError:
+            sleep(0.1)
+    raise RuntimeError(f"Server on port {server_port} not reachable after {timeout}s")
 
 
 @pytest.fixture(scope="session")
@@ -41,10 +51,7 @@ def api() -> httpx.Client:
 def server():
     server_process = Process(target=_start_server)
     server_process.start()
-    sleep(get_sleep_time())
-
-    if not server_process.is_alive():
-        raise TypeError("The server process did not start!")
+    _wait_for_server(server_process)
 
     yield 1
 

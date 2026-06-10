@@ -18,6 +18,8 @@ jobs:
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.11.7"
 
       - name: Install Dependencies
         run: uv sync --frozen

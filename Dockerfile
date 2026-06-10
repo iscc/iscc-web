@@ -1,14 +1,7 @@
-# bookworm pin: current python:3.9 tags resolve to Debian trixie, whose taglib 2.0 breaks the
-# pytaglib 1.5.0 sdist build and which dropped the libmagic1/libtag1v5-vanilla runtime packages.
-FROM python:3.9-bookworm AS builder
+FROM python:3.13-slim AS builder
 
 # Disable stdout/stderr buffering, can cause issues with Docker logs
 ENV PYTHONUNBUFFERED=1
-
-# Install taglib
-RUN apt-get update && \
-  apt-get install --no-install-recommends -y libtag1-dev && \
-  rm -rf /var/lib/apt/lists
 
 # Install uv
 COPY --from=ghcr.io/astral-sh/uv:0.11 /uv /uvx /bin/
@@ -26,7 +19,8 @@ FROM builder AS prod-build
 # Install dependencies into /app/.venv
 RUN uv sync --frozen --no-dev --no-install-project
 
-RUN /app/.venv/bin/python -m iscc_sdk.install
+# Fetch content processing tools (ffmpeg, ffprobe, fpcalc) into /root/.local/share/iscc-sdk
+RUN /app/.venv/bin/iscc-sdk install
 
 COPY . /app/
 
@@ -51,11 +45,9 @@ RUN pnpm run build
 # prod-runtime
 #
 
-FROM python:3.9-slim-bookworm AS prod-runtime
+FROM python:3.13-slim AS prod-runtime
 
 LABEL org.opencontainers.image.source=https://github.com/iscc/iscc-web
-
-RUN apt-get update && apt-get install --no-install-recommends -y libmagic1 libtag1v5-vanilla && rm -rf /var/lib/apt/lists
 
 # Disable stdout/stderr buffering, can cause issues with Docker logs
 ENV PYTHONUNBUFFERED=1
@@ -67,7 +59,6 @@ ENV ISCC_WEB_ENVIRONMENT=production
 ENV PORT=8000
 
 COPY --from=prod-build /root/.local/share/iscc-sdk /root/.local/share/iscc-sdk
-COPY --from=prod-build /root/.ipfs /root/.ipfs
 COPY --from=prod-build /app /app
 COPY --from=frontend-build /app/iscc_web/static/dist /app/iscc_web/static/dist
 
@@ -75,4 +66,4 @@ WORKDIR /app
 
 EXPOSE 8000/tcp
 
-CMD ["gunicorn", "iscc_web.main:app", "-k", "uvicorn.workers.UvicornWorker"]
+CMD ["gunicorn", "iscc_web.main:app", "-k", "uvicorn_worker.UvicornWorker"]

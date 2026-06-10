@@ -358,7 +358,7 @@ components:
           - type: string
           - type: array
             items:
-            - type: string
+              type: string
           description: Keywords or tags used to describe this content. Multiple entries in
             a keywords list are typically delimited by commas.
     TechnicalMetadata:

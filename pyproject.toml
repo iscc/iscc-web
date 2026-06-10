@@ -66,6 +66,10 @@ fix = true
 preview = true
 line-ending = "lf"
 
+[tool.ruff.lint.per-file-ignores]
+# Star imports register BlackSheep controllers as an import side effect.
+"iscc_web/__init__.py" = ["F403"]
+
 [tool.coverage.run]
 branch = true
 source = ["iscc_web"]

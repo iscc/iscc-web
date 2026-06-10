@@ -6,6 +6,7 @@ import iscc_core as ic
 import iscc_sct as sct
 import xxhash
 from blacksheep.server.controllers import APIController, post
+from loguru import logger as log
 from iscc_web.api.pool import Pool
 from iscc_web.options import opts
 from iscc_web.api.schema import SimprintRequest
@@ -80,7 +81,9 @@ class Simprint(APIController):
         loop = asyncio.get_event_loop()
         try:
             result = await loop.run_in_executor(pool, text_simprints, query.text)
-        except Exception as e:
-            return self.status_code(422, f"Unprocessable Entity - simprint processing error: {e}")
+        except Exception:
+            # Exception details may contain server paths (e.g. model file locations).
+            log.exception("Simprint processing failed")
+            return self.status_code(422, "Unprocessable Entity - simprint processing error.")
 
         return self.json(result)

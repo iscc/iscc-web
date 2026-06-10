@@ -17,6 +17,7 @@ from typing import Tuple, Union
 from iscc_web.main import app
 import iscc_sdk as idk
 from iscc_web.api.common import rmtree
+from loguru import logger as log
 
 
 def code_iscc(fp, semantic=False, granular=False):
@@ -175,11 +176,16 @@ class FileHandler:
         pool = app.services.provider[Pool]
         try:
             iscc_obj = await loop.run_in_executor(pool, code_iscc, file_path.as_posix(), semantic, granular)
-        except Exception as e:
+        except idk.IsccUnsupportedMediatype as e:
+            # Safe to echo - the message only contains the mediatype and the client's own filename.
             return self.status_code(422, str(e))
+        except Exception:
+            # Other exception details may contain server paths (e.g. subprocess command lines).
+            log.exception("ISCC processing failed")
+            return self.status_code(422, "ISCC processing error.")
 
         if iscc_obj is None:
-            return self.status_code(422, "ISCC processsing error.")
+            return self.status_code(422, "ISCC processing error.")
 
         # Store ISCC processing result
         result_path = file_path.parent / f"{file_path.parent.name}.iscc.json"

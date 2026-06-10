@@ -5,6 +5,7 @@ import types
 from concurrent.futures import Future
 
 from iscc_samples import images
+import iscc_sdk as idk
 
 import iscc_web.api.mixins as mixins
 import iscc_web.api.simprint as simprint_module
@@ -52,9 +53,21 @@ def _make_package(media_path, file_name="file.jpg", with_file=True):
 
 
 def test_process_iscc_error_result(monkeypatch, tmp_path):
-    monkeypatch.setattr(mixins, "app", _fake_app(FakePool(ValueError("processing failed"))))
+    """Unexpected exceptions must not leak internal details (e.g. server paths) to the client."""
+    error = ValueError(r"Command 'C:\server\tools\fpcalc.exe' returned non-zero exit status")
+    monkeypatch.setattr(mixins, "app", _fake_app(FakePool(error)))
     response = asyncio.run(Iscc().process_iscc(tmp_path / "file.jpg"))
     assert response.status == 422
+    assert response.content.body == b"ISCC processing error."
+
+
+def test_process_iscc_unsupported_mediatype(monkeypatch, tmp_path):
+    """Unsupported mediatype messages are safe and passed through to the client."""
+    error = idk.IsccUnsupportedMediatype("No known processing mode for application/octet-stream")
+    monkeypatch.setattr(mixins, "app", _fake_app(FakePool(error)))
+    response = asyncio.run(Iscc().process_iscc(tmp_path / "file.jpg"))
+    assert response.status == 422
+    assert response.content.body == b"No known processing mode for application/octet-stream"
 
 
 def test_process_iscc_none_result(monkeypatch, tmp_path):
@@ -77,11 +90,25 @@ def test_delete_file_package_vanished(monkeypatch, tmp_path):
 
 
 def test_embed_failure(monkeypatch, tmp_path):
+    """Unexpected exceptions must not leak internal details (e.g. server paths) to the client."""
     monkeypatch.setattr(opts, "media_path", tmp_path)
     media_id = _make_package(tmp_path)
-    pool = FakePool(ValueError("embedding failed"))
+    pool = FakePool(ValueError(r"exiv2 failed for C:\server\media\file.jpg"))
     response = asyncio.run(Metadata().embed(None, media_id, InlineMetadata(name="x"), pool))
     assert response.status == 422
+    assert response.content.body == b"Unprocessable Entity - Failed to embed metadata."
+
+
+def test_embed_unsupported_mediatype(monkeypatch, tmp_path):
+    """Unsupported mediatype messages are safe and passed through to the client."""
+    monkeypatch.setattr(opts, "media_path", tmp_path)
+    media_id = _make_package(tmp_path)
+    pool = FakePool(idk.IsccUnsupportedMediatype("Unsupported mediatype text/plain for file.jpg"))
+    response = asyncio.run(Metadata().embed(None, media_id, InlineMetadata(name="x"), pool))
+    assert response.status == 422
+    assert response.content.body == (
+        b"Unprocessable Entity - Failed to embed metadata: Unsupported mediatype text/plain for file.jpg"
+    )
 
 
 def test_embed_returns_none(monkeypatch, tmp_path):
@@ -105,9 +132,11 @@ def test_code_iscc_semantic_without_semantic_code(monkeypatch):
 
 
 def test_simprint_processing_error():
-    pool = FakePool(ValueError("simprint processing failed"))
+    """Exceptions must not leak internal details (e.g. model file locations) to the client."""
+    pool = FakePool(ValueError(r"cannot load C:\server\models\sct.onnx"))
     response = asyncio.run(Simprint().create_simprint(SimprintRequest(text="some text"), pool))
     assert response.status == 422
+    assert response.content.body == b"Unprocessable Entity - simprint processing error."
 
 
 def test_text_simprints_without_semantic_features(monkeypatch):

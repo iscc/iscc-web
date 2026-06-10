@@ -9,6 +9,7 @@ from iscc_web.api.pool import Pool
 from iscc_web.api.mixins import FileHandler
 from iscc_web.options import opts
 import iscc_sdk as idk
+from loguru import logger as log
 
 
 class Metadata(APIController, FileHandler):
@@ -66,8 +67,13 @@ class Metadata(APIController, FileHandler):
         loop = asyncio.get_event_loop()
         try:
             genfile = await loop.run_in_executor(pool, idk.embed_metadata, file_path, sdk_meta)
-        except Exception as e:
-            return self.status_code(422, f"Unprocessable Entity - Failed to embed metadata {e}")
+        except idk.IsccUnsupportedMediatype as e:
+            # Safe to echo - the message only contains the mediatype and the client's own filename.
+            return self.status_code(422, f"Unprocessable Entity - Failed to embed metadata: {e}")
+        except Exception:
+            # Other exception details may contain server paths (e.g. subprocess command lines).
+            log.exception("Metadata embedding failed")
+            return self.status_code(422, "Unprocessable Entity - Failed to embed metadata.")
 
         if genfile is None:
             return self.status_code(422, "Unprocessable Entity - Failed to embed metadata.")

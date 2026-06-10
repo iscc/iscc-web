@@ -6,10 +6,11 @@ The POST /simprint endpoint promises byte-identical output to iscc-search's
 `iscc_search.processing.text_simprints()`. This script runs the reference implementation on a
 small text corpus and stores inputs and expected outputs in `tests/data/simprint_fixtures.json`.
 
-Run it with the iscc-search virtualenv interpreter (iscc-sct must be installed there):
+Run it with the iscc-search virtualenv interpreter (iscc-sct must be installed there), e.g.
+from an iscc-search checkout next to this repository:
 
-    cd C:/Users/titusz/Code/iscc/iscc-search
-    .venv/Scripts/python.exe C:/Users/titusz/Code/iscc/iscc-web/develop/gen_simprint_fixtures.py
+    cd ../iscc-search
+    uv run python ../iscc-web/develop/gen_simprint_fixtures.py
 """
 
 import json

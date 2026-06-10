@@ -6,15 +6,18 @@ from iscc_web import app
 import httpx
 import os
 
-os.environ["ISCC_WEB_SCHEME"] = "http"
-os.environ["ISCC_WEB_HOST"] = "localhost"
-os.environ["ISCC_WEB_PORT"] = "44555"
-os.environ["ISCC_WEB_PRIVATE_FILES"] = "false"
-
+# Each pytest-xdist worker (gw0, gw1, ...) gets its own server port to avoid bind conflicts.
+_worker = os.environ.get("PYTEST_XDIST_WORKER", "master")
+_port_offset = int(_worker[2:]) if _worker.startswith("gw") else 0
 
 server_host = "localhost"
-server_port = 44555
+server_port = 44555 + _port_offset
 server_api_path = "api/v1"
+
+os.environ["ISCC_WEB_SCHEME"] = "http"
+os.environ["ISCC_WEB_HOST"] = "localhost"
+os.environ["ISCC_WEB_PORT"] = str(server_port)
+os.environ["ISCC_WEB_PRIVATE_FILES"] = "false"
 
 
 def get_sleep_time():

@@ -3,12 +3,11 @@ name = "iscc-web"
 version = "0.2.0"
 description = "ISCC - Generator Web Application"
 authors = [{ name = "Titusz", email = "tp@py7.de" }]
-requires-python = ">=3.8,<3.11"
+requires-python = ">=3.9,<3.11"
 readme = "README.md"
 license = "Apache-2.0"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
 ]
@@ -35,12 +34,16 @@ iscc-web = "iscc_web.main:main"
 [dependency-groups]
 dev = [
     "pytest>=7.1,<8",
-    "black>=22.8,<23",
     "poethepoet>=0.16,<0.17",
     "pytest-asyncio>=0.19,<0.20",
+    "pytest-cov>=4.0",
+    "pytest-xdist>=3.0",
     "schemathesis>=3.17,<4",
     "datamodel-code-generator>=0.13,<0.14",
     "iscc-samples>=0.4,<0.5",
+    "ruff>=0.15.1",
+    "prek>=0.2.9",
+    "radon>=6.0.1",
 ]
 
 [tool.uv]
@@ -54,10 +57,23 @@ module-root = ""
 requires = ["uv_build>=0.11.7,<0.12.0"]
 build-backend = "uv_build"
 
-[tool.black]
-line-length = 100
-target-version = ['py38']
+[tool.ruff]
+target-version = "py39"
+line-length = 120
+fix = true
+
+[tool.ruff.format]
 preview = true
+line-ending = "lf"
+
+[tool.coverage.run]
+branch = true
+source = ["iscc_web"]
+
+[tool.coverage.report]
+skip_empty = true
+# Baseline measured at Stage 2 of the v0.3.0 modernization (45.32%); ratchets to 100 in Stage 5.
+fail_under = 45
 
 [tool.datamodel-codegen]
 input = "iscc_web/static/docs/openapi.yaml"
@@ -67,10 +83,11 @@ disable-timestamp = true
 target-python-version = "3.8"
 
 [tool.poe.tasks]
-formatopenapi = { cmd = "uv run python -m develop.format_openapi", help = "Reformat openapi.yaml"}
-codegen = { cmd = "uv run datamodel-codegen", help="Build code from OpenAPI Schema"}
-format = { cmd = "uv run black .", help = "Code style formating with black" }
-lf = { cmd = "uv run python -m develop.lf", help = "Convert line endings to LF" }
-test = { cmd = "uv run pytest", help = "Run tests" }
-run = { cmd = "uv run uvicorn iscc_web.asgi:application --reload", help = "Run dev server"}
-all = ["formatopenapi", "codegen", "format", "lf", "test"]
+formatopenapi = { cmd = "uv run python -m develop.format_openapi", help = "Reformat openapi.yaml" }
+codegen = { shell = "uv run datamodel-codegen && uv run ruff format iscc_web/api/schema.py", help = "Build code from OpenAPI Schema" }
+format = { cmd = "uv run ruff format .", help = "Format code files" }
+precommit = { shell = "uv run prek run", help = "Run prek hooks on changed files" }
+test = { shell = "uv run python -m pytest -n auto --tb=line --no-header -q --cov --cov-config=pyproject.toml --cov-report=term-missing", help = "Test the code with pytest" }
+check-complexity = { shell = "uv run radon cc --min C --show-complexity --average iscc_web/", help = "Check code complexity with radon" }
+run = { cmd = "uv run uvicorn iscc_web.asgi:application --reload", help = "Run dev server" }
+all = { sequence = ["formatopenapi", "codegen", "format", "test", "check-complexity"], help = "Run all tasks" }

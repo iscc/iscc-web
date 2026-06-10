@@ -3,6 +3,8 @@ from httpx import codes
 from iscc_samples import images
 import base64
 
+from tests.conftest import server_host, server_port, server_api_path
+
 
 def test_upload_extract_embed_download(api):
     # upload
@@ -40,7 +42,7 @@ def test_upload_extract_embed_download(api):
         "@context": "http://purl.org/iscc/context/0.4.0.jsonld",
         "@type": "ImageObject",
         "acquire": "https://example.com/buy-license-for-item-here",
-        "content": f"http://localhost:44555/api/v1/media/{media_id}",
+        "content": f"http://{server_host}:{server_port}/{server_api_path}/media/{media_id}",
         "creator": "Another Cat Lover, Joanne K. Rowling",
         "datahash": "1e201d022472b35f48c92ea376c620a6303901751a3839cce573178cb576968c3a4d",
         "description": "a 1984 fantasy film co-written and directed by *Wolfgang Petersen*",

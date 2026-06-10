@@ -1,0 +1,34 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: ^media/
+      - id: check-added-large-files
+        exclude: ^uv\.lock$
+      - id: end-of-file-fixer
+        exclude: ^media/
+      - id: fix-byte-order-marker
+      - id: check-json
+      - id: check-toml
+      - id: check-yaml
+      - id: mixed-line-ending
+        args: [--fix=lf]
+        exclude: ^media/
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.1
+    hooks:
+      - id: ruff-format
+      - id: ruff-check
+        args: [--fix]
+  - repo: https://github.com/executablebooks/mdformat
+    rev: 1.0.0
+    hooks:
+      - id: mdformat
+        additional_dependencies:
+          - "mdformat-mkdocs[recommended]"
+  - repo: https://github.com/python-openapi/openapi-spec-validator
+    rev: 0.7.2
+    hooks:
+      - id: openapi-spec-validator
+        files: ^iscc_web/static/docs/openapi\.yaml$

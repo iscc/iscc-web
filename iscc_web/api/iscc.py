@@ -27,8 +27,8 @@ class Iscc(APIController, FileHandler):
         )
 
     @post()
-    async def create_iscc(self, request: Request):
-        """Upload and create ISCC-CODE for media asset."""
+    async def create_iscc(self, request: Request, semantic: bool = False, granular: bool = False):
+        """Upload and create ISCC-CODE for media asset (optional semantic units / granular features)."""
 
         result = await self.handle_upload(request)
         if isinstance(result, Response):
@@ -38,7 +38,7 @@ class Iscc(APIController, FileHandler):
         file_path = package_dir / result.clean_file_name
 
         log.info(f"Start Processing: {result.media_id}", enqueue=True)
-        proc_result = await self.process_iscc(file_path)
+        proc_result = await self.process_iscc(file_path, semantic=semantic, granular=granular)
         log.info(f"Finished Processing: {result.media_id}", enqueue=True)
 
         if isinstance(proc_result, Response):

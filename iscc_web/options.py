@@ -15,7 +15,12 @@ class IsccWebOptions(BaseSettings):
     environment: str = "development"
     site_address: AnyHttpUrl = AnyHttpUrl("http://localhost:8000")
     media_path: Path = HERE.parent.absolute() / "media"
-    max_workers: Optional[int] = Field(None, description="Max number of iscc worker processes (defaults to CPU count)")
+    max_workers: Optional[int] = Field(
+        None,
+        description="Max number of iscc worker processes (defaults to CPU count). Each worker lazy-loads "
+        "iscc-sdk and, for semantic features, the iscc-sct/iscc-sci ONNX models - several hundred MB of "
+        "RAM per worker.",
+    )
     max_upload_size: int = 1_073_741_824  # 1 GB
     io_read_size: int = 2_097_152  # 2 MB
     private_files: bool = Field(True, description="Restrict file downloads/deletions to original uploader")

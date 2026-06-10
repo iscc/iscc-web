@@ -20,6 +20,18 @@ upload/download, metadata extraction/embedding and ISCC processing.<br>
 Files uploaded for processing are automatically deleted after a configurable timeout.
 An interactive API documentation is available at [/docs](https://iscc.io/docs)<br><br>
 
+**Experimental features** (not part of ISO 24138, algorithms may change before their v1.0
+release):
+
+- `POST /api/v1/iscc?semantic=true` adds the ISCC-UNITs of the media asset to the `units`
+    field, including Semantic-Code units for text ([iscc-sct](https://github.com/iscc/iscc-sct))
+    and image ([iscc-sci](https://github.com/iscc/iscc-sci)) content. The composite ISCC-CODE
+    itself always stays a pure ISO 24138 identifier.
+- `POST /api/v1/iscc?granular=true` adds granular simprint features to the `features` field.
+- `POST /api/v1/simprint` generates granular simprints from plain text - byte-identical to
+    [iscc-search](https://github.com/iscc/iscc-search)'s local simprint generation, so search
+    services can delegate text processing to this service.
+
 <img align="left" width="200" src="docs/iscc-web-vue-frontend.jpg?raw=true">
 
 **Demo Frontend**
@@ -41,6 +53,10 @@ Configuration is handled by environment variables:
 - `ISCC_WEB_CLEANUP_INTERVAL`: interval in seconds to run file cleanup task. Use 0 to deactivate (default: 600).
 - `ISCC_WEB_LOG_LEVEL`: set log level (default: `DEBUG`).
 - `ISCC_WEB_IO_READ_SIZE`: file read chunk size (default: 2097152).
+- `ISCC_WEB_MAX_WORKERS`: max number of ISCC worker processes (default: CPU count). Each worker
+    lazy-loads the iscc-sdk toolchain and - when semantic features are requested - the iscc-sct and
+    iscc-sci ONNX models, which can take several hundred MB of RAM per worker. Lower this value on
+    memory-constrained hosts.
 - `ISCC_WEB_SENTRY_DSN`: optional sentry dsn for error reporting (default: emtpy string).
 
 The production Dockerfile also supports `PORT` to configure gunicorns default port. (see [gunicorn
@@ -117,14 +133,10 @@ ISCC_WEB_IO_READ_SIZE=2097152
 FORWARDED_ALLOW_IPS=*
 ```
 
-You can also configure iscc-core and iscc-sdk dependencies. For example to activate generation
-of granular fingerprints (currently only implemented for text) add the following to your .env:
-
-```.env
-ISCC_SDK_GRANULAR=true
-```
-
-For available environment variables see:
+Granular fingerprints and semantic ISCC-UNITs are requested per API call via the `granular`
+and `semantic` query params on `POST /api/v1/iscc` (see [/docs](https://iscc.io/docs)) -
+they are not server configuration. You can still configure the iscc-core and iscc-sdk
+dependencies through their own environment variables:
 
 - https://sdk.iscc.codes/options/
 - https://core.iscc.codes/options/options/

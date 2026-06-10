@@ -27,6 +27,9 @@ RUN uv sync --frozen --no-dev --no-install-project
 # Fetch content processing tools (ffmpeg, ffprobe, fpcalc) into /root/.local/share/iscc-sdk
 RUN /app/.venv/bin/iscc-sdk install
 
+# Pre-download semantic-code ONNX models so containers start warm (no first-request download)
+RUN /app/.venv/bin/python -c "import iscc_sct.utils, iscc_sci.utils; iscc_sct.utils.get_model(); iscc_sci.utils.get_model()"
+
 COPY . /app/
 
 #
@@ -71,6 +74,8 @@ ENV ISCC_WEB_ENVIRONMENT=production
 ENV PORT=8000
 
 COPY --from=prod-build /root/.local/share/iscc-sdk /root/.local/share/iscc-sdk
+COPY --from=prod-build /root/.local/share/iscc-sct /root/.local/share/iscc-sct
+COPY --from=prod-build /root/.local/share/iscc-sci /root/.local/share/iscc-sci
 COPY --from=prod-build /app /app
 COPY --from=frontend-build /app/iscc_web/static/dist /app/iscc_web/static/dist
 

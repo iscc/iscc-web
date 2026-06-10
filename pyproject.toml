@@ -14,8 +14,9 @@ dependencies = [
     "blacksheep>=2.6,<3",
     "uvicorn>=0.34",
     "aiofiles>=24.1",
-    "iscc-sdk==0.9.3",
+    "iscc-sdk[sct,sci]==0.9.3",
     "iscc-core>=1.2.1",
+    "xxhash>=3.5",
     "httpx>=0.28",
     "pathvalidate>=3.2",
     "aiofile>=3.9",
@@ -79,7 +80,7 @@ source = ["iscc_web"]
 parallel = true
 concurrency = ["thread", "multiprocessing"]
 sigterm = true
-# Process pool workers execute only iscc-sdk code and legitimately collect no iscc_web data.
+# Some process pool workers exit without executing iscc_web code and legitimately collect no data.
 disable_warnings = ["no-data-collected"]
 
 [tool.coverage.report]

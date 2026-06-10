@@ -14,6 +14,8 @@ tags:
   description: Extract or embed metadata in media files.
 - name: explain
   description: Decompose ISCC and return various representations.
+- name: simprint
+  description: Create granular simprints from plain text.
 paths:
   /iscc:
     post:
@@ -30,6 +32,25 @@ paths:
         schema:
           type: string
           example: eW91ci1tZWRpYS1maWxlLmpwZw==
+      - name: semantic
+        in: query
+        description: Add ISCC-UNITs to the `units` field, including experimental Semantic-Code
+          units for text and image content. The composite ISCC-CODE itself stays a pure ISO
+          24138 identifier. Semantic-Code algorithms are not part of ISO 24138 and may change
+          before their v1.0 release.
+        required: false
+        schema:
+          type: boolean
+          default: false
+      - name: granular
+        in: query
+        description: Add granular simprint features to the `features` field (text content;
+          combined with `semantic` also semantic text simprints). Granular features are experimental
+          and may change before their v1.0 release.
+        required: false
+        schema:
+          type: boolean
+          default: false
       requestBody:
         description: The raw file data (not form encoded).
         content:
@@ -245,6 +266,34 @@ paths:
                 $ref: '#/components/schemas/IsccDetail'
         400:
           description: Bad Request
+  /simprint:
+    post:
+      operationId: create-simprint
+      summary: Create Simprints
+      description: Generate granular simprints from plain text for similarity search. The
+        output format is compatible with [iscc-search](https://github.com/iscc/iscc-search)
+        and the granular `features` of `POST /iscc`. Simprint algorithms are experimental
+        and may change before their v1.0 release.
+      tags:
+      - simprint
+      requestBody:
+        description: Plain text input for simprint generation.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimprintRequest'
+        required: true
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimprintResponse'
+        400:
+          description: Bad Request
+        422:
+          description: Unprocessable Entity - simprint processing error.
 components:
   schemas:
     MediaID:
@@ -441,6 +490,91 @@ components:
             of the media file.
           type: string
           example: 1e20b46b2257d6c6248f0b2130affc644088cc07f31219394f28523e7742441e91fd
+        units:
+          description: ISCC-UNITs of the media asset, including experimental Semantic-Code
+            units. Only included on request (`semantic=true`).
+          type: array
+          items:
+            type: string
+            pattern: ^ISCC:[A-Z2-7]{10,73}$
+          example:
+          - ISCC:AAAV5NAQXBCHCWFW
+          - ISCC:CAA7X3SMP7IQ4Z65
+          - ISCC:EAAQMBEYQF6457DP
+          - ISCC:GAAYGICYTOZYKQAL
+          - ISCC:IAAUNUPL2ZHVCU3R
+        features:
+          description: Granular features of the media asset. Only included on request (`granular=true`).
+          type: array
+          items:
+            $ref: '#/components/schemas/FeatureSet'
+    FeatureSet:
+      type: object
+      description: Granular features of *digital content* paired with their algorithm metadata.
+      properties:
+        maintype:
+          description: ISCC MainType of the simprint algorithm.
+          type: string
+          example: content
+        subtype:
+          description: ISCC SubType of the simprint algorithm.
+          type: string
+          example: text
+        version:
+          description: Version of the simprint algorithm.
+          type: integer
+          example: 0
+        byte_offsets:
+          description: Whether offsets are UTF-8 byte positions instead of character positions.
+          type: boolean
+          example: false
+        simprints:
+          description: Base64-encoded granular similarity-preserving fingerprints.
+          type: array
+          items:
+            type: string
+          example:
+          - k5TpwXVE3j9N5IBxm36c4hkXP6fHOv8bkY2f68_8XSg
+        offsets:
+          description: Start positions of the features in the *digital content*.
+          type: array
+          items:
+            type: integer
+        sizes:
+          description: Sizes of the features in the *digital content*.
+          type: array
+          items:
+            type: integer
+    SimprintRequest:
+      type: object
+      description: Plain text input for simprint generation.
+      required:
+      - text
+      properties:
+        text:
+          description: Plain text to generate simprints for.
+          type: string
+          minLength: 1
+          example: The quick brown fox jumps over the lazy dog.
+    SimprintResponse:
+      type: object
+      description: Granular simprints keyed by simprint type.
+      properties:
+        CONTENT_TEXT_V0:
+          description: Base64-encoded 256-bit minhash simprints, one per content-defined text
+            chunk.
+          type: array
+          items:
+            type: string
+          example:
+          - k5TpwXVE3j9N5IBxm36c4hkXP6fHOv8bkY2f68_8XSg
+        SEMANTIC_TEXT_V0:
+          description: Base64-encoded 256-bit semantic simprints generated by [iscc-sct](https://github.com/iscc/iscc-sct).
+          type: array
+          items:
+            type: string
+          example:
+          - XUj8aOg4CGm5Uosm-Ggxi7d9G9pa4NBMyBDDAhrkf00
     IsccDetail:
       type: object
       description: Detailed decomposition of an ISCC

@@ -1,0 +1,51 @@
+{
+  "short": {
+    "text": "Hello World! This is a short text for simprint generation.",
+    "expected": {
+      "CONTENT_TEXT_V0": [
+        "SCXX_obwF2sK-xsnk9p1hhsH1fvrzwyZZBhhsVxMLTM"
+      ],
+      "SEMANTIC_TEXT_V0": [
+        "emhK25dQAqnkcdcMuworif5t5GzDy8A3zmlDCEdAyWk"
+      ]
+    }
+  },
+  "multi_chunk": {
+    "text": "Alice was beginning to get very tired of sitting by her sister on the bank, and\nof having nothing to do: once or twice she had peeped into the book her sister was reading, but\nit had no pictures or conversations in it, \"and what is the use of a book,\" thought Alice,\n\"without pictures or conversations?\"\n\nSo she was considering in her own mind (as well as she could, for the hot day made her feel very\nsleepy and stupid), whether the pleasure of making a daisy-chain would be worth the trouble of\ngetting up and picking the daisies, when suddenly a White Rabbit with pink eyes ran close by her.\n\nThere was nothing so very remarkable in that; nor did Alice think it so very much out of the way\nto hear the Rabbit say to itself, \"Oh dear! Oh dear! I shall be late!\" (when she thought it over\nafterwards, it occurred to her that she ought to have wondered at this, but at the time it all\nseemed quite natural); but when the Rabbit actually took a watch out of its waistcoat-pocket, and\nlooked at it, and then hurried on, Alice started to her feet, for it flashed across her mind that\nshe had never before seen a rabbit with either a waistcoat-pocket, or a watch to take out of it,\nand burning with curiosity, she ran across the field after it, and fortunately was just in time\nto see it pop down a large rabbit-hole under the hedge.\n\nIn another moment down went Alice after it, never once considering how in the world she was to\nget out again. The rabbit-hole went straight on like a tunnel for some way, and then dipped\nsuddenly down, so suddenly that Alice had not a moment to think about stopping herself before\nshe found herself falling down a very deep well.\n\nEither the well was very deep, or she fell very slowly, for she had plenty of time as she went\ndown to look about her and to wonder what was going to happen next. First, she tried to look\ndown and make out what she was coming to, but it was too dark to see anything; then she looked\nat the sides of the well, and noticed that they were filled with cupboards and book-shelves;\nhere and there she saw maps and pictures hung upon pegs. She took down a jar from one of the\nshelves as she passed; it was labelled \"ORANGE MARMALADE\", but to her great disappointment it\nwas empty: she did not like to drop the jar for fear of killing somebody underneath, so managed\nto put it into one of the cupboards as she fell past it.\n\n\"Well!\" thought Alice to herself, \"after such a fall as this, I shall think nothing of tumbling\ndown stairs! How brave they'll all think me at home! Why, I wouldn't say anything about it, even\nif I fell off the top of the house!\" (Which was very likely true.)\n\nDown, down, down. Would the fall never come to an end? \"I wonder how many miles I've fallen by\nthis time?\" she said aloud. \"I must be getting somewhere near the centre of the earth. Let me\nsee: that would be four thousand miles down, I think—\" (for, you see, Alice had learnt several\nthings of this sort in her lessons in the schoolroom, and though this was not a very good\nopportunity for showing off her knowledge, as there was no one to listen to her, still it was\ngood practice to say it over) \"—yes, that's about the right distance—but then I wonder what\nLatitude or Longitude I've got to?\" (Alice had no idea what Latitude was, or Longitude either,\nbut thought they were nice grand words to say.)",
+    "expected": {
+      "CONTENT_TEXT_V0": [
+        "b5L6H5PmzDwcuGfxUock2d7CeBGQrOCsIklNnW4aiwc",
+        "nTAkfdjmn1Y1X1HcoDGrMNNNnfXXuWlWDNLh_E5J1Lg",
+        "nM_Jb-IjJ_L7CwNdxxqZfPhtDGLkA5oxKeOdRroU1gM",
+        "3NEWfl-hW7-o7iu0BQ6xSq3ils5D3KbMHHTHtO5LwT0",
+        "fLHHQkqOjLoLHsTljAU1NDNRpb3f1sNPEC7ZZuNYJV0",
+        "35K7TOShjbEFzUKrQCca2vs1K0fruyOui6h6SfAou34",
+        "EUxiVYAscZmUP4t4fIqm51-bxwwmi2NNhXhQtyeZ7h4"
+      ],
+      "SEMANTIC_TEXT_V0": [
+        "mvnTwfhIkCODHzAOXuiJohtFu2Rtbm8v2WCjcpKmEOU",
+        "--eRI0uxgZaLP3CDBIPQ8muHPlfFdW_7zyqB-DiDtOA",
+        "8vnVgVmjEYOLvzAH1ujQ9y_FeVfO4H_6_SrB8JjmPHU",
+        "evHREEvtgbWLPzEHmuvg6ytHOtdGYH_69QqA8LhnuPQ",
+        "trlRsXJv3ZuLO_GvRurFMiNFuVVsKH94_Sqs8onuvPA",
+        "85hRwH4rkbmvONGHPurpgoflOpX0MVd5zQLW-NnbuOQ",
+        "-7hTwHTTkNmneXGudujMIQrn_tR0IFVl1UrS-KGJgOc",
+        "ujlVkNAv15PLqZGPFujIuqjFOVRlKH963Srt-MlGPHg",
+        "trkVgP_NMfMvHrOPpurJm6vHOFh1qmdy1Qpo8llFOOQ",
+        "sDlX4N2tEddPfjGGBK6YEr7fWxRs7Gdu2ULh8EvJMHU"
+      ]
+    }
+  },
+  "multilingual": {
+    "text": "Der International Standard Content Code ist ein Identifikator für digitale\nMedieninhalte. Er wird direkt aus dem Inhalt einer Datei berechnet und benötigt keine zentrale\nRegistrierungsstelle.\n\nLe Code International Normalisé de Contenu est un identifiant pour les contenus médiatiques\nnumériques. Il est calculé directement à partir du contenu d'un fichier.\n\n国际标准内容代码是数字媒体内容的标识符。它直接从文件内容计算得出，不需要中央注册机构。\n内容代码由多个部分组成：元数据代码、内容代码、数据代码和实例代码。\n\nМеждународный стандартный код контента — это идентификатор цифрового медиаконтента.\nОн вычисляется непосредственно из содержимого файла и не требует центрального органа регистрации.\n\nرمز المحتوى القياسي الدولي هو معرف لمحتوى الوسائط الرقمية. يتم حسابه مباشرة من محتوى الملف\nولا يتطلب سلطة تسجيل مركزية.\n\nISCCコードはデジタルメディアコンテンツの識別子です。ファイルの内容から直接計算され、\n中央登録機関を必要としません。",
+    "expected": {
+      "CONTENT_TEXT_V0": [
+        "ZDYf5gGT5rX0O1xXcvH1F5NvLbUeR8f0Zloyi-jvpgg"
+      ],
+      "SEMANTIC_TEXT_V0": [
+        "iEiOSsnYRNnQ2foMOTk-jjR98vr4zNt97VBBKljugEI",
+        "jEiKSMHcZAv4Y-oMuDk-CiZ98njQyFNt69FBKlZuQAM"
+      ]
+    }
+  }
+}

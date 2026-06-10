@@ -45,29 +45,28 @@ jobs:
       - name: Install dependencies
         run: uv sync --frozen
 
-      # Cache the iscc-sct ONNX model across runs (Stage 7 plumbing: iscc-sdk[sct] is not a
-      # dependency yet, so the pre-download below is a no-op until then). Parallel pytest-xdist
-      # workers would otherwise race on the download and can produce a corrupt ONNX file.
-      - name: Cache iscc-sct model
+      # Cache the iscc-sct/iscc-sci ONNX models across runs. Parallel pytest-xdist workers
+      # would otherwise race on the download and can produce a corrupt ONNX file.
+      - name: Cache semantic-code models
         uses: actions/cache@v5
         with:
           path: |
             ~/.local/share/iscc-sct
+            ~/.local/share/iscc-sci
             ~\AppData\Local\iscc\iscc-sct
-          key: iscc-sct-model-${{ runner.os }}-${{ hashFiles('uv.lock') }}
+            ~\AppData\Local\iscc\iscc-sci
+          key: iscc-models-${{ runner.os }}-${{ hashFiles('uv.lock') }}
           restore-keys: |
-            iscc-sct-model-${{ runner.os }}-
+            iscc-models-${{ runner.os }}-
 
-      - name: Pre-download iscc-sct model (serial, before parallel tests)
+      - name: Pre-download semantic-code models (serial, before parallel tests)
         run: |
-          mkdir -p ~/.local/share/iscc-sct  # ensure at least one cache path exists
           uv run python - <<'EOF'
-          try:
-              import iscc_sct.code_semantic_text as sct
-              sct.model()
-              print("iscc-sct model ready")
-          except ImportError:
-              print("iscc-sct not installed - nothing to pre-download")
+          import iscc_sct.utils
+          import iscc_sci.utils
+          iscc_sct.utils.get_model()
+          iscc_sci.utils.get_model()
+          print("semantic-code models ready")
           EOF
 
       - name: Run tests  # local parity: uv run poe test

@@ -19,6 +19,42 @@ import iscc_sdk as idk
 from iscc_web.api.common import rmtree
 
 
+def code_iscc(fp, semantic=False, granular=False):
+    # type: (str, bool, bool) -> IsccMeta
+    """
+    Generate ISCC metadata for the file at `fp` (top-level function - pool workers must pickle it).
+
+    Both opt-ins extend the result without changing the composite ISCC-CODE, which stays a pure
+    ISO 24138 identifier:
+
+    - `semantic`: list the ISCC-UNITs in `units`, including experimental Semantic-Code units
+      (text via iscc-sct, image via iscc-sci - other modes have no semantic codes).
+    - `granular`: add granular simprint features to `features` (text mode; with `semantic` also
+      semantic simprints compatible with the /simprint endpoint).
+    """
+    result = idk.code_iscc(fp, add_units=semantic, granular=granular)
+    if not result.features:
+        result.features = None  # image and audio content codes produce no granular features
+    if semantic:
+        semantic_meta = code_semantic(fp, result.mode, granular)
+        if semantic_meta:
+            result.units.insert(1, semantic_meta.iscc)
+            if semantic_meta.features:
+                result.features = semantic_meta.features + (result.features or [])
+    return result
+
+
+def code_semantic(fp, mode, granular):
+    # type: (str, str|None, bool) -> IsccMeta|None
+    """Generate experimental Semantic-Code metadata for text/image media (None for other modes)."""
+    if mode == "text":
+        sct_options = {"simprints": True, "bits_granular": 256} if granular else {}
+        return idk.code_text_semantic(fp, **sct_options)
+    if mode == "image":
+        return idk.code_image_semantic(fp)
+    return None
+
+
 class FileHandler:
     @staticmethod
     def new_media_id() -> str:
@@ -130,13 +166,15 @@ class FileHandler:
 
         return upload_meta
 
-    async def process_iscc(self, file_path: Path) -> Union[IsccMeta, Response]:
-        """Process an ISCC for file at `file_path`."""
+    async def process_iscc(
+        self, file_path: Path, semantic: bool = False, granular: bool = False
+    ) -> Union[IsccMeta, Response]:
+        """Process an ISCC for file at `file_path` with optional semantic units and granular features."""
 
         loop = asyncio.get_event_loop()
         pool = app.services.provider[Pool]
         try:
-            iscc_obj = await loop.run_in_executor(pool, idk.code_iscc, file_path.as_posix())
+            iscc_obj = await loop.run_in_executor(pool, code_iscc, file_path.as_posix(), semantic, granular)
         except Exception as e:
             return self.status_code(422, str(e))
 

@@ -1,17 +1,21 @@
-"""In-process tests for controller failure paths that cannot be triggered over HTTP."""
+"""In-process tests for controller and worker paths that cannot be triggered over HTTP."""
 
 import asyncio
 import types
 from concurrent.futures import Future
 
+from iscc_samples import images
+
 import iscc_web.api.mixins as mixins
+import iscc_web.api.simprint as simprint_module
 from iscc_web.api.iscc import Iscc
 from iscc_web.api.media import Media
 from iscc_web.api.metadata import Metadata
 from iscc_web.api.mixins import FileHandler
 from iscc_web.api.models import UploadMeta
 from iscc_web.api.pool import Pool
-from iscc_web.api.schema import InlineMetadata
+from iscc_web.api.schema import InlineMetadata, SimprintRequest
+from iscc_web.api.simprint import Simprint
 from iscc_web.options import opts
 
 
@@ -86,6 +90,42 @@ def test_embed_returns_none(monkeypatch, tmp_path):
     pool = FakePool(None)
     response = asyncio.run(Metadata().embed(None, media_id, InlineMetadata(name="x"), pool))
     assert response.status == 422
+
+
+def test_code_semantic_unsupported_mode_returns_none():
+    assert mixins.code_semantic("unused-path", "audio", granular=False) is None
+
+
+def test_code_iscc_semantic_without_semantic_code(monkeypatch):
+    """Media without a Semantic-Code algorithm keeps its plain unit list when semantic=true."""
+    monkeypatch.setattr(mixins, "code_semantic", lambda fp, mode, granular: None)
+    result = mixins.code_iscc(images("jpg")[0].as_posix(), semantic=True)
+    assert len(result.units) == 4
+    assert not any(unit.startswith("ISCC:C") for unit in result.units)
+
+
+def test_simprint_processing_error():
+    pool = FakePool(ValueError("simprint processing failed"))
+    response = asyncio.run(Simprint().create_simprint(SimprintRequest(text="some text"), pool))
+    assert response.status == 422
+
+
+def test_text_simprints_without_semantic_features(monkeypatch):
+    """Defensive path ported from iscc-search: sct result without features yields no semantic key."""
+    monkeypatch.setattr(simprint_module.sct, "gen_text_code_semantic", lambda *args, **kwargs: {"features": []})
+    result = simprint_module.text_simprints("hello world")
+    assert result == {"CONTENT_TEXT_V0": ["JQ25bg1KF6BhSJXnr_eE_uFCcDd_l36NicEiIgzpa-M"]}
+
+
+def test_text_simprints_with_empty_semantic_simprints(monkeypatch):
+    """Defensive path ported from iscc-search: feature set without simprints yields no semantic key."""
+    monkeypatch.setattr(
+        simprint_module.sct,
+        "gen_text_code_semantic",
+        lambda *args, **kwargs: {"features": [{"simprints": []}]},
+    )
+    result = simprint_module.text_simprints("hello world")
+    assert "SEMANTIC_TEXT_V0" not in result
 
 
 def test_embed_iscc_processing_failure(monkeypatch, tmp_path):

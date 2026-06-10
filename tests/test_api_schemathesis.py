@@ -20,4 +20,6 @@ schema.location = f"http://{server_host}:{server_port}/{server_api_path}"
 
 @schema.parametrize()
 def test_api(case):
-    case.call_and_validate(checks=[not_a_server_error])
+    # Generous request timeout: first /iscc and /simprint calls warm up SDK imports and ONNX
+    # models in the pool worker, which can exceed the 10s default under parallel test load.
+    case.call_and_validate(checks=[not_a_server_error], timeout=60)

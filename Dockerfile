@@ -3,6 +3,11 @@ FROM python:3.13-slim AS builder
 # Disable stdout/stderr buffering, can cause issues with Docker logs
 ENV PYTHONUNBUFFERED=1
 
+# libexpat is required by the exiv2 wheel's bundled native library
+RUN apt-get update && \
+  apt-get install --no-install-recommends -y libexpat1 && \
+  rm -rf /var/lib/apt/lists
+
 # Install uv
 COPY --from=ghcr.io/astral-sh/uv:0.11 /uv /uvx /bin/
 
@@ -29,7 +34,9 @@ COPY . /app/
 #
 FROM node:16.17.0 AS frontend-build
 
-RUN npm install -g pnpm
+# pnpm 7 matches pnpm-lock.yaml (lockfileVersion 5.4) and still supports Node 16;
+# unpinned installs now resolve to pnpm >=10 which requires Node >=22.
+RUN npm install -g pnpm@7
 
 WORKDIR /app
 
@@ -48,6 +55,11 @@ RUN pnpm run build
 FROM python:3.13-slim AS prod-runtime
 
 LABEL org.opencontainers.image.source=https://github.com/iscc/iscc-web
+
+# libexpat is required by the exiv2 wheel's bundled native library
+RUN apt-get update && \
+  apt-get install --no-install-recommends -y libexpat1 && \
+  rm -rf /var/lib/apt/lists
 
 # Disable stdout/stderr buffering, can cause issues with Docker logs
 ENV PYTHONUNBUFFERED=1

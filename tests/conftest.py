@@ -16,13 +16,18 @@ os.environ["ISCC_WEB_MAX_UPLOAD_SIZE"] = "1000000"
 os.environ["OPENBLAS_NUM_THREADS"] = "1"
 
 import threading
-from multiprocessing import Event, Process
+import multiprocessing
 from time import sleep, time
 import socket
 import pytest
 import uvicorn
 from iscc_web import app
 import httpx
+
+# Server subprocesses must use spawn (Windows' only mode) on every platform: a forked child
+# would inherit this process' already-imported iscc_web with its frozen opts instead of
+# re-importing under the env configured above (or, for the private server, its own env).
+mp = multiprocessing.get_context("spawn")
 
 # Each pytest-xdist worker (gw0, gw1, ...) gets its own server port to avoid bind conflicts.
 _worker = os.environ.get("PYTEST_XDIST_WORKER", "master")
@@ -65,8 +70,8 @@ def api() -> httpx.Client:
 
 @pytest.fixture(scope="session", autouse=True)
 def server():
-    stop_event = Event()
-    server_process = Process(target=_start_server, args=(stop_event,))
+    stop_event = mp.Event()
+    server_process = mp.Process(target=_start_server, args=(stop_event,))
     server_process.start()
     wait_for_server(server_process)
 

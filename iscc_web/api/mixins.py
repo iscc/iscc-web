@@ -10,7 +10,8 @@ from iscc_web import opts
 from iscc_web.api.pool import Pool
 from iscc_web.api.models import UploadMeta
 import iscc_core as ic
-from aiofiles.os import mkdir, rename
+import shutil
+from aiofiles.os import mkdir
 import aiofile
 from typing import Tuple, Union
 from iscc_web.main import app
@@ -66,8 +67,8 @@ class FileHandler:
 
     @staticmethod
     async def move_file(src: str, dst: str):
-        """Move file from source to destination"""
-        await rename(src, dst)
+        """Move file from source to destination (rename fails across drives/filesystems)"""
+        await asyncio.to_thread(shutil.move, src, dst)
 
     async def handle_upload(self, request: Request) -> Union[UploadMeta, Response]:
         """

@@ -2,7 +2,6 @@
 
 import base64
 import shutil
-from multiprocessing import Event, Process
 
 import httpx
 import pytest
@@ -13,7 +12,7 @@ from iscc_web.api.mixins import FileHandler
 from iscc_web.api.models import UploadMeta
 from iscc_web.options import opts
 from tests import private_server
-from tests.conftest import _port_offset, server_api_path, server_host, wait_for_server
+from tests.conftest import _port_offset, mp, server_api_path, server_host, wait_for_server
 
 private_port = 44700 + _port_offset
 
@@ -21,8 +20,8 @@ private_port = 44700 + _port_offset
 @pytest.fixture(scope="module")
 def papi():
     """Client against a server running with ISCC_WEB_PRIVATE_FILES=true."""
-    stop_event = Event()
-    process = Process(target=private_server.run, args=(server_host, private_port, stop_event))
+    stop_event = mp.Event()
+    process = mp.Process(target=private_server.run, args=(server_host, private_port, stop_event))
     process.start()
     wait_for_server(process, port=private_port)
     client = httpx.Client(base_url=f"http://{server_host}:{private_port}/{server_api_path}", timeout=None)

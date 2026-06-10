@@ -170,3 +170,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Agents
+.claude
+CLAUDE.md

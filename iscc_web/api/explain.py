@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from blacksheep.server.controllers import APIController, get
 import iscc_core as ic
-from iscc_web.api.schema import IsccDetail, Unit
+from iscc_web.api.schema import Iscc, IsccDetail, Unit
 
 
 class Explain(APIController):
@@ -32,7 +32,7 @@ class Explain(APIController):
                     )
                 )
             result = IsccDetail()
-            result.iscc = norm
+            result.iscc = Iscc(root=norm)
             result.readable = code.explain
             result.multiformat = code.mf_base64url
             result.decomposed = "-".join(decomposed)

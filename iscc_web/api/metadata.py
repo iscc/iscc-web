@@ -34,6 +34,7 @@ class Metadata(APIController, FileHandler):
                 "name",
                 "description",
                 "meta",
+                "identifier",
                 "creator",
                 "license",
                 "acquire",

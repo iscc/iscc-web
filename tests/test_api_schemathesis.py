@@ -4,7 +4,7 @@ import pathlib
 import schemathesis.openapi
 from schemathesis import Config
 from schemathesis.checks import not_a_server_error
-from schemathesis.config._projects import HealthCheck
+from schemathesis.config import HealthCheck
 
 from tests.conftest import server_api_path, server_host, server_port
 

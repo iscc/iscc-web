@@ -427,6 +427,20 @@ components:
           type: string
           format: uri
           example: https://picsum.photos/200/300.jpg
+        generator:
+          description: Name and version of the software that generated the ISCC.
+          type: string
+          example: iscc-sdk - v0.9.3
+        metahash:
+          description: A [multihash](https://multiformats.io/multihash/) of the metadata that
+            was used as input for ISCC Meta-Code generation.
+          type: string
+          example: 1e20304ab0c98a760be580dfa20716f2912d7ae30ec82b5f48b01dcf8f008d42568d
+        datahash:
+          description: A [multihash](https://multiformats.io/multihash/) of the raw bytes
+            of the media file.
+          type: string
+          example: 1e20b46b2257d6c6248f0b2130affc644088cc07f31219394f28523e7742441e91fd
     IsccDetail:
       type: object
       description: Detailed decomposition of an ISCC

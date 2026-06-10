@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import isccLogo from "../assets/iscc-logo-extended-black.svg?raw";
+import isccLogo from "../assets/iscc-logo-white.png";
 </script>
 
 <template lang="pug">
@@ -7,7 +7,7 @@ header
   .header-bar
     .container
       .d-flex.align-items-center.justify-content-between.py-3
-        .logo(v-html="isccLogo")
+        img.logo(:src="isccLogo" alt="ISCC logo")
         span.tagline.d-none.d-md-block The DNA of your digital content
   .hero
     .container.py-4
@@ -19,10 +19,9 @@ header
 .header-bar {
   background-color: var(--iscc-deep-navy);
 
-  .logo :deep(svg) {
+  .logo {
     height: 2.5rem;
     width: auto;
-    filter: invert(1);
   }
 
   .tagline {

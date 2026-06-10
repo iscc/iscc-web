@@ -1,6 +1,6 @@
 # ISCC - Generator Microservice
 
-[![Tests](https://github.com/iscc/iscc-web/actions/workflows/test-backend.yaml/badge.svg)](https://github.com/iscc/iscc-web/actions/workflows/test-backend.yaml)
+[![CI](https://github.com/iscc/iscc-web/actions/workflows/ci.yml/badge.svg)](https://github.com/iscc/iscc-web/actions/workflows/ci.yml)
 
 ## About `iscc-web`
 

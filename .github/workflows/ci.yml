@@ -1,0 +1,212 @@
+# Continuous integration. Every check is a command an agent or human can run locally:
+#
+#   test      ->  uv run poe test
+#   lint      ->  uv run prek run --all-files
+#   frontend  ->  pnpm install && pnpm exec eslint frontend/ && pnpm exec vue-tsc --noEmit
+#                 && pnpm run build
+#   docker    ->  docker build -t iscc-web:smoke . && docker run -p 8000:8000 iscc-web:smoke
+#                 (hadolint: docker run --rm -v "$PWD:/repo" -w /repo hadolint/hadolint hadolint Dockerfile)
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, v0.3.0]
+  workflow_dispatch:
+
+# Cancel stale in-flight PR runs; let branch-push runs complete so :main publishing isn't cancelled.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+      fail-fast: false
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8
+        with:
+          version: "0.11.7"
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      # Cache the iscc-sct ONNX model across runs (Stage 7 plumbing: iscc-sdk[sct] is not a
+      # dependency yet, so the pre-download below is a no-op until then). Parallel pytest-xdist
+      # workers would otherwise race on the download and can produce a corrupt ONNX file.
+      - name: Cache iscc-sct model
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.local/share/iscc-sct
+            ~\AppData\Local\iscc\iscc-sct
+          key: iscc-sct-model-${{ runner.os }}-${{ hashFiles('uv.lock') }}
+          restore-keys: |
+            iscc-sct-model-${{ runner.os }}-
+
+      - name: Pre-download iscc-sct model (serial, before parallel tests)
+        run: |
+          mkdir -p ~/.local/share/iscc-sct  # ensure at least one cache path exists
+          uv run python - <<'EOF'
+          try:
+              import iscc_sct.code_semantic_text as sct
+              sct.model()
+              print("iscc-sct model ready")
+          except ImportError:
+              print("iscc-sct not installed - nothing to pre-download")
+          EOF
+
+      - name: Run tests  # local parity: uv run poe test
+        run: uv run poe test
+
+  lint:
+    name: Lint (prek hooks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8
+        with:
+          version: "0.11.7"
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Cache prek hook environments
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/prek
+          key: prek-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
+          restore-keys: |
+            prek-${{ runner.os }}-
+
+      - name: Run prek hooks  # local parity: uv run prek run --all-files
+        run: uv run prek run --all-files
+
+  frontend:
+    name: Frontend (eslint, vue-tsc, build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 7  # matches pnpm-lock.yaml (lockfileVersion 5.4); bump in Stage 9
+
+      - name: Install Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: .tool-versions
+          cache: pnpm
+
+      - name: Install dependencies  # local parity: pnpm install
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint  # local parity: pnpm exec eslint frontend/
+        run: pnpm exec eslint frontend/
+
+      - name: Type check  # local parity: pnpm exec vue-tsc --noEmit
+        run: pnpm exec vue-tsc --noEmit
+
+      - name: Build  # local parity: pnpm run build
+        run: pnpm run build
+
+  docker:
+    name: Docker (hadolint, build, smoke test)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Lint Dockerfile
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
+          config: .hadolint.yaml
+
+      - uses: docker/setup-buildx-action@v4
+
+      - name: Build image (load into local daemon)
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile
+          load: true
+          tags: iscc-web:smoke
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run container and probe endpoints
+        run: |
+          docker run -d --name iscc-web-smoke -p 8000:8000 iscc-web:smoke
+          trap 'echo "--- container logs ---"; docker logs iscc-web-smoke; docker rm -f iscc-web-smoke' EXIT
+          # Wait up to 60s for the app to come up
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:8000/ > /dev/null; then
+              echo "Up after ${i} attempts"
+              break
+            fi
+            sleep 2
+          done
+          # Frontend index is served
+          curl -sf http://localhost:8000/ > /dev/null
+          # Backend API answers: explain a known ISCC
+          curl -sf "http://localhost:8000/api/v1/explain/ISCC:KMDMRJYGHHVRCZ5TM6U4G6D4MXA6LAXC4ZRPOKFU7JBEQXR2BJOS6NA"
+
+  # Publish the :main image on pushes to main, after all checks pass. Nothing auto-pulls
+  # :main, so this is safe by itself. `latest=false` is deliberate: demo.iscc.io pins
+  # ghcr.io/iscc/iscc-web:latest (2022 image) and must never receive a new image under
+  # that tag — see also release.yml.
+  publish-main:
+    name: Publish Docker image (:main)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [test, lint, frontend, docker]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: docker/setup-buildx-action@v4
+
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ghcr.io/${{ github.repository }}
+          flavor: |
+            latest=false
+          tags: |
+            type=ref,event=branch
+
+      - name: Build and push
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha

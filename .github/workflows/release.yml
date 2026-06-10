@@ -1,0 +1,97 @@
+# Release pipeline: a published GitHub release (tag vX.Y.Z) runs the test suite, then
+# publishes the Docker image to ghcr.io under immutable semver tags ONLY.
+#
+# IMPORTANT: `flavor: latest=false` is deliberate. demo.iscc.io pins
+# ghcr.io/iscc/iscc-web:latest and still runs a 2022 image; publishing :latest again would
+# silently upgrade it on the next manual `docker compose pull`. Reintroduce :latest only
+# after demo.iscc.io is retired (or pinned to its image digest).
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8
+        with:
+          version: "0.11.7"
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      # Same iscc-sct model cache plumbing as ci.yml — a no-op until iscc-sdk[sct] lands.
+      - name: Cache iscc-sct model
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.local/share/iscc-sct
+            ~\AppData\Local\iscc\iscc-sct
+          key: iscc-sct-model-${{ runner.os }}-${{ hashFiles('uv.lock') }}
+          restore-keys: |
+            iscc-sct-model-${{ runner.os }}-
+
+      - name: Pre-download iscc-sct model (serial, before parallel tests)
+        run: |
+          mkdir -p ~/.local/share/iscc-sct  # ensure at least one cache path exists
+          uv run python - <<'EOF'
+          try:
+              import iscc_sct.code_semantic_text as sct
+              sct.model()
+              print("iscc-sct model ready")
+          except ImportError:
+              print("iscc-sct not installed - nothing to pre-download")
+          EOF
+
+      - name: Run tests  # local parity: uv run poe test
+        run: uv run poe test
+
+  publish-docker:
+    name: Publish Docker image (semver tags)
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: docker/setup-buildx-action@v4
+
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ghcr.io/${{ github.repository }}
+          # No :latest, ever — see header comment.
+          flavor: |
+            latest=false
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      - name: Build and push
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

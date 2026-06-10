@@ -1,3 +1,5 @@
 ignored:
   - DL3008  # We don't want to pin apt package versions
   - DL3016  # We don't want to pin npm package versions
+# Do not fail on info-level findings (e.g. DL3059 consecutive RUN consolidation)
+failure-threshold: warning

@@ -1,21 +1,8 @@
-import threading
-from multiprocessing import Event, Process
-from time import sleep, time
-import socket
-import pytest
-import uvicorn
-from iscc_web import app
-import httpx
+# ruff: noqa: E402
 import os
 
-# Each pytest-xdist worker (gw0, gw1, ...) gets its own server port to avoid bind conflicts.
-_worker = os.environ.get("PYTEST_XDIST_WORKER", "master")
-_port_offset = int(_worker[2:]) if _worker.startswith("gw") else 0
-
-server_host = "localhost"
-server_port = 44555 + _port_offset
-server_api_path = "api/v1"
-
+# Test environment must be configured BEFORE iscc_web is imported: opts is instantiated at
+# import time, and on Linux the server subprocess forks with this module state already loaded.
 os.environ["ISCC_WEB_PRIVATE_FILES"] = "false"
 # Workers share the media/ directory; disable the periodic cleanup task so parallel servers
 # do not race each other deleting expired package dirs.
@@ -27,6 +14,23 @@ os.environ["ISCC_WEB_MAX_WORKERS"] = "1"
 # large enough for all iscc-samples test files.
 os.environ["ISCC_WEB_MAX_UPLOAD_SIZE"] = "1000000"
 os.environ["OPENBLAS_NUM_THREADS"] = "1"
+
+import threading
+from multiprocessing import Event, Process
+from time import sleep, time
+import socket
+import pytest
+import uvicorn
+from iscc_web import app
+import httpx
+
+# Each pytest-xdist worker (gw0, gw1, ...) gets its own server port to avoid bind conflicts.
+_worker = os.environ.get("PYTEST_XDIST_WORKER", "master")
+_port_offset = int(_worker[2:]) if _worker.startswith("gw") else 0
+
+server_host = "localhost"
+server_port = 44555 + _port_offset
+server_api_path = "api/v1"
 
 
 def _start_server(stop_event):

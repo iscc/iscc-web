@@ -13,26 +13,31 @@ import iscc_core as ic
 import shutil
 from aiofiles.os import mkdir
 import aiofile
-from typing import Tuple, Union
+from typing import Optional, Tuple, Union
 from iscc_web.main import app
 import iscc_sdk as idk
 from iscc_web.api.common import rmtree
 from loguru import logger as log
 
 
-def code_iscc(fp, semantic=False, granular=False):
-    # type: (str, bool, bool) -> IsccMeta
+def code_iscc(fp, semantic=None, granular=None):
+    # type: (str, bool|None, bool|None) -> IsccMeta
     """
     Generate ISCC metadata for the file at `fp` (top-level function - pool workers must pickle it).
 
-    Both opt-ins extend the result without changing the composite ISCC-CODE, which stays a pure
+    Both options extend the result without changing the composite ISCC-CODE, which stays a pure
     ISO 24138 identifier:
 
     - `semantic`: list the ISCC-UNITs in `units`, including experimental Semantic-Code units
       (text via iscc-sct, image via iscc-sci - other modes have no semantic codes).
     - `granular`: add granular simprint features to `features` (text mode; with `semantic` also
       semantic simprints compatible with the /simprint endpoint).
+
+    `None` means "use the service default" (`sdk_opts.add_units` / `sdk_opts.granular`,
+    overridable via ISCC_SDK_* environment variables), resolved here in the worker process.
     """
+    semantic = idk.sdk_opts.add_units if semantic is None else semantic
+    granular = idk.sdk_opts.granular if granular is None else granular
     result = idk.code_iscc(fp, add_units=semantic, granular=granular)
     if not result.features:
         result.features = None  # image and audio content codes produce no granular features
@@ -49,7 +54,8 @@ def code_semantic(fp, mode, granular):
     # type: (str, str|None, bool) -> IsccMeta|None
     """Generate experimental Semantic-Code metadata for text/image media (None for other modes)."""
     if mode == "text":
-        sct_options = {"simprints": True, "bits_granular": 256} if granular else {}
+        # Bit lengths come from sct_opts (ISCC_SCT_BITS / ISCC_SCT_BITS_GRANULAR defaults).
+        sct_options = {"simprints": True} if granular else {}
         return idk.code_text_semantic(fp, **sct_options)
     if mode == "image":
         return idk.code_image_semantic(fp)
@@ -168,9 +174,13 @@ class FileHandler:
         return upload_meta
 
     async def process_iscc(
-        self, file_path: Path, semantic: bool = False, granular: bool = False
+        self, file_path: Path, semantic: Optional[bool] = None, granular: Optional[bool] = None
     ) -> Union[IsccMeta, Response]:
-        """Process an ISCC for file at `file_path` with optional semantic units and granular features."""
+        """
+        Process an ISCC for file at `file_path` with optional semantic units and granular features.
+
+        `None` defers to the service defaults (see `code_iscc`).
+        """
 
         loop = asyncio.get_event_loop()
         pool = app.services.provider[Pool]

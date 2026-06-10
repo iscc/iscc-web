@@ -23,11 +23,12 @@ An interactive API documentation is available at [/docs](https://iscc.io/docs)<b
 **Experimental features** (not part of ISO 24138, algorithms may change before their v1.0
 release):
 
-- `POST /api/v1/iscc?semantic=true` adds the ISCC-UNITs of the media asset to the `units`
-    field, including Semantic-Code units for text ([iscc-sct](https://github.com/iscc/iscc-sct))
+- `POST /api/v1/iscc` includes the ISCC-UNITs of the media asset in the `units` field by
+    default, including Semantic-Code units for text ([iscc-sct](https://github.com/iscc/iscc-sct))
     and image ([iscc-sci](https://github.com/iscc/iscc-sci)) content. The composite ISCC-CODE
-    itself always stays a pure ISO 24138 identifier.
-- `POST /api/v1/iscc?granular=true` adds granular simprint features to the `features` field.
+    itself always stays a pure ISO 24138 identifier. Opt out per request with `?semantic=false`.
+- `POST /api/v1/iscc` includes granular simprint features in the `features` field by default
+    (text content). Opt out per request with `?granular=false`.
 - `POST /api/v1/simprint` generates granular simprints from plain text - byte-identical to
     [iscc-search](https://github.com/iscc/iscc-search)'s local simprint generation, so search
     services can delegate text processing to this service.
@@ -133,10 +134,25 @@ ISCC_WEB_IO_READ_SIZE=2097152
 FORWARDED_ALLOW_IPS=*
 ```
 
-Granular fingerprints and semantic ISCC-UNITs are requested per API call via the `granular`
-and `semantic` query params on `POST /api/v1/iscc` (see [/docs](https://iscc.io/docs)) -
-they are not server configuration. You can still configure the iscc-core and iscc-sdk
-dependencies through their own environment variables:
+Semantic ISCC-UNITs and granular fingerprints are enabled by default and can be disabled per
+API call via the `semantic` and `granular` query params on `POST /api/v1/iscc` (see
+[/docs](https://iscc.io/docs)). The service applies the following ISCC processing defaults,
+each overridable through the corresponding environment variable:
+
+```shell
+ISCC_SDK_GRANULAR=true       # granular fingerprints for ISCC-CODEs
+ISCC_SDK_BYTE_OFFSETS=true   # UTF-8 byte offsets (instead of characters) for granular features
+ISCC_SDK_ADD_UNITS=true      # ISCC-UNITs in the `units` field
+ISCC_SDK_BITS=256            # bit-length of ISCC-UNITs
+ISCC_SDK_WIDE=true           # wide (128-bit) Data/Instance units for 2-unit ISCC-SUM
+ISCC_SDK_FALLBACK=true       # ISCC-SUM fallback for unsupported media types (instead of HTTP 422)
+ISCC_SCT_BITS=256            # bit-length of Semantic Text-Code units
+ISCC_SCT_BITS_GRANULAR=256   # bit-length of granular semantic text features
+ISCC_SCI_BITS=256            # bit-length of Semantic Image-Code units
+```
+
+Further iscc-core and iscc-sdk options can be configured through their own environment
+variables:
 
 - https://sdk.iscc.codes/options/
 - https://core.iscc.codes/options/options/

@@ -17,13 +17,14 @@ const emit = defineEmits<{
 const semantic = ref<boolean>(false);
 const granular = ref<boolean>(false);
 
-// Resolved per upload so toggle changes apply without rebuilding the Uppy instance
+// Resolved per upload so toggle changes apply without rebuilding the Uppy instance.
+// Params are always sent explicitly - omitting them would fall back to the service
+// defaults (which enable both), making the off position a no-op.
 const uploadEndpoint = () => {
   const params = new URLSearchParams();
-  if (semantic.value) params.set("semantic", "true");
-  if (granular.value) params.set("granular", "true");
-  const query = params.toString();
-  return "/api/v1/iscc" + (query ? `?${query}` : "");
+  params.set("semantic", String(semantic.value));
+  params.set("granular", String(granular.value));
+  return `/api/v1/iscc?${params.toString()}`;
 };
 
 const uppy = computed(() =>

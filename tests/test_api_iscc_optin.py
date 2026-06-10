@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
-"""Tests for opt-in semantic ISCC-UNITs and granular features on POST /iscc."""
+"""
+Tests for semantic ISCC-UNITs and granular features on POST /iscc.
+
+Both are enabled by default (service defaults via ISCC_SDK_* env variables) and can be
+disabled per request with explicit `semantic=false` / `granular=false` query params.
+"""
 
 import base64
 from httpx import codes
@@ -13,20 +18,20 @@ TEXT = texts("doc")[0]
 
 IMAGE_ISCC = "ISCC:KECWRY3VY6R5SNV4YNBTBHR4T2HGP3HKVFO7TYUP2BKVFG724W63HVI"
 IMAGE_UNITS = [
-    "ISCC:AAAWRY3VY6R5SNV4",
-    "ISCC:CEAQYWTPK2Q7ZTK4",
-    "ISCC:EEA4GQZQTY6J5DTH",
-    "ISCC:GAA6Z2VJLX46FD6Q",
-    "ISCC:IAAVKUU37LS33M6V",
+    "ISCC:AADWRY3VY6R5SNV4NUAGFYLVSJ3I7KX37VO6PYLC22DFONVH2GVZIPY",
+    "ISCC:CEDQYWTPK2Q7ZTK47HPOYUUTO3TCAZ6KNVUZODFMMY42S6O7RDCWFEA",
+    "ISCC:EED4GQZQTY6J5DTHQ2DWCPDZHQOM6QZQTY6J5DTFZ2DWCPDZHQOMXDI",
+    "ISCC:GAD6Z2VJLX46FD6QVSSCW3BOUAIV5GRINTAHISA6UQIHPLWH3YBGAHQ",
+    "ISCC:IADVKUU37LS33M6VGDCS6RGRHTGWU7DRB5RWEDOC3MOEHRKZFLRNZFY",
 ]
 
 TEXT_ISCC = "ISCC:KACV5NAQXBCHCWFWAYCJRAL5Z36G7AZALCN3HBKABNDND26WJ5IVG4I"
 TEXT_UNITS = [
-    "ISCC:AAAV5NAQXBCHCWFW",
-    "ISCC:CAA7X3SMP7IQ4Z65",
-    "ISCC:EAAQMBEYQF6457DP",
-    "ISCC:GAAYGICYTOZYKQAL",
-    "ISCC:IAAUNUPL2ZHVCU3R",
+    "ISCC:AADV5NAQXBCHCWFWDAKH73TRQFFMMEC426IIPINQ3TY5ZKQRAJF7CDY",
+    "ISCC:CAD7X3SMP7IQ4Z65GJAIBDRXMWGZVIMG33FEYTEPLWGU4FS2KCG5DRQ",
+    "ISCC:EADQMBEYQF6457DPBR6T57675QKCHTATASH4TQG5BJAIB6RDQHWNP6A",
+    "ISCC:GADYGICYTOZYKQAL2YOJ27EBBQU5RZOAOKFVTTMZELKYE2WRJDPYB7Q",
+    "ISCC:IADUNUPL2ZHVCU3RZCGR35N4BVBYSOY7UHSYMVFSYQSE4SI5AYAHUYI",
 ]
 
 TEXT_SEMANTIC_FEATURES = {
@@ -56,11 +61,13 @@ TEXT_SEMANTIC_FEATURES = {
     ],
 }
 
+# Offsets and sizes are UTF-8 byte based (ISCC_SDK_BYTE_OFFSETS default); for this pure-ASCII
+# sample text they coincide with character offsets.
 TEXT_CONTENT_FEATURES = {
     "maintype": "content",
     "subtype": "text",
     "version": 0,
-    "byte_offsets": False,
+    "byte_offsets": True,
     "simprints": [
         "k5TpwXVE3j9N5IBxm36c4hkXP6fHOv8bkY2f68_8XSg",
         "OERRAF2u5WWuLHZLZzgcCSoCoL9R0NYrBJD7s7A43t0",
@@ -80,22 +87,28 @@ def upload(api, file_path, file_name, params=""):
     return api.post(f"/iscc{params}", content=file_path.open("rb").read(), headers=headers)
 
 
-def test_create_iscc_explicit_false_params_match_default(api):
+def test_create_iscc_explicit_false_params_lean(api):
+    result = upload(api, IMAGE, "demo.jpg", "?semantic=false&granular=false").json()
+    assert result["iscc"] == IMAGE_ISCC  # composite ISCC-CODE unaffected by the options
+    assert "units" not in result
+    assert "features" not in result
+
+
+def test_create_iscc_default_matches_explicit_true(api):
     default = upload(api, IMAGE, "demo.jpg").json()
-    explicit = upload(api, IMAGE, "demo.jpg", "?semantic=false&granular=false").json()
+    explicit = upload(api, IMAGE, "demo.jpg", "?semantic=true&granular=true").json()
     for volatile in ("media_id", "content"):
         del default[volatile]
         del explicit[volatile]
     assert explicit == default
-    assert "units" not in default
-    assert "features" not in default
+    assert default["units"] == IMAGE_UNITS
 
 
 def test_create_iscc_semantic_image(api):
-    response = upload(api, IMAGE, "demo.jpg", "?semantic=true")
+    response = upload(api, IMAGE, "demo.jpg", "?semantic=true&granular=false")
     assert response.status_code == codes.CREATED
     result = response.json()
-    assert result["iscc"] == IMAGE_ISCC  # composite ISCC-CODE unchanged by opt-in
+    assert result["iscc"] == IMAGE_ISCC  # composite ISCC-CODE unchanged by semantic units
     assert result["units"] == IMAGE_UNITS
     assert "features" not in result
 
@@ -111,16 +124,16 @@ def test_create_iscc_granular_image_has_no_features(api):
 
 
 def test_create_iscc_semantic_text(api):
-    response = upload(api, TEXT, "demo.doc", "?semantic=true")
+    response = upload(api, TEXT, "demo.doc", "?semantic=true&granular=false")
     assert response.status_code == codes.CREATED
     result = response.json()
-    assert result["iscc"] == TEXT_ISCC  # composite ISCC-CODE unchanged by opt-in
+    assert result["iscc"] == TEXT_ISCC  # composite ISCC-CODE unchanged by semantic units
     assert result["units"] == TEXT_UNITS
     assert "features" not in result
 
 
 def test_create_iscc_granular_text(api):
-    response = upload(api, TEXT, "demo.doc", "?granular=true")
+    response = upload(api, TEXT, "demo.doc", "?semantic=false&granular=true")
     assert response.status_code == codes.CREATED
     result = response.json()
     assert result["iscc"] == TEXT_ISCC

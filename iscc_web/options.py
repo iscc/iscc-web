@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 from pathlib import Path
 from typing import Optional
 
@@ -7,6 +8,24 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 HERE = Path(__file__).parent.absolute()
+
+# Service defaults for iscc-sdk / iscc-sct / iscc-sci options. Applied as environment defaults
+# before those libraries are imported (their pydantic-settings read the process environment at
+# import time) and inherited by pool worker processes. `setdefault` keeps explicitly set
+# environment variables authoritative.
+ISCC_LIB_ENV_DEFAULTS = {
+    "ISCC_SDK_GRANULAR": "true",
+    "ISCC_SDK_BYTE_OFFSETS": "true",
+    "ISCC_SDK_ADD_UNITS": "true",
+    "ISCC_SDK_BITS": "256",
+    "ISCC_SDK_WIDE": "true",
+    "ISCC_SDK_FALLBACK": "true",
+    "ISCC_SCT_BITS": "256",
+    "ISCC_SCT_BITS_GRANULAR": "256",
+    "ISCC_SCI_BITS": "256",
+}
+for _key, _value in ISCC_LIB_ENV_DEFAULTS.items():
+    os.environ.setdefault(_key, _value)
 
 
 class IsccWebOptions(BaseSettings):

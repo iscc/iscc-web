@@ -34,23 +34,23 @@ paths:
           example: eW91ci1tZWRpYS1maWxlLmpwZw==
       - name: semantic
         in: query
-        description: Add ISCC-UNITs to the `units` field, including experimental Semantic-Code
+        description: Include ISCC-UNITs in the `units` field, including experimental Semantic-Code
           units for text and image content. The composite ISCC-CODE itself stays a pure ISO
           24138 identifier. Semantic-Code algorithms are not part of ISO 24138 and may change
-          before their v1.0 release.
+          before their v1.0 release. If omitted, the service default applies (enabled unless
+          configured otherwise via ISCC_SDK_ADD_UNITS).
         required: false
         schema:
           type: boolean
-          default: false
       - name: granular
         in: query
-        description: Add granular simprint features to the `features` field (text content;
+        description: Include granular simprint features in the `features` field (text content;
           combined with `semantic` also semantic text simprints). Granular features are experimental
-          and may change before their v1.0 release.
+          and may change before their v1.0 release. If omitted, the service default applies
+          (enabled unless configured otherwise via ISCC_SDK_GRANULAR).
         required: false
         schema:
           type: boolean
-          default: false
       requestBody:
         description: The raw file data (not form encoded).
         content:
@@ -76,7 +76,7 @@ paths:
         400:
           description: Bad Request
         422:
-          description: Unprocessable Entity - ISCC processsing error.
+          description: Unprocessable Entity - ISCC processing error.
   /iscc/{media_id}:
     get:
       operationId: get-iscc
@@ -243,7 +243,7 @@ paths:
         404:
           description: Not Found
         422:
-          description: Unprocessable Entity - ISCC processsing error.
+          description: Unprocessable Entity - ISCC processing error.
   /explain/{iscc}:
     get:
       operationId: explain-iscc
@@ -492,7 +492,7 @@ components:
           example: 1e20b46b2257d6c6248f0b2130affc644088cc07f31219394f28523e7742441e91fd
         units:
           description: ISCC-UNITs of the media asset, including experimental Semantic-Code
-            units. Only included on request (`semantic=true`).
+            units. Included by default; excluded with `semantic=false`.
           type: array
           items:
             type: string
@@ -504,7 +504,8 @@ components:
           - ISCC:GAAYGICYTOZYKQAL
           - ISCC:IAAUNUPL2ZHVCU3R
         features:
-          description: Granular features of the media asset. Only included on request (`granular=true`).
+          description: Granular features of the media asset. Included by default; excluded
+            with `granular=false`.
           type: array
           items:
             $ref: '#/components/schemas/FeatureSet'

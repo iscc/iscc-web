@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from typing import Optional
+
 import aiofile
 from blacksheep import Request, ContentDispositionType, Response
 from blacksheep.server.controllers import APIController, post, get
@@ -27,8 +29,13 @@ class Iscc(APIController, FileHandler):
         )
 
     @post()
-    async def create_iscc(self, request: Request, semantic: bool = False, granular: bool = False):
-        """Upload and create ISCC-CODE for media asset (optional semantic units / granular features)."""
+    async def create_iscc(self, request: Request, semantic: Optional[bool] = None, granular: Optional[bool] = None):
+        """
+        Upload and create ISCC-CODE for media asset.
+
+        Omitted `semantic`/`granular` query params defer to the service defaults (on unless
+        disabled via ISCC_SDK_* environment variables); explicit values override per request.
+        """
 
         result = await self.handle_upload(request)
         if isinstance(result, Response):

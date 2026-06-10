@@ -32,7 +32,43 @@ def test_create_iscc_location_and_result(api):
         "mode": "image",
         "name": "test image",
         "thumbnail": "data:image/webp;base64,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",
+        "units": [
+            "ISCC:AADXNDSZVTTX2LDQWWLJUWUK3DGIQV27EFWEUI2AEXNONCRDWUSE2OY",
+            "ISCC:CEDQ2WTPK2QPZTK47HLOYUUTO3TCA35K5UQZODFMMY42S6O6RDQWFEA",
+            "ISCC:EED4GQZQTY6J5DTHQ2DWCPDZHQOM6QZQTY6J5DTFZ2DWCPDZHQOMXDI",
+            "ISCC:GADWAIBQLNWP7X32J3INMAMDUJ4QMN67BBQKVTVZIWHXQ7QJIKHYTBY",
+            "ISCC:IADZ3NGA3HTIYUQD3SGC737FF6S5KRTRXY5DEU7ANCEMVTT4MDS2OQY",
+        ],
         "width": 200,
+    }
+
+
+def test_create_iscc_unsupported_mediatype_fallback(api):
+    """Unsupported media types yield a 2-unit wide ISCC-SUM (Data + Instance) by default."""
+    content = b"binary gibberish that is no known mediatype"
+    headers = {
+        "X-Upload-Filename": base64.b64encode("data.bin".encode("utf-8")),
+        "Content-Type": "application/octet-stream",
+    }
+    response = api.post("/iscc", content=content, headers=headers)
+    assert response.status_code == codes.CREATED
+    result = response.json()
+    del result["media_id"]
+    del result["content"]
+    assert result == {
+        "$schema": "http://purl.org/iscc/schema/0.8.0.json",
+        "@context": "http://purl.org/iscc/context/0.8.0.jsonld",
+        "@type": "CreativeWork",
+        "datahash": "1e20e71d4ae9d38271d900dd98e8ca9ff1f42075038d2139f5aed93c8329da6e7b4e",
+        "filename": "data.bin",
+        "filesize": 43,
+        "generator": "iscc-sdk - v0.9.3",
+        "iscc": "ISCC:K4ANLI74MSJU22HRO6FI2IOR3IVCNZY5JLU5HATR3EAN3GHIZKP7D5A",
+        "mediatype": "application/octet-stream",
+        "units": [
+            "ISCC:GAD5LI74MSJU22HRO6FI2IOR3IVCNZUI5AQQJLU3V6BCJDETHFQDYEI",
+            "ISCC:IAD6OHKK5HJYE4OZADOZR2GKT7Y7IIDVAOGSCOPVV3MTZAZJ3JXHWTQ",
+        ],
     }
 
 

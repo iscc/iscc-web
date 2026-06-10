@@ -35,17 +35,16 @@ COPY . /app/
 #
 # frontend-build
 #
-FROM node:16.17.0 AS frontend-build
+FROM node:24.4.1-slim AS frontend-build
 
-# pnpm 7 matches pnpm-lock.yaml (lockfileVersion 5.4) and still supports Node 16;
-# unpinned installs now resolve to pnpm >=10 which requires Node >=22.
-RUN npm install -g pnpm@7
+# Match the packageManager field in package.json
+RUN npm install -g pnpm@11.5.3
 
 WORKDIR /app
 
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
-RUN pnpm install
+RUN pnpm install --frozen-lockfile
 
 COPY . .
 

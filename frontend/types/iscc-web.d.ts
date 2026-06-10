@@ -1,3 +1,5 @@
+type Nullable<T> = T | null;
+
 declare namespace IsccWeb {
   export interface FileUpload {
     id: string;
@@ -8,6 +10,7 @@ declare namespace IsccWeb {
     metadataChanged: boolean;
     error: Nullable<Error>;
     hashBits: Nullable<string>;
+    units: Nullable<Array<Api.IsccUnit>>;
   }
 
   export interface MetadataFormData {

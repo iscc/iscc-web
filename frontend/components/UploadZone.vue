@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Uppy from "@uppy/core";
-import type { UppyFile } from "@uppy/utils";
+import type { Meta, Body, UppyFile } from "@uppy/core";
 import XhrUpload from "@uppy/xhr-upload";
 import { Base64 } from "js-base64";
 import { computed, onUnmounted, ref } from "vue";
@@ -8,56 +8,58 @@ import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiFolderMultipleImage } from "@mdi/js";
 
 const emit = defineEmits<{
-  (e: "file-added", file: UppyFile): void;
-  (e: "upload-progress", file: UppyFile, percentage: number): void;
-  (e: "upload-error", file: UppyFile, error: Error): void;
-  (e: "upload-success", file: UppyFile, isccMetadata: Api.IsccMetadata): void;
+  (e: "file-added", file: UppyFile<Meta, Body>): void;
+  (e: "upload-progress", file: UppyFile<Meta, Body>, percentage: number): void;
+  (e: "upload-error", file: UppyFile<Meta, Body>, error: Error): void;
+  (e: "upload-success", file: UppyFile<Meta, Body>, isccMetadata: Api.IsccMetadata): void;
 }>();
 
+const semantic = ref<boolean>(false);
+const granular = ref<boolean>(false);
+
+// Resolved per upload so toggle changes apply without rebuilding the Uppy instance
+const uploadEndpoint = () => {
+  const params = new URLSearchParams();
+  if (semantic.value) params.set("semantic", "true");
+  if (granular.value) params.set("granular", "true");
+  const query = params.toString();
+  return "/api/v1/iscc" + (query ? `?${query}` : "");
+};
+
 const uppy = computed(() =>
-  new Uppy({ autoProceed: true })
+  new Uppy<Meta, Body>({ autoProceed: true })
     .use(XhrUpload, {
-      endpoint: "/api/v1/iscc",
+      endpoint: uploadEndpoint,
       formData: false,
       timeout: 0,
-      headers: (file) => ({ "X-Upload-Filename": Base64.encode(file.name) }),
-      getResponseError: (responseText, response: unknown) => {
-        if (response instanceof XMLHttpRequest) {
-          return new Error(`${(response as XMLHttpRequest).status}: ${responseText}`);
-        }
-
-        return new Error(responseText);
-      },
+      headers: (file) => ({ "X-Upload-Filename": Base64.encode(file.name ?? "") }),
+      // Fail fast: Uppy 5 would otherwise silently re-upload the full body 3 times
+      shouldRetry: () => false,
     })
     .on("file-added", (file) => {
       emit("file-added", file);
     })
     .on("upload-success", (file, response) => {
-      if (!file) {
-        return;
-      }
-
-      const metadata: Api.IsccMetadata = response.body;
+      if (!file) return;
+      const metadata = response.body as unknown as Api.IsccMetadata;
       emit("upload-success", file, metadata);
     })
     .on("upload-progress", (file, progress) => {
-      if (!file) {
-        return;
-      }
-
-      emit("upload-progress", file, Math.floor((progress.bytesUploaded / progress.bytesTotal) * 100));
+      if (!file) return;
+      const total = progress.bytesTotal ?? 1;
+      emit("upload-progress", file, Math.floor((progress.bytesUploaded / total) * 100));
     })
-    .on("upload-error", (file, error) => {
-      if (!file) {
-        return;
-      }
-
-      emit("upload-error", file, error);
-    })
+    .on("upload-error", (file, error, response) => {
+      if (!file) return;
+      // xhr-upload 5 passes the raw XMLHttpRequest here (its declared type is wrong)
+      const xhr = response as unknown as XMLHttpRequest | undefined;
+      const message = xhr?.status ? `${xhr.status}: ${xhr.responseText || error.message}` : error.message;
+      emit("upload-error", file, new Error(message));
+    }),
 );
 
 onUnmounted(() => {
-  uppy.value.close({ reason: "unmount" });
+  uppy.value.destroy();
 });
 
 const onInputChange = () => {
@@ -107,7 +109,7 @@ const handleFiles = (fl: FileList) => {
       meta: {
         relativePath: f.webkitRelativePath,
       },
-    }))
+    })),
   );
 };
 
@@ -124,6 +126,7 @@ const dragging = ref<boolean>(false);
         @dragleave="onDragLeave"
         @dragover="onDragOver"
         @drop="onDrop"
+        @click="input?.click()"
         :class="dragging ? 'dragging' : ''"
       )
         input(
@@ -139,25 +142,54 @@ const dragging = ref<boolean>(false);
             size="48"
           )
           span Drag & Drop
-        button.btn.btn-primary.mt-3.mb-5(@click="input?.click()") or choose media file
+        button.btn.btn-primary.mt-3.mb-4(@click.stop="input?.click()") or choose media file
+        .upload-options.d-flex.flex-column.flex-sm-row.justify-content-center.gap-2.gap-sm-4.pb-4(@click.stop)
+          .form-check.form-switch
+            input#semantic-toggle.form-check-input(type="checkbox" v-model="semantic")
+            label.form-check-label(
+              for="semantic-toggle"
+              v-tooltip="'Add experimental Semantic-Code ISCC-UNITs for text and image content'"
+            ) Semantic ISCC-UNITs
+          .form-check.form-switch
+            input#granular-toggle.form-check-input(type="checkbox" v-model="granular")
+            label.form-check-label(
+              for="granular-toggle"
+              v-tooltip="'Add experimental granular simprint features for text content'"
+            ) Granular simprints
 </template>
 
 <style scoped lang="scss">
-@import "~bootstrap/scss/_functions";
-@import "~bootstrap/scss/_variables";
-
 .upload-zone {
   text-align: center;
-  background-color: $gray-300;
+  background-color: #ffffff;
   border-radius: 20px;
-  border: 2px dashed black;
+  border: 2px dashed var(--iscc-blue);
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out;
+
+  &:hover {
+    background-color: #f8f9fa;
+  }
 
   &.dragging {
-    background-color: $gray-200;
+    background-color: #e9ecef;
+    border-style: solid;
+    border-color: var(--iscc-sky-blue);
+  }
+
+  h2 {
+    color: var(--iscc-deep-navy);
   }
 
   input[type="file"] {
     display: none;
+  }
+
+  .upload-options {
+    .form-check-label {
+      color: var(--iscc-deep-navy);
+      font-size: 0.875rem;
+    }
   }
 }
 </style>

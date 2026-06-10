@@ -104,10 +104,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Install pnpm
+      - name: Install pnpm  # version comes from the packageManager field in package.json
         uses: pnpm/action-setup@v4
-        with:
-          version: 7  # matches pnpm-lock.yaml (lockfileVersion 5.4); bump in Stage 9
 
       - name: Install Node.js
         uses: actions/setup-node@v5

@@ -5,7 +5,7 @@ import IsccHeader from "./components/IsccHeader.vue";
 import UploadZone from "./components/UploadZone.vue";
 import UploadedFile from "./components/UploadedFile.vue";
 import IsccFooter from "./components/IsccFooter.vue";
-import type { UppyFile } from "@uppy/core";
+import type { UppyFile, Meta, Body } from "@uppy/core";
 import { apiService } from "./services/api.service";
 
 const uploadedMediaFiles = ref<Array<IsccWeb.FileUpload>>([]);
@@ -27,23 +27,24 @@ const loadHashBitsForFile = async (fileId: string, iscc: string) => {
   const isccDecomposition = await apiService.explainIscc(iscc);
   const hashBits = isccDecomposition.units.map((unit) => unit.hash_bits).join("");
 
-  updateUploadedMediaFile(fileId, { hashBits });
+  updateUploadedMediaFile(fileId, { hashBits, units: isccDecomposition.units });
 };
 
-const onFileAdded = (file: UppyFile) => {
+const onFileAdded = (file: UppyFile<Meta, Body>) => {
   uploadedMediaFiles.value.unshift({
     id: file.id,
-    name: file.name,
+    name: file.name ?? "",
     progress: 0,
     status: "UPLOADING",
     isccMetadata: null,
     metadataChanged: false,
     error: null,
     hashBits: null,
+    units: null,
   });
 };
 
-const onUploadProgress = (file: UppyFile, percentage: number) => {
+const onUploadProgress = (file: UppyFile<Meta, Body>, percentage: number) => {
   const data: Partial<IsccWeb.FileUpload> = {
     progress: percentage,
   };
@@ -55,14 +56,14 @@ const onUploadProgress = (file: UppyFile, percentage: number) => {
   updateUploadedMediaFile(file.id, data);
 };
 
-const onUploadError = (file: UppyFile, error: Error) => {
+const onUploadError = (file: UppyFile<Meta, Body>, error: Error) => {
   updateUploadedMediaFile(file.id, {
     status: "ERROR",
     error: error,
   });
 };
 
-const onUploadSuccess = async (file: UppyFile, isccMetadata: Api.IsccMetadata) => {
+const onUploadSuccess = async (file: UppyFile<Meta, Body>, isccMetadata: Api.IsccMetadata) => {
   updateUploadedMediaFile(file.id, {
     progress: 100,
     status: "PROCESSED",
@@ -82,20 +83,21 @@ const onUpdateMetadata = async (file: IsccWeb.FileUpload, formData: IsccWeb.Meta
   });
 
   try {
-    const newMetadata = await apiService.embedMetadata(file.isccMetadata?.media_id, formData);
+    const newMetadata = await apiService.embedMetadata(file.isccMetadata?.media_id ?? "", formData);
 
     updateUploadedMediaFile(file.id, {
       isccMetadata: newMetadata,
       metadataChanged: true,
       status: "PROCESSED",
       hashBits: null,
+      units: null,
     });
 
     await loadHashBitsForFile(file.id, newMetadata.iscc);
   } catch (e) {
     updateUploadedMediaFile(file.id, {
       status: "ERROR",
-      error: e,
+      error: e instanceof Error ? e : new Error(String(e)),
     });
   }
 };

@@ -8,7 +8,7 @@ const props = defineProps<{
   file: IsccWeb.FileUpload;
   comparison?: {
     name: string;
-    hashBits?: Array<string>;
+    hashBits: Nullable<string>;
   };
 }>();
 
@@ -26,7 +26,7 @@ const onUpdateMetadataClick = async () => {
 };
 
 const onDownloadClick = () => {
-  window.location.href = `/api/v1/media/${props.file.isccMetadata.media_id}`;
+  window.location.href = `/api/v1/media/${props.file.isccMetadata?.media_id}`;
 };
 
 const working = computed(() => {
@@ -34,8 +34,8 @@ const working = computed(() => {
 });
 
 const formData = ref<IsccWeb.MetadataFormData>({
-  name: props.file.isccMetadata?.name,
-  description: props.file.isccMetadata?.description,
+  name: props.file.isccMetadata?.name ?? "",
+  description: props.file.isccMetadata?.description ?? "",
 });
 
 const currentTab = ref<"iscc" | "dna" | "raw-metadata">("iscc");
@@ -50,7 +50,7 @@ watch(
     formData.value.name = newFile.isccMetadata.name;
     formData.value.description = newFile.isccMetadata.description;
   },
-  { deep: true }
+  { deep: true },
 );
 
 const hashBitComparisonClass = (hashBit: string, index: number) => {
@@ -64,10 +64,48 @@ const hashBitComparisonClass = (hashBit: string, index: number) => {
     return "equal";
   }
 };
+
+// ISCC MainTypes by codec header (first base32 char encodes the maintype in its top 4 bits)
+const BASE32_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+const UNIT_TYPES = ["meta", "semantic", "content", "data", "instance"];
+
+const unitTypeFromIscc = (isccUnit: string) => {
+  const code = isccUnit.replace("ISCC:", "");
+  const maintype = BASE32_ALPHABET.indexOf(code.charAt(0)) >> 1;
+  return UNIT_TYPES[maintype] ?? "unknown";
+};
+
+// Prefer the units delivered with the ISCC result (includes opt-in Semantic-Code units),
+// fall back to the decomposed composite units.
+const isccUnits = computed<Array<string>>(() => {
+  return props.file.isccMetadata?.units ?? props.file.units?.map((unit) => unit.iscc_unit) ?? [];
+});
+
+const hashBitUnitClass = (index: number) => {
+  if (!props.file.units) {
+    return "";
+  }
+
+  let offset = 0;
+  for (const unit of props.file.units) {
+    offset += unit.hash_bits.length;
+    if (index < offset) {
+      return `unit-${unitTypeFromIscc(unit.iscc_unit)}`;
+    }
+  }
+
+  return "";
+};
+
+const statusClass = computed(() => {
+  if (props.file.status === "ERROR") return "status-error";
+  if (props.file.status === "PROCESSED") return "status-success";
+  return "status-working";
+});
 </script>
 
 <template lang="pug">
-.card
+.card(:class="statusClass")
   .card-header
     ul.nav.nav-tabs.card-header-tabs
       li.nav-item
@@ -110,6 +148,14 @@ const hashBitComparisonClass = (hashBit: string, index: number) => {
           .progress-bar(v-if="file.status === 'UPLOADING'" :style="`width: ${file.progress || 0}%`") Uploading...
       .col-12(v-if="file.isccMetadata?.iscc")
         .font-monospace.iscc-code(v-text="file.isccMetadata?.iscc")
+        .iscc-units.d-flex.flex-wrap.gap-2.mt-2(v-if="isccUnits.length")
+          .iscc-unit(
+            v-for="unit in isccUnits"
+            :key="unit"
+            :class="`unit-${unitTypeFromIscc(unit)}`"
+          )
+            span.unit-type(v-text="unitTypeFromIscc(unit)")
+            span.unit-code.font-monospace(v-text="unit")
       template(v-if="currentTab === 'iscc'")
         .col-12.col-sm-3.col-lg-2(v-if="file.isccMetadata?.thumbnail")
           img.img-thumbnail(:src="file.isccMetadata.thumbnail")
@@ -153,9 +199,13 @@ const hashBitComparisonClass = (hashBit: string, index: number) => {
           .hash-bit(
             v-for="(hashBit, index) in file.hashBits"
             v-text="hashBit"
-            :class="`pos-${index} ${hashBitComparisonClass(hashBit, index)}`"
+            :class="`pos-${index} ${hashBitUnitClass(index)} ${hashBitComparisonClass(hashBit, index)}`"
           )
-        p(v-else) Loading...
+        .unit-legend.d-flex.flex-wrap.gap-3.mt-3(v-if="file.units")
+          .legend-item.d-flex.align-items-center(v-for="unit in file.units" :key="unit.iscc_unit")
+            span.legend-swatch(:class="`unit-${unitTypeFromIscc(unit.iscc_unit)}`")
+            span.legend-label(v-text="`${unitTypeFromIscc(unit.iscc_unit).toUpperCase()}-CODE`")
+        p(v-if="!file.hashBits") Loading...
       .raw-metadata(v-else)
         highlightjs(language="json" :code="JSON.stringify(file.isccMetadata, null, 2)")
 </template>
@@ -165,6 +215,18 @@ const hashBitComparisonClass = (hashBit: string, index: number) => {
 @import "~bootstrap/scss/_variables";
 @import "~bootstrap/scss/mixins/_border-radius";
 @import "~bootstrap/scss/mixins/_breakpoints";
+
+.card {
+  border-top: 3px solid var(--iscc-sky-blue);
+
+  &.status-success {
+    border-top-color: var(--iscc-lime-green);
+  }
+
+  &.status-error {
+    border-top-color: var(--iscc-coral-red);
+  }
+}
 
 .card-header {
   display: flex;
@@ -183,6 +245,31 @@ const hashBitComparisonClass = (hashBit: string, index: number) => {
   }
 }
 
+.unit-meta {
+  background-color: var(--iscc-unit-meta);
+  color: var(--iscc-deep-navy);
+}
+
+.unit-semantic {
+  background-color: var(--iscc-unit-semantic);
+  color: #ffffff;
+}
+
+.unit-content {
+  background-color: var(--iscc-unit-content);
+  color: #ffffff;
+}
+
+.unit-data {
+  background-color: var(--iscc-unit-data);
+  color: var(--iscc-deep-navy);
+}
+
+.unit-instance {
+  background-color: var(--iscc-unit-instance);
+  color: #ffffff;
+}
+
 .card-body {
   .img-thumbnail {
     width: 100%;
@@ -192,6 +279,29 @@ const hashBitComparisonClass = (hashBit: string, index: number) => {
     padding: $input-padding-y $input-padding-x;
     border: $input-border-width solid $input-border-color;
     @include border-radius($input-border-radius, 0);
+  }
+
+  .iscc-units {
+    .iscc-unit {
+      display: inline-flex;
+      align-items: stretch;
+      border-radius: 0.375rem;
+      overflow: hidden;
+      font-size: 0.75rem;
+      border: 1px solid #e9ecef;
+
+      .unit-type {
+        padding: 0.25rem 0.5rem;
+        text-transform: uppercase;
+        font-weight: 600;
+      }
+
+      .unit-code {
+        padding: 0.25rem 0.5rem;
+        background-color: #f8f9fa;
+        color: #212529;
+      }
+    }
   }
 
   .dna {
@@ -204,7 +314,7 @@ const hashBitComparisonClass = (hashBit: string, index: number) => {
       }
 
       .hash-bit {
-        color: black;
+        color: white;
         background-color: lightgray;
         display: flex;
         align-items: center;
@@ -216,14 +326,36 @@ const hashBitComparisonClass = (hashBit: string, index: number) => {
         aspect-ratio: 1 / 1;
         overflow: hidden;
 
+        &.unit-meta {
+          background-color: var(--iscc-unit-meta);
+          color: var(--iscc-deep-navy);
+        }
+
+        &.unit-semantic {
+          background-color: var(--iscc-unit-semantic);
+        }
+
+        &.unit-content {
+          background-color: var(--iscc-unit-content);
+        }
+
+        &.unit-data {
+          background-color: var(--iscc-unit-data);
+          color: var(--iscc-deep-navy);
+        }
+
+        &.unit-instance {
+          background-color: var(--iscc-unit-instance);
+        }
+
         &.equal {
-          background-color: green;
-          color: white;
+          background-color: var(--iscc-lime-green);
+          color: var(--iscc-deep-navy);
         }
 
         &.unequal {
-          background-color: red;
-          color: white;
+          background-color: var(--iscc-coral-red);
+          color: var(--iscc-deep-navy);
         }
 
         @include media-breakpoint-down(md) {
@@ -240,6 +372,21 @@ const hashBitComparisonClass = (hashBit: string, index: number) => {
             clear: left;
           }
         }
+      }
+    }
+
+    .unit-legend {
+      .legend-swatch {
+        display: inline-block;
+        width: 1rem;
+        height: 1rem;
+        margin-right: 0.375rem;
+        border-radius: 0.25rem;
+      }
+
+      .legend-label {
+        font-size: 0.75rem;
+        color: #6c757d;
       }
     }
   }

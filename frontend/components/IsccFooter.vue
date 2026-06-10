@@ -2,7 +2,7 @@
 
 <template lang="pug">
 .footer
-  span Copyright © 2022 ISCC Foundation
+  span Copyright © 2022–2026 ISCC Foundation
   span &nbsp;|&nbsp;
   a.link-secondary(href="https://iscc.foundation/privacy/" target="_blank") Privacy Policy
   span &nbsp;|&nbsp;

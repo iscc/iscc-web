@@ -25,6 +25,18 @@ declare namespace Api {
     characters: number;
     language: string;
     thumbnail: string;
+    units?: Array<string>;
+    features?: Array<Api.FeatureSet>;
+  }
+
+  export interface FeatureSet {
+    maintype: string;
+    subtype: string;
+    version: number;
+    byte_offsets: boolean;
+    simprints: Array<string>;
+    offsets?: Array<number>;
+    sizes?: Array<number>;
   }
 
   export interface IsccUnit {

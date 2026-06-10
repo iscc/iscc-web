@@ -1,6 +1,32 @@
+// ISCC brand theme (see .claude/skills/iscc-brand-guidelines)
+$primary: #0054b2; // ISCC Blue
+$success: #a6db50; // Lime Green
+$info: #4596f5; // Sky Blue
+$warning: #ffc300; // Bright Yellow
+$danger: #f56169; // Coral Red
+$dark: #123663; // Deep Navy
+
+$font-family-sans-serif: "Readex Pro", Arial, sans-serif;
+$font-family-monospace: "JetBrains Mono", Consolas, monospace;
+
 @import "~bootstrap/scss/bootstrap";
 
 :root {
-  --bs-font-sans-serif: "Readex Pro";
-  --bs-font-monospace: "Jetbrains Mono";
+  --iscc-blue: #0054b2;
+  --iscc-deep-navy: #123663;
+  --iscc-bright-yellow: #ffc300;
+  --iscc-coral-red: #f56169;
+  --iscc-lime-green: #a6db50;
+  --iscc-sky-blue: #4596f5;
+  --iscc-light-cyan: #7ac2f7;
+  // ISCC component colors for unit visualization
+  --iscc-unit-meta: var(--iscc-sky-blue);
+  --iscc-unit-semantic: #6c757d;
+  --iscc-unit-content: var(--iscc-blue);
+  --iscc-unit-data: var(--iscc-light-cyan);
+  --iscc-unit-instance: var(--iscc-deep-navy);
+}
+
+body {
+  background-color: #f8f9fa;
 }

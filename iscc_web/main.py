@@ -51,9 +51,7 @@ async def configure_cleanup(application):
     if opts.cleanup_interval == 0:
         log.warning("Upload cleanup deactivated", enqueue=True)
     else:
-        log.info(
-            f"Install cleanup task with {opts.cleanup_interval} seconds interval", enqueue=True
-        )
+        log.info(f"Install cleanup task with {opts.cleanup_interval} seconds interval", enqueue=True)
         asyncio.get_event_loop().create_task(cleanup_task())
 
 

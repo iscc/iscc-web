@@ -8,9 +8,7 @@ from tests.conftest import server_host, server_port, server_api_path
 
 HERE = pathlib.Path(__file__).parent.absolute()
 SCHEMA_PATH = HERE.parent / "iscc_web/static/docs/openapi.yaml"
-schema = schemathesis.from_path(
-    SCHEMA_PATH, base_url=f"http://{server_host}:{server_port}/{server_api_path}"
-)
+schema = schemathesis.from_path(SCHEMA_PATH, base_url=f"http://{server_host}:{server_port}/{server_api_path}")
 
 
 schema.add_link(

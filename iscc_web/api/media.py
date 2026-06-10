@@ -27,9 +27,7 @@ class Media(ApiController, FileHandler):
         location_header = f"/api/v1/media/{media_id}".encode("ascii")
         location = f"{base_url(request)}/media/{media_id}"
 
-        return self.created(
-            location=location_header, value={"content": location, "media_id": media_id}
-        )
+        return self.created(location=location_header, value={"content": location, "media_id": media_id})
 
     @get("{mid:media_id}")
     async def download_file(self, request: Request, media_id: str):

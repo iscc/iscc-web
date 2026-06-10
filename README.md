@@ -33,16 +33,15 @@ Configuration is handled by environment variables:
 
 **Backend:**
 
--   `ISCC_WEB_ENVIRONMENT`: `development` or `production` (default: `development`).
--   `ISCC_WEB_SITE_ADDRESS`: public site address (default: http://localhost:8000).
--   `ISCC_WEB_PRIVATE_FILES`: restrict file downloads to original uploader (default: true).
--   `ISCC_WEB_MAX_UPLOAD_SIZE`: max file size per file upload in bytes (default: 1073741824).
--   `ISCC_WEB_STORAGE_EXPIRY`: delete uploaded files after x seconds (default 3600).
--   `ISCC_WEB_CLEANUP_INTERVAL`: interval in seconds to run file cleanup task. Use 0 to deactivate (default: 600).
--   `ISCC_WEB_LOG_LEVEL`: set log level (default: `DEBUG`).
--   `ISCC_WEB_IO_READ_SIZE`: file read chunk size (default: 2097152).
--   `ISCC_WEB_SENTRY_DSN`: optional sentry dsn for error reporting (default: emtpy string).
-
+- `ISCC_WEB_ENVIRONMENT`: `development` or `production` (default: `development`).
+- `ISCC_WEB_SITE_ADDRESS`: public site address (default: http://localhost:8000).
+- `ISCC_WEB_PRIVATE_FILES`: restrict file downloads to original uploader (default: true).
+- `ISCC_WEB_MAX_UPLOAD_SIZE`: max file size per file upload in bytes (default: 1073741824).
+- `ISCC_WEB_STORAGE_EXPIRY`: delete uploaded files after x seconds (default 3600).
+- `ISCC_WEB_CLEANUP_INTERVAL`: interval in seconds to run file cleanup task. Use 0 to deactivate (default: 600).
+- `ISCC_WEB_LOG_LEVEL`: set log level (default: `DEBUG`).
+- `ISCC_WEB_IO_READ_SIZE`: file read chunk size (default: 2097152).
+- `ISCC_WEB_SENTRY_DSN`: optional sentry dsn for error reporting (default: emtpy string).
 
 The production Dockerfile also supports `PORT` to configure gunicorns default port. (see [gunicorn
 docs](https://docs.gunicorn.org/en/stable/settings.html?highlight=PORT#bind) for details)
@@ -82,9 +81,8 @@ Run `pnpm run dev` to run the development server.
 
 # Special thanks to the developers of
 
--   [Blacksheep](https://github.com/Neoteroi/BlackSheep) (see [benchmarks](http://klen.github.io/py-frameworks-bench/))
--   [Schemathesis](https://github.com/schemathesis/schemathesis)
-
+- [Blacksheep](https://github.com/Neoteroi/BlackSheep) (see [benchmarks](http://klen.github.io/py-frameworks-bench/))
+- [Schemathesis](https://github.com/schemathesis/schemathesis)
 
 ## Deployment
 
@@ -93,6 +91,7 @@ Here is a simple docker-compose based standalone deployment with automatic SSL/T
 Create these three files on your server:
 
 ### Caddyfile
+
 ```
 {
   email {$ISCC_WEB_SITE_EMAIL}
@@ -104,6 +103,7 @@ Create these three files on your server:
 ```
 
 ### .env
+
 ```.env
 ISCC_WEB_ENVIRONMENT=production
 ISCC_WEB_SITE_EMAIL=admin@example.com
@@ -132,7 +132,7 @@ For available environment variables see:
 ### docker-compose.yaml
 
 ```yaml
-version: "3.8"
+version: '3.8'
 
 volumes:
   caddy-config:
@@ -152,9 +152,9 @@ services:
       - caddy-config:/config
       - caddy-data:/data
     ports:
-      - "80:80"
-      - "443:443"
-      - "443:443/udp"
+      - 80:80
+      - 443:443
+      - 443:443/udp
     depends_on:
       - app
 ```
@@ -163,12 +163,15 @@ Make sure you have a DNS entry pointing to your servers IP and set the correct
 `ISCC_WEB_SITE_ADDRESS` in your `.env` file. You should also change `ISCC_WEB_SITE_EMAIL`.
 
 ### Start the app
+
 `docker-compose up -d`
 
 ### Watch logs
+
 `docker-compose logs -f`
 
 ### Update to the latest docker image
+
 ```shell
 docker-compose pull
 docker-compose up -d

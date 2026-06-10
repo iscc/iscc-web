@@ -10,9 +10,7 @@ def test_explain_iscc(api):
         "iscc": "ISCC:KMDMRJYGHHVRCZ5TM6U4G6D4MXA6LAXC4ZRPOKFU7JBEQXR2BJOS6NA",
         "decomposed": "AAA4RJYGHHVRCZ5T-CMAWPKODPB6GLQPF-GAAYFYXGML3SRNH2-IAAUESC6HIFF2LZU",
         "multiformat": "uzAFTBsinBjnrEWezZ6nDeHxlweWC4uZi9yi0-kJIXjoKXS80",
-        "readable": (
-            "ISCC-VIDEO-V0-MSDI-c8a70639eb1167b367a9c3787c65c1e582e2e662f728b4fa42485e3a0a5d2f34"
-        ),
+        "readable": ("ISCC-VIDEO-V0-MSDI-c8a70639eb1167b367a9c3787c65c1e582e2e662f728b4fa42485e3a0a5d2f34"),
         "units": [
             {
                 "iscc_unit": "ISCC:AAA4RJYGHHVRCZ5T",

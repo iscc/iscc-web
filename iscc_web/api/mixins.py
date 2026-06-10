@@ -12,11 +12,10 @@ from iscc_web.api.models import UploadMeta
 import iscc_core as ic
 from aiofiles.os import mkdir, rename
 import aiofile
-from typing import Tuple, Union, Optional
+from typing import Tuple, Union
 from iscc_web.main import app
 import iscc_sdk as idk
 from iscc_web.api.common import rmtree, copyfile
-from loguru import logger as log
 
 
 class FileHandler:
@@ -90,9 +89,7 @@ class FileHandler:
         if content_length:
             cl = int(content_length)
             if cl < 1 or cl > opts.max_upload_size:
-                return self.status_code(
-                    400, f"Bad Request - Content-Length must be > 0 and < {opts.max_upload_size}"
-                )
+                return self.status_code(400, f"Bad Request - Content-Length must be > 0 and < {opts.max_upload_size}")
 
         file_name_base64 = request.get_first_header(b"X-Upload-Filename")
         if not file_name_base64:

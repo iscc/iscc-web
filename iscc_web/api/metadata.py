@@ -68,7 +68,7 @@ class Metadata(ApiController, FileHandler):
             return self.status_code(422, f"Unprocessable Entity - Failed to embed metadata {e}")
 
         if genfile is None:
-            return self.status_code(422, f"Unprocessable Entity - Failed to embed metadata.")
+            return self.status_code(422, "Unprocessable Entity - Failed to embed metadata.")
 
         # Move to new media file
         new_media_id, media_dir = await self.create_package()

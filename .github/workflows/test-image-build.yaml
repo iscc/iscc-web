@@ -37,4 +37,3 @@ jobs:
             echo "Fetching index failed!"
             exit 1
           fi
-

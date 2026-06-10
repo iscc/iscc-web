@@ -32,5 +32,5 @@ def test_upload_and_delete_file(api):
 
 
 def test_download_missing(api):
-    response = api.get(f"/media/161knt35ej404")
+    response = api.get("/media/161knt35ej404")
     assert response.status_code == codes.NOT_FOUND

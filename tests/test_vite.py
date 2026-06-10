@@ -59,6 +59,15 @@ def test_prod_mode_asset_renders_css_and_script(env, prod):
     )
 
 
+def test_prod_mode_asset_safe_under_autoescape(prod):
+    # BlackSheep's JinjaRenderer enables autoescape; joined tags must stay Markup-safe.
+    environment = Environment(autoescape=True)
+    vite.register_extensions(environment)
+    out = environment.from_string("{% vite_asset 'frontend/main.ts' %}").render()
+    assert "&lt;" not in out
+    assert out.startswith('<link rel="stylesheet"')
+
+
 def test_prod_mode_missing_asset_raises(env, prod):
     with pytest.raises(RuntimeError, match="Cannot find missing.ts"):
         render(env, "{% vite_asset 'missing.ts' %}")

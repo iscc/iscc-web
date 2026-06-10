@@ -51,7 +51,8 @@ class ViteAssetExtension(StandaloneTag):
 
         generated_tags.append(generate_script_tag(urljoin(VITE_STATIC_URL, manifest_entry["file"])))
 
-        return "\n".join(generated_tags)
+        # str.join returns a plain str even for Markup items, which Jinja would autoescape
+        return Markup("\n".join(generated_tags))
 
     def __generate_css_tags(self, asset_path: str, seen_tags=None):
         if not VITE_MANIFEST or asset_path not in VITE_MANIFEST:

@@ -33,8 +33,9 @@ class Iscc(APIController, FileHandler):
         """
         Upload and create ISCC-CODE for media asset.
 
-        Omitted `semantic`/`granular` query params defer to the service defaults (on unless
-        disabled via ISCC_SDK_* environment variables); explicit values override per request.
+        Omitted `semantic`/`granular` query params defer to the service defaults (semantic off,
+        granular on unless configured otherwise via ISCC_SDK_* environment variables); explicit
+        values override per request.
         """
 
         result = await self.handle_upload(request)

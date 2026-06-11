@@ -25,41 +25,24 @@ def code_iscc(fp, semantic=None, granular=None):
     """
     Generate ISCC metadata for the file at `fp` (top-level function - pool workers must pickle it).
 
-    Both options extend the result without changing the composite ISCC-CODE, which stays a pure
-    ISO 24138 identifier:
-
-    - `semantic`: list the ISCC-UNITs in `units`, including experimental Semantic-Code units
-      (text via iscc-sct, image via iscc-sci - other modes have no semantic codes).
+    - `semantic`: generate an experimental Semantic-Code ISCC-UNIT (text via iscc-sct, image via
+      iscc-sci - other modes have no semantic codes) that becomes part of the composite
+      ISCC-CODE. The resulting 5-unit ISCC-CODE is not a standard ISO 24138 identifier.
     - `granular`: add granular simprint features to `features` (text mode; with `semantic` also
       semantic simprints compatible with the /simprint endpoint).
 
-    `None` means "use the service default" (`sdk_opts.add_units` / `sdk_opts.granular`,
+    `None` means "use the service default" (`sdk_opts.experimental` / `sdk_opts.granular`,
     overridable via ISCC_SDK_* environment variables), resolved here in the worker process.
     """
-    semantic = idk.sdk_opts.add_units if semantic is None else semantic
+    semantic = idk.sdk_opts.experimental if semantic is None else semantic
     granular = idk.sdk_opts.granular if granular is None else granular
-    result = idk.code_iscc(fp, add_units=semantic, granular=granular)
-    if not result.features:
-        result.features = None  # image and audio content codes produce no granular features
-    if semantic:
-        semantic_meta = code_semantic(fp, result.mode, granular)
-        if semantic_meta:
-            result.units.insert(1, semantic_meta.iscc)
-            if semantic_meta.features:
-                result.features = semantic_meta.features + (result.features or [])
+    result = idk.code_iscc(fp, experimental=semantic, granular=granular)
+    if not granular or not result.features:
+        # The semantic path attaches simprints even when granular output is off (sct simprints
+        # are enabled globally - see options.py); image and audio content codes produce no
+        # granular features at all.
+        result.features = None
     return result
-
-
-def code_semantic(fp, mode, granular):
-    # type: (str, str|None, bool) -> IsccMeta|None
-    """Generate experimental Semantic-Code metadata for text/image media (None for other modes)."""
-    if mode == "text":
-        # Bit lengths come from sct_opts (ISCC_SCT_BITS / ISCC_SCT_BITS_GRANULAR defaults).
-        sct_options = {"simprints": True} if granular else {}
-        return idk.code_text_semantic(fp, **sct_options)
-    if mode == "image":
-        return idk.code_image_semantic(fp)
-    return None
 
 
 class FileHandler:
@@ -177,7 +160,8 @@ class FileHandler:
         self, file_path: Path, semantic: Optional[bool] = None, granular: Optional[bool] = None
     ) -> Union[IsccMeta, Response]:
         """
-        Process an ISCC for file at `file_path` with optional semantic units and granular features.
+        Process an ISCC for file at `file_path` with optional Semantic-Code unit and granular
+        features.
 
         `None` defers to the service defaults (see `code_iscc`).
         """

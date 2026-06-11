@@ -264,7 +264,7 @@ class TechnicalMetadata(BaseModel):
     )
     units: list[constr(pattern=r"^ISCC:[A-Z2-7]{10,73}$")] | None = Field(
         None,
-        description="ISCC-UNITs of the media asset, including experimental Semantic-Code units. Included by default; excluded with `semantic=false`.",
+        description="ISCC-UNITs of the media asset (with `semantic=true` including the experimental Semantic-Code unit). Included by default; excluded if the service is configured with ISCC_SDK_ADD_UNITS=false.",
         examples=[
             [
                 "ISCC:AAAV5NAQXBCHCWFW",
@@ -277,7 +277,7 @@ class TechnicalMetadata(BaseModel):
     )
     features: list[FeatureSet] | None = Field(
         None,
-        description="Granular features of the media asset. Included by default; excluded with `granular=false`.",
+        description="Granular features of the media asset. Included by default; excluded with `granular=false`. With `semantic=true` also includes semantic simprints.",
     )
 
 

@@ -14,6 +14,7 @@ HERE = Path(__file__).parent.absolute()
 # import time) and inherited by pool worker processes. `setdefault` keeps explicitly set
 # environment variables authoritative.
 ISCC_LIB_ENV_DEFAULTS = {
+    "ISCC_SDK_EXPERIMENTAL": "false",
     "ISCC_SDK_GRANULAR": "true",
     "ISCC_SDK_BYTE_OFFSETS": "true",
     "ISCC_SDK_ADD_UNITS": "true",
@@ -22,6 +23,14 @@ ISCC_LIB_ENV_DEFAULTS = {
     "ISCC_SDK_FALLBACK": "true",
     "ISCC_SCT_BITS": "256",
     "ISCC_SCT_BITS_GRANULAR": "256",
+    # Granular semantic text simprints always carry 256-bit fingerprints with byte-based
+    # offsets and sizes. The SDK does not forward options to the semantic-code functions,
+    # so these must be configured globally (simprints are stripped from results when
+    # granular output is off - see `code_iscc` in api/mixins.py).
+    "ISCC_SCT_SIMPRINTS": "true",
+    "ISCC_SCT_OFFSETS": "true",
+    "ISCC_SCT_SIZES": "true",
+    "ISCC_SCT_BYTE_OFFSETS": "true",
     "ISCC_SCI_BITS": "256",
 }
 for _key, _value in ISCC_LIB_ENV_DEFAULTS.items():

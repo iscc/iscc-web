@@ -4,7 +4,6 @@ import asyncio
 import types
 from concurrent.futures import Future
 
-from iscc_samples import images
 import iscc_sdk as idk
 
 import iscc_web.api.mixins as mixins
@@ -117,18 +116,6 @@ def test_embed_returns_none(monkeypatch, tmp_path):
     pool = FakePool(None)
     response = asyncio.run(Metadata().embed(None, media_id, InlineMetadata(name="x"), pool))
     assert response.status == 422
-
-
-def test_code_semantic_unsupported_mode_returns_none():
-    assert mixins.code_semantic("unused-path", "audio", granular=False) is None
-
-
-def test_code_iscc_semantic_without_semantic_code(monkeypatch):
-    """Media without a Semantic-Code algorithm keeps its plain unit list when semantic=true."""
-    monkeypatch.setattr(mixins, "code_semantic", lambda fp, mode, granular: None)
-    result = mixins.code_iscc(images("jpg")[0].as_posix(), semantic=True)
-    assert len(result.units) == 4
-    assert not any(unit.startswith("ISCC:C") for unit in result.units)
 
 
 def test_simprint_processing_error():

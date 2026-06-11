@@ -19,7 +19,7 @@ const granular = ref<boolean>(false);
 
 // Resolved per upload so toggle changes apply without rebuilding the Uppy instance.
 // Params are always sent explicitly - omitting them would fall back to the service
-// defaults (which enable both), making the off position a no-op.
+// defaults (semantic off, granular on), decoupling the toggles from server config.
 const uploadEndpoint = () => {
   const params = new URLSearchParams();
   params.set("semantic", String(semantic.value));
@@ -149,7 +149,7 @@ const dragging = ref<boolean>(false);
             input#semantic-toggle.form-check-input(type="checkbox" v-model="semantic")
             label.form-check-label(
               for="semantic-toggle"
-              v-tooltip="'Add experimental Semantic-Code ISCC-UNITs for text and image content'"
+              v-tooltip="'Include an experimental Semantic-Code ISCC-UNIT in the ISCC-CODE for text and image content'"
             ) Semantic ISCC-UNITs
           .form-check.form-switch
             input#granular-toggle.form-check-input(type="checkbox" v-model="granular")

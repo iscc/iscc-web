@@ -23,12 +23,15 @@ An interactive API documentation is available at [/docs](https://iscc.io/docs)<b
 **Experimental features** (not part of ISO 24138, algorithms may change before their v1.0
 release):
 
-- `POST /api/v1/iscc` includes the ISCC-UNITs of the media asset in the `units` field by
-    default, including Semantic-Code units for text ([iscc-sct](https://github.com/iscc/iscc-sct))
-    and image ([iscc-sci](https://github.com/iscc/iscc-sci)) content. The composite ISCC-CODE
-    itself always stays a pure ISO 24138 identifier. Opt out per request with `?semantic=false`.
+- `POST /api/v1/iscc?semantic=true` generates an experimental Semantic-Code ISCC-UNIT for text
+    ([iscc-sct](https://github.com/iscc/iscc-sct)) and image
+    ([iscc-sci](https://github.com/iscc/iscc-sci)) content that becomes part of the composite
+    ISCC-CODE - 5 units (Meta, Semantic, Content, Data, Instance) instead of 4. The resulting
+    ISCC-CODE is not a standard ISO 24138 identifier. Off by default.
 - `POST /api/v1/iscc` includes granular simprint features in the `features` field by default
-    (text content). Opt out per request with `?granular=false`.
+    (text content; with `semantic=true` also semantic simprints). Simprints are 256-bit
+    fingerprints with UTF-8 byte based offsets and sizes. Opt out per request with
+    `?granular=false`.
 - `POST /api/v1/simprint` generates granular simprints from plain text - byte-identical to
     [iscc-search](https://github.com/iscc/iscc-search)'s local simprint generation, so search
     services can delegate text processing to this service.
@@ -134,12 +137,13 @@ ISCC_WEB_IO_READ_SIZE=2097152
 FORWARDED_ALLOW_IPS=*
 ```
 
-Semantic ISCC-UNITs and granular fingerprints are enabled by default and can be disabled per
-API call via the `semantic` and `granular` query params on `POST /api/v1/iscc` (see
-[/docs](https://iscc.io/docs)). The service applies the following ISCC processing defaults,
-each overridable through the corresponding environment variable:
+The experimental Semantic-Code ISCC-UNIT is off by default and enabled per API call with
+`?semantic=true`; granular fingerprints are on by default and disabled with `?granular=false`
+(see [/docs](https://iscc.io/docs)). The service applies the following ISCC processing
+defaults, each overridable through the corresponding environment variable:
 
 ```shell
+ISCC_SDK_EXPERIMENTAL=false  # Semantic-Code ISCC-UNIT as part of the ISCC-CODE
 ISCC_SDK_GRANULAR=true       # granular fingerprints for ISCC-CODEs
 ISCC_SDK_BYTE_OFFSETS=true   # UTF-8 byte offsets (instead of characters) for granular features
 ISCC_SDK_ADD_UNITS=true      # ISCC-UNITs in the `units` field
@@ -147,7 +151,11 @@ ISCC_SDK_BITS=256            # bit-length of ISCC-UNITs
 ISCC_SDK_WIDE=true           # wide (128-bit) Data/Instance units for 2-unit ISCC-SUM
 ISCC_SDK_FALLBACK=true       # ISCC-SUM fallback for unsupported media types (instead of HTTP 422)
 ISCC_SCT_BITS=256            # bit-length of Semantic Text-Code units
-ISCC_SCT_BITS_GRANULAR=256   # bit-length of granular semantic text features
+ISCC_SCT_BITS_GRANULAR=256   # bit-length of granular semantic text simprints
+ISCC_SCT_SIMPRINTS=true      # granular semantic text simprints (output only with granular=true)
+ISCC_SCT_OFFSETS=true        # offsets for granular semantic text simprints
+ISCC_SCT_SIZES=true          # sizes for granular semantic text simprints
+ISCC_SCT_BYTE_OFFSETS=true   # UTF-8 byte offsets for granular semantic text simprints
 ISCC_SCI_BITS=256            # bit-length of Semantic Image-Code units
 ```
 

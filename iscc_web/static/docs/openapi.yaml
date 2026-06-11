@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: ISCC-WEB Generator API
   description: Simple ISCC Generator Service
-  version: 0.1.0
+  version: 0.2.0
 servers:
 - url: /api/v1
 tags:

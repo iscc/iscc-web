@@ -102,6 +102,7 @@ output-model-type = "pydantic_v2.BaseModel"
 encoding = "UTF-8"
 disable-timestamp = true
 target-python-version = "3.13"
+formatters = []
 
 [tool.poe.tasks]
 formatopenapi = { cmd = "uv run python -m develop.format_openapi", help = "Reformat openapi.yaml" }

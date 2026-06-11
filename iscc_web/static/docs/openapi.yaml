@@ -35,20 +35,20 @@ paths:
       - name: semantic
         in: query
         description: Generate an experimental Semantic-Code ISCC-UNIT for text and image content
-          that becomes part of the composite ISCC-CODE (5 units - Meta, Semantic, Content, Data,
-          Instance - instead of 4). The resulting ISCC-CODE is not a standard ISO 24138 identifier,
-          and Semantic-Code algorithms may change before their v1.0 release. If omitted, the
-          service default applies (disabled unless configured otherwise via ISCC_SDK_EXPERIMENTAL).
+          that becomes part of the composite ISCC-CODE (5 units - Meta, Semantic, Content,
+          Data, Instance - instead of 4). The resulting ISCC-CODE is not a standard ISO 24138
+          identifier, and Semantic-Code algorithms may change before their v1.0 release. If
+          omitted, the service default applies (disabled unless configured otherwise via ISCC_SDK_EXPERIMENTAL).
         required: false
         schema:
           type: boolean
       - name: granular
         in: query
         description: Include granular simprint features in the `features` field (text content;
-          combined with `semantic` also semantic text simprints). Simprints are 256-bit
-          fingerprints with offsets and sizes (UTF-8 byte based for text). Granular features are
-          experimental and may change before their v1.0 release. If omitted, the service default
-          applies (enabled unless configured otherwise via ISCC_SDK_GRANULAR).
+          combined with `semantic` also semantic text simprints). Simprints are 256-bit fingerprints
+          with offsets and sizes (UTF-8 byte based for text). Granular features are experimental
+          and may change before their v1.0 release. If omitted, the service default applies
+          (enabled unless configured otherwise via ISCC_SDK_GRANULAR).
         required: false
         schema:
           type: boolean
@@ -492,9 +492,9 @@ components:
           type: string
           example: 1e20b46b2257d6c6248f0b2130affc644088cc07f31219394f28523e7742441e91fd
         units:
-          description: ISCC-UNITs of the media asset (with `semantic=true` including the
-            experimental Semantic-Code unit). Included by default; excluded if the service is
-            configured with ISCC_SDK_ADD_UNITS=false.
+          description: ISCC-UNITs of the media asset (with `semantic=true` including the experimental
+            Semantic-Code unit). Included by default; excluded if the service is configured
+            with ISCC_SDK_ADD_UNITS=false.
           type: array
           items:
             type: string

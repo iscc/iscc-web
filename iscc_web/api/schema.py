@@ -2,10 +2,8 @@
 #   filename:  openapi.yaml
 
 from __future__ import annotations
-
-from enum import StrEnum
-
 from pydantic import AnyUrl, BaseModel, Field, RootModel, confloat, conint, constr
+from enum import StrEnum
 
 
 class MediaID(RootModel[constr(pattern=r"[a-v0-9]{13}$", min_length=13, max_length=13)]):
@@ -79,9 +77,7 @@ class InlineMetadata(BaseModel):
         description="Other identifier(s) referencing the work, product or other abstraction of which the referenced **digital content** is a full or partial manifestation.",
     )
     creator: str | None = Field(
-        None,
-        description="An entity primarily responsible for making the resource.",
-        examples=["Joanne K. Rowling"],
+        None, description="An entity primarily responsible for making the resource.", examples=["Joanne K. Rowling"]
     )
     license: str | None = Field(
         None,
@@ -118,17 +114,11 @@ class Mode(StrEnum):
 
 
 class FeatureSet(BaseModel):
-    maintype: str | None = Field(
-        None,
-        description="ISCC MainType of the simprint algorithm.",
-        examples=["content"],
-    )
+    maintype: str | None = Field(None, description="ISCC MainType of the simprint algorithm.", examples=["content"])
     subtype: str | None = Field(None, description="ISCC SubType of the simprint algorithm.", examples=["text"])
     version: int | None = Field(None, description="Version of the simprint algorithm.", examples=[0])
     byte_offsets: bool | None = Field(
-        None,
-        description="Whether offsets are UTF-8 byte positions instead of character positions.",
-        examples=[False],
+        None, description="Whether offsets are UTF-8 byte positions instead of character positions.", examples=[False]
     )
     simprints: list[str] | None = Field(
         None,
@@ -162,24 +152,14 @@ class SimprintResponse(BaseModel):
 
 class Unit(BaseModel):
     iscc_unit: str | None = Field(
-        None,
-        description="Canonical representation of ISCC-UNIT",
-        examples=["ISCC:AAA4RJYGHHVRCZ5T"],
+        None, description="Canonical representation of ISCC-UNIT", examples=["ISCC:AAA4RJYGHHVRCZ5T"]
     )
     readable: str | None = Field(
-        None,
-        description="Human readable version of ISCC-UNIT",
-        examples=["META-NONE-V0-64-c8a70639eb1167b3"],
+        None, description="Human readable version of ISCC-UNIT", examples=["META-NONE-V0-64-c8a70639eb1167b3"]
     )
-    hash_hex: str | None = Field(
-        None,
-        description="Hex representation of ISCC-BODY",
-        examples=["e1fb7dc4e3dbb4be"],
-    )
+    hash_hex: str | None = Field(None, description="Hex representation of ISCC-BODY", examples=["e1fb7dc4e3dbb4be"])
     hash_uint: str | None = Field(
-        None,
-        description="Unsigned integer representation of ISCC-BODY",
-        examples=["16283747162278048958"],
+        None, description="Unsigned integer representation of ISCC-BODY", examples=["16283747162278048958"]
     )
     hash_bits: str | None = Field(
         None,
@@ -205,22 +185,13 @@ class IsccDetail(BaseModel):
         description="ISCC decomomposed into a dash seperated secquence of ISCC-UNITs",
         examples=["AAA4RJYGHHVRCZ5T-CMAWPKODPB6GLQPF-GAAYFYXGML3SRNH2-IAAUESC6HIFF2LZU"],
     )
-    units: list[Unit] | None = Field(
-        None,
-        description="Different representations of the individial units of the ISCC",
-    )
+    units: list[Unit] | None = Field(None, description="Different representations of the individial units of the ISCC")
 
 
 class TechnicalMetadata(BaseModel):
-    mode: Mode | None = Field(
-        None,
-        description="The perceptual mode used to create the ISCC.",
-        examples=["image"],
-    )
+    mode: Mode | None = Field(None, description="The perceptual mode used to create the ISCC.", examples=["image"])
     filename: str | None = Field(
-        None,
-        description="Filename of the referenced **digital content**",
-        examples=["your-media-file.jpg"],
+        None, description="Filename of the referenced **digital content**", examples=["your-media-file.jpg"]
     )
     filesize: int | None = Field(None, description="File size of media asset in number of bytes.")
     mediatype: str | None = Field(
@@ -233,9 +204,7 @@ class TechnicalMetadata(BaseModel):
     width: int | None = Field(None, description="Width of visual media in number of pixels.", examples=[640])
     height: conint(ge=1) | None = Field(None, description="Height of visual media in number of pixels.", examples=[480])
     characters: int | None = Field(
-        None,
-        description="Number of text characters (code points after Unicode normalization)",
-        examples=[55689],
+        None, description="Number of text characters (code points after Unicode normalization)", examples=[55689]
     )
     language: str | None = Field(
         None,
@@ -248,9 +217,7 @@ class TechnicalMetadata(BaseModel):
         examples=["https://picsum.photos/200/300.jpg"],
     )
     generator: str | None = Field(
-        None,
-        description="Name and version of the software that generated the ISCC.",
-        examples=["iscc-sdk - v0.9.3"],
+        None, description="Name and version of the software that generated the ISCC.", examples=["iscc-sdk - v0.9.3"]
     )
     metahash: str | None = Field(
         None,

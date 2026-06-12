@@ -1,8 +1,53 @@
+# Version control and CI
 .git
 .github
-.venv/
-__pycache__
-node_modules/
-Dockerfile
+.gitignore
 
+# Docker, lint, formatter and automation configs (not needed inside the image)
+Dockerfile
+.dockerignore
+.hadolint.yaml
+.pre-commit-config.yaml
+.editorconfig
+.prettierignore
+.prettierrc.cjs
+eslint.config.js
+vitest.config.ts
+renovate.json
+.python-version
+.tool-versions
+
+# Local environments and secrets
+.venv/
+**/.env
+**/.env.*
+
+# Caches and test/coverage artifacts
+**/__pycache__
+**/*.py[co]
+.cache/
+.pytest_cache/
+.hypothesis/
+.ruff_cache/
+.coverage*
+htmlcov/
+
+# Tests, docs and dev tooling (never run inside the image)
+tests/
+docs/
+site/
+develop/
+zensical.toml
+
+# Local agent workspaces and notes
+.claude/
+CLAUDE.md
+cauldron/
+
+# Node modules and prebuilt frontend assets (rebuilt in the frontend-build stage)
+node_modules/
 iscc_web/static/dist/
+
+# Media storage - keep the empty directory, drop local upload packages and fixtures
+media/*
+!media/.gitignore

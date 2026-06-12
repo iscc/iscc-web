@@ -10,6 +10,8 @@ import { normalizeIscc } from "../lib/iscc";
 import { apiService } from "../services/api.service";
 import UiIcon from "./UiIcon.vue";
 
+type IntakeMode = "file" | "text" | "code";
+
 const emit = defineEmits<{
   (
     e: "file-added",
@@ -25,9 +27,10 @@ const emit = defineEmits<{
   (e: "upload-success", fileId: string, metadata: Api.IsccMetadata): void;
   (e: "text-submit", text: string, options: { semantic: boolean; granular: boolean }): void;
   (e: "code-submit", iscc: string): void;
+  (e: "mode-change", mode: IntakeMode): void;
 }>();
 
-const tab = ref<"file" | "text" | "code">("file");
+const tab = ref<IntakeMode>("file");
 const semantic = ref(false);
 const granular = ref(false);
 const text = ref("");
@@ -93,8 +96,14 @@ onUnmounted(() => {
   uppy.destroy();
 });
 
+const setTab = (next: IntakeMode) => {
+  if (tab.value === next) return;
+  tab.value = next;
+  emit("mode-change", next);
+};
+
 const addFiles = (list: FileList) => {
-  tab.value = "file";
+  setTab("file");
   uppy.addFiles(Array.from(list).map((f) => ({ name: f.name, type: f.type, data: f })));
 };
 
@@ -173,21 +182,21 @@ const submitCode = () => {
     button.intake-tab(
       type="button"
       :class="{ active: tab === 'file' }"
-      @click="tab = 'file'"
+      @click="setTab('file')"
     )
       UiIcon(name="upload" :size="15")
       span Media file
     button.intake-tab(
       type="button"
       :class="{ active: tab === 'text' }"
-      @click="tab = 'text'"
+      @click="setTab('text')"
     )
       UiIcon(name="type" :size="15")
       span Plain text
     button.intake-tab(
       type="button"
       :class="{ active: tab === 'code' }"
-      @click="tab = 'code'"
+      @click="setTab('code')"
     )
       UiIcon(name="search" :size="15")
       span ISCC code

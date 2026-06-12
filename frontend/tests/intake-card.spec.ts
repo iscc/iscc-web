@@ -26,6 +26,16 @@ describe("IntakeCard", () => {
     wrapper.unmount();
   });
 
+  it("emits mode changes when switching tabs", async () => {
+    const wrapper = mount(IntakeCard);
+    await tabButton(wrapper, "Plain text").trigger("click");
+    await tabButton(wrapper, "ISCC code").trigger("click");
+    await tabButton(wrapper, "ISCC code").trigger("click");
+
+    expect(wrapper.emitted("mode-change")).toEqual([["text"], ["code"]]);
+    wrapper.unmount();
+  });
+
   it("generates from plain text with the current toggle state", async () => {
     const wrapper = mount(IntakeCard);
     await tabButton(wrapper, "Plain text").trigger("click");

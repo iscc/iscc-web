@@ -17,6 +17,21 @@ let sequence = 0;
 
 const findSpecimen = (id: string) => specimens.value.find((s) => s.id === id);
 
+const cleanupSpecimen = (specimen: IsccWeb.Specimen) => {
+  const mediaId = specimen.metadata?.media_id;
+  if (mediaId && specimen.status === "done") {
+    apiService.deleteMedia(mediaId).catch(() => undefined);
+  }
+  if (specimen.previewUrl && typeof URL.revokeObjectURL === "function") {
+    URL.revokeObjectURL(specimen.previewUrl);
+  }
+};
+
+const clearSpecimens = () => {
+  for (const specimen of specimens.value) cleanupSpecimen(specimen);
+  specimens.value = [];
+};
+
 const baseSpecimen = (partial: Partial<IsccWeb.Specimen> & Pick<IsccWeb.Specimen, "id" | "kind" | "label">) => {
   const specimen: IsccWeb.Specimen = {
     status: "processing",
@@ -160,13 +175,7 @@ const onEmbed = async (specimen: IsccWeb.Specimen, formData: IsccWeb.MetadataFor
 };
 
 const onRemove = (specimen: IsccWeb.Specimen) => {
-  const mediaId = specimen.metadata?.media_id;
-  if (mediaId && specimen.status === "done") {
-    apiService.deleteMedia(mediaId).catch(() => undefined);
-  }
-  if (specimen.previewUrl && typeof URL.revokeObjectURL === "function") {
-    URL.revokeObjectURL(specimen.previewUrl);
-  }
+  cleanupSpecimen(specimen);
   specimens.value = specimens.value.filter((s) => s.id !== specimen.id);
   for (const other of specimens.value) {
     if (other.compareWithId === specimen.id) {
@@ -220,6 +229,7 @@ const compareOptionsFor = (specimen: IsccWeb.Specimen) =>
             @upload-success="onUploadSuccess"
             @text-submit="onTextSubmit"
             @code-submit="onCodeSubmit"
+            @mode-change="clearSpecimens"
           )
         .copy-col
           .iso-badge

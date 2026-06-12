@@ -52,6 +52,11 @@ Configuration is handled by environment variables:
 - `ISCC_WEB_ENVIRONMENT`: `development` or `production` (default: `development`).
 - `ISCC_WEB_SITE_ADDRESS`: public site address (default: http://localhost:8000).
 - `ISCC_WEB_PRIVATE_FILES`: restrict file downloads to original uploader (default: true).
+- `ISCC_WEB_CORS_ORIGINS`: origins allowed for cross-origin API requests, space or comma
+    separated (e.g. `https://app.example.com`, use `*` to allow any origin). Empty disables
+    CORS support (default: empty). The service's own origin (`ISCC_WEB_SITE_ADDRESS`) is always
+    allowed, so the bundled frontend keeps working. Note: with `ISCC_WEB_PRIVATE_FILES` enabled,
+    uploaders are identified by client IP - make sure your reverse proxy forwards real client IPs.
 - `ISCC_WEB_MAX_UPLOAD_SIZE`: max file size per file upload in bytes (default: 1073741824).
 - `ISCC_WEB_STORAGE_EXPIRY`: delete uploaded files after x seconds (default 3600).
 - `ISCC_WEB_CLEANUP_INTERVAL`: interval in seconds to run file cleanup task. Use 0 to deactivate (default: 600).

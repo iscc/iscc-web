@@ -36,6 +36,7 @@ _port_offset = int(_worker[2:]) if _worker.startswith("gw") else 0
 server_host = "localhost"
 server_port = 44555 + _port_offset
 server_api_path = "api/v1"
+private_port = 44700 + _port_offset
 
 
 def _start_server(stop_event):
@@ -79,3 +80,19 @@ def server():
 
     stop_event.set()
     server_process.join(timeout=30)
+
+
+@pytest.fixture(scope="session")
+def papi():
+    """Client against a server running with ISCC_WEB_PRIVATE_FILES=true and CORS enabled."""
+    from tests import private_server
+
+    stop_event = mp.Event()
+    process = mp.Process(target=private_server.run, args=(server_host, private_port, stop_event))
+    process.start()
+    wait_for_server(process, port=private_port)
+    client = httpx.Client(base_url=f"http://{server_host}:{private_port}/{server_api_path}", timeout=None)
+    yield client
+    client.close()
+    stop_event.set()
+    process.join(timeout=30)

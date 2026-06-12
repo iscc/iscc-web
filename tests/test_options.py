@@ -10,6 +10,11 @@ def test_debug_property():
     assert iscc_web.options.IsccWebOptions(environment="production").debug is False
 
 
+def test_site_origin_property():
+    assert iscc_web.options.IsccWebOptions(site_address="https://iscc.io").site_origin == "https://iscc.io"
+    assert iscc_web.options.IsccWebOptions(site_address="http://localhost:8000").site_origin == "http://localhost:8000"
+
+
 def test_sentry_init_with_dsn(monkeypatch):
     monkeypatch.setenv("ISCC_WEB_SENTRY_DSN", "https://examplePublicKey@o0.ingest.sentry.io/0")
     module = importlib.reload(iscc_web.options)

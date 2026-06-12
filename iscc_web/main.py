@@ -19,6 +19,19 @@ STATIC = HERE / "static"
 
 
 app = Application(show_error_details=opts.debug)
+if opts.cors_origins:
+    # Cross-origin support for frontends hosted on other domains: X-Upload-Filename is required
+    # for uploads; Location and Content-Disposition let cross-origin clients read upload
+    # locations and download filenames. The service's own origin is always allowed - browsers
+    # send an Origin header on same-origin POST/DELETE too, and BlackSheep rejects unlisted
+    # origins with 400, which would break the bundled frontend.
+    app.use_cors(
+        allow_methods="GET POST DELETE",
+        allow_headers="Content-Type X-Upload-Filename",
+        allow_origins=f"{opts.cors_origins} {opts.site_origin}",
+        expose_headers="Location Content-Disposition",
+        max_age=300,
+    )
 renderer = JinjaRenderer(loader=PackageLoader("iscc_web", "templates"), enable_async=True)
 register_extensions(renderer.env)
 html_settings.use(renderer)

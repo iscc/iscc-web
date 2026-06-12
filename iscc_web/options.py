@@ -52,6 +52,11 @@ class IsccWebOptions(BaseSettings):
     max_upload_size: int = 1_073_741_824  # 1 GB
     io_read_size: int = 2_097_152  # 2 MB
     private_files: bool = Field(True, description="Restrict file downloads/deletions to original uploader")
+    cors_origins: str = Field(
+        "",
+        description="Origins allowed for cross-origin API requests, space or comma separated "
+        "(use '*' to allow any origin). Empty string disables CORS support.",
+    )
     storage_expiry: int = Field(3600, description="Number of seconds after which uploaded files are deleted")
     cleanup_interval: int = Field(600, description="Interval in seconds for running file cleanup. Use 0 to deactivate")
     log_level: str = Field("DEBUG", description="Set logging level")
@@ -60,6 +65,14 @@ class IsccWebOptions(BaseSettings):
     @property
     def debug(self):
         return self.environment == "development"
+
+    @property
+    def site_origin(self):
+        """Site address as a browser Origin string (scheme://host, default ports omitted)."""
+        url = self.site_address
+        default_port = {"http": 80, "https": 443}[url.scheme]
+        origin = f"{url.scheme}://{url.host}"
+        return origin if url.port in (None, default_port) else f"{origin}:{url.port}"
 
 
 opts = IsccWebOptions()

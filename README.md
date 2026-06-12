@@ -8,7 +8,17 @@
 ([ISCC](https://iscc.codes)) for media files. A public instance of this service is available at
 https://web.iscc.io
 
-Full documentation is published at https://web.iscc.codes
+Full documentation is published at https://web.iscc.codes and release history is tracked in the
+[changelog](https://web.iscc.codes/development/changelog/).
+
+## Quickstart
+
+Run the service with Docker (images are published to [ghcr.io](https://github.com/iscc/iscc-web/pkgs/container/iscc-web)
+with `main` and semver tags):
+
+```shell
+docker run -p 8000:8000 ghcr.io/iscc/iscc-web:main
+```
 
 ## Overview
 
@@ -72,7 +82,7 @@ uv run iscc-web
 ```
 
 Access the app at http://localhost:8000
-Api documentation is at /docs
+API documentation is at /docs
 
 Before committing any changes run code formatting and tests with:
 
@@ -100,5 +110,5 @@ The documentation site at https://web.iscc.codes is built with
 
 # Special thanks to the developers of
 
-- [Blacksheep](https://github.com/Neoteroi/BlackSheep) (see [benchmarks](http://klen.github.io/py-frameworks-bench/))
+- [BlackSheep](https://github.com/Neoteroi/BlackSheep)
 - [Schemathesis](https://github.com/schemathesis/schemathesis)

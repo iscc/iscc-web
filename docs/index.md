@@ -13,8 +13,8 @@ description: A microservice for generating International Standard Content Codes 
 
 !!! tip "Try it without installing anything"
 
-    A public instance runs at [iscc.io](https://iscc.io) - upload a file in the demo frontend or
-    explore the interactive API documentation at [iscc.io/docs](https://iscc.io/docs).
+    A public instance runs at [web.iscc.io](https://web.iscc.io) - upload a file in the demo frontend or
+    explore the interactive API documentation at [web.iscc.io/docs](https://web.iscc.io/docs).
 
 ## Introduction
 

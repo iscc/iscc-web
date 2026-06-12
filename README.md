@@ -6,7 +6,7 @@
 
 `iscc-web` is a microservice for generating **International Standard Content Codes**
 ([ISCC](https://iscc.codes)) for media files. A public instance of this service is available at
-https://iscc.io
+https://web.iscc.io
 
 Full documentation is published at https://web.iscc.codes
 
@@ -20,7 +20,7 @@ The microservice provides a REST API for generating ISCCs. The endpoints support
 upload/download, metadata extraction/embedding and ISCC processing.<br>
 
 Files uploaded for processing are automatically deleted after a configurable timeout.
-An interactive API documentation is available at [/docs](https://iscc.io/docs)<br><br>
+An interactive API documentation is available at [/docs](https://web.iscc.io/docs)<br><br>
 
 **Experimental features** (not part of ISO 24138, algorithms may change before their v1.0
 release):

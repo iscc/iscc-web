@@ -16,8 +16,8 @@ Run the `iscc-web` service locally, generate your first ISCC by uploading a medi
 
 !!! tip
 
-    No local setup at all? The public instance at [iscc.io](https://iscc.io) serves the same
-    API — replace `http://localhost:8000` with `https://iscc.io` in the examples below.
+    No local setup at all? The public instance at [web.iscc.io](https://web.iscc.io) serves the same
+    API — replace `http://localhost:8000` with `https://web.iscc.io` in the examples below.
 
 ## Start the service
 

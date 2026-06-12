@@ -7,12 +7,12 @@ and receive its ISCC-CODE together with extracted metadata, ISCC-UNITs, and gran
 fingerprints (simprints). The service also embeds metadata into media files, decodes ISCC codes
 into human-readable form, and generates plaintext simprints for search services. Uploaded files
 are automatically deleted after a configurable timeout. A public instance with a Vue.js demo
-frontend runs at https://iscc.io, with interactive API documentation at https://iscc.io/docs.
+frontend runs at https://web.iscc.io, with interactive API documentation at https://web.iscc.io/docs.
 
 Run: `docker run -p 8000:8000 ghcr.io/iscc/iscc-web:main`
 
 - [Source code](https://github.com/iscc/iscc-web)
-- [Public instance](https://iscc.io)
+- [Public instance](https://web.iscc.io)
 - [Full documentation](https://web.iscc.codes/llms-full.txt)
 
 ## Tutorials

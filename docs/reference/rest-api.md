@@ -9,7 +9,7 @@ All endpoints live under the base path `/api/v1`. The OpenAPI 3.0 document at
 `iscc_web/static/docs/openapi.yaml` is the source of truth for the API; every running instance
 serves interactive API documentation (Stoplight Elements) at `/docs` and the raw spec at
 `/docs/openapi.yaml`. Examples below target a local instance at `http://localhost:8000` — the
-public demo instance is <https://iscc.io>.
+public demo instance is <https://web.iscc.io>.
 
 ## Conventions
 

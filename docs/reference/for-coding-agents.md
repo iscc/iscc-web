@@ -10,7 +10,7 @@ the codebase. Tables and code over prose. Terminology matches the codebase exact
 
 ## Integrating with the API
 
-Base path: `/api/v1` (public instance: `https://iscc.io/api/v1`). The OpenAPI spec is served at
+Base path: `/api/v1` (public instance: `https://web.iscc.io/api/v1`). The OpenAPI spec is served at
 `/docs/openapi.yaml` with interactive docs at `/docs`. Full details:
 [REST API reference](rest-api.md).
 
@@ -67,7 +67,7 @@ the `X-Upload-Filename` header. Applies to `POST /iscc` and `POST /media`.
     }
     with open(filename, "rb") as f:
         response = httpx.post(
-            "https://iscc.io/api/v1/iscc",
+            "https://web.iscc.io/api/v1/iscc",
             params={"semantic": "false", "granular": "true"},
             content=f.read(),  # raw body, NOT files={...}
             headers=headers,
@@ -81,7 +81,7 @@ the `X-Upload-Filename` header. Applies to `POST /iscc` and `POST /media`.
 === "curl"
 
     ```shell
-    curl -X POST "https://iscc.io/api/v1/iscc?semantic=false&granular=true" \
+    curl -X POST "https://web.iscc.io/api/v1/iscc?semantic=false&granular=true" \
       --data-binary @your-media-file.jpg \
       -H "X-Upload-Filename: $(printf %s "your-media-file.jpg" | base64)" \
       -H "Content-Type: image/jpeg"

@@ -1,0 +1,38 @@
+# iscc-web
+
+> Microservice for generating International Standard Content Codes (ISCC, ISO 24138) for media files.
+
+iscc-web wraps the ISCC reference software (iscc-sdk) in an async REST API: upload a media file
+and receive its ISCC-CODE together with extracted metadata, ISCC-UNITs, and granular content
+fingerprints (simprints). The service also embeds metadata into media files, decodes ISCC codes
+into human-readable form, and generates plaintext simprints for search services. Uploaded files
+are automatically deleted after a configurable timeout. A public instance with a Vue.js demo
+frontend runs at https://iscc.io, with interactive API documentation at https://iscc.io/docs.
+
+Run: `docker run -p 8000:8000 ghcr.io/iscc/iscc-web:main`
+
+- [Source code](https://github.com/iscc/iscc-web)
+- [Public instance](https://iscc.io)
+- [Full documentation](https://web.iscc.codes/llms-full.txt)
+
+## Tutorials
+
+- [Getting Started](https://web.iscc.codes/tutorials/getting-started.md): Run the service and generate your first ISCC
+
+## How-to Guides
+
+- [Deployment](https://web.iscc.codes/howto/deployment.md): Production deployment with Docker Compose and Caddy
+- [Configuration](https://web.iscc.codes/howto/configuration.md): Environment variables and ISCC processing defaults
+
+## Explanation
+
+- [Architecture](https://web.iscc.codes/explanation/architecture.md): OpenAPI-first design, request flow, storage, and process pool
+
+## Reference
+
+- [REST API](https://web.iscc.codes/reference/rest-api.md): Complete endpoint reference for the /api/v1 REST API
+- [For Coding Agents](https://web.iscc.codes/reference/for-coding-agents.md): Prescriptive reference for AI agents integrating with or modifying iscc-web
+
+## Development
+
+- [Contributing](https://web.iscc.codes/development/contributing.md): Dev setup, testing, and contribution guidelines

@@ -1,0 +1,106 @@
+[project]
+site_name = "iscc-web"
+site_description = "Microservice for generating International Standard Content Codes (ISCC, ISO 24138) for media files."
+site_author = "Titusz Pan"
+site_url = "https://web.iscc.codes/"
+repo_url = "https://github.com/iscc/iscc-web"
+repo_name = "iscc/iscc-web"
+copyright = "Copyright &copy; 2022-2026 ISCC Foundation"
+extra_css = ["stylesheets/extra.css"]
+extra_javascript = [
+    "https://iscc.ai/copilot/index.js",
+    "javascripts/copilot.js",
+    "javascripts/copypage.js",
+]
+
+nav = [
+    "index.md",
+    { "Tutorials" = [
+        "tutorials/getting-started.md",
+    ]},
+    { "How-to Guides" = [
+        "howto/deployment.md",
+        "howto/configuration.md",
+    ]},
+    { "Explanation" = [
+        "explanation/architecture.md",
+    ]},
+    { "Reference" = [
+        "reference/rest-api.md",
+        "reference/for-coding-agents.md",
+    ]},
+    { "Development" = [
+        "development/contributing.md",
+    ]},
+]
+
+[project.theme]
+language = "en"
+custom_dir = "docs/overrides"
+logo = "assets/logo_light.png"
+favicon = "assets/favicon.png"
+features = [
+    "content.code.annotate",
+    "content.code.copy",
+    "content.tooltips",
+    "header.autohide",
+    "navigation.expand",
+    "navigation.footer",
+    "navigation.sections",
+    "navigation.top",
+    "navigation.tracking",
+    "search.highlight",
+    "toc.follow",
+]
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: light)"
+scheme = "default"
+toggle = { icon = "lucide/sun", name = "Switch to dark mode" }
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: dark)"
+scheme = "slate"
+toggle = { icon = "lucide/moon", name = "Switch to light mode" }
+
+[project.markdown_extensions]
+abbr = {}
+admonition = {}
+attr_list = {}
+def_list = {}
+footnotes = {}
+md_in_html = {}
+
+[project.markdown_extensions.toc]
+permalink = true
+
+[project.markdown_extensions.pymdownx]
+betterem = {}
+caret = {}
+details = {}
+inlinehilite = {}
+keys = {}
+magiclink = {}
+mark = {}
+smartsymbols = {}
+tasklist = { custom_checkbox = true }
+tilde = {}
+
+[project.markdown_extensions.pymdownx.emoji]
+emoji_generator = "zensical.extensions.emoji.to_svg"
+emoji_index = "zensical.extensions.emoji.twemoji"
+
+[project.markdown_extensions.pymdownx.highlight]
+anchor_linenums = true
+line_spans = "__span"
+pygments_lang_class = true
+
+[project.markdown_extensions.pymdownx.superfences]
+custom_fences = [{ name = "mermaid", class = "mermaid" }]
+
+[project.markdown_extensions.pymdownx.tabbed]
+alternate_style = true
+combine_header_slug = true
+
+[project.markdown_extensions.pymdownx.snippets]
+auto_append = ["docs/includes/abbreviations.md"]

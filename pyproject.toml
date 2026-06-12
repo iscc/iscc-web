@@ -47,6 +47,7 @@ dev = [
     "ruff>=0.15.1",
     "prek>=0.2.9",
     "radon>=6.0.1",
+    "zensical>=0.0.21",
 ]
 
 [tool.uv]
@@ -112,4 +113,9 @@ precommit = { cmd = "uv run prek run", help = "Run prek hooks on changed files" 
 test = { cmd = "uv run python -m pytest -n auto --tb=line --no-header -q --cov --cov-config=pyproject.toml --cov-report=term-missing", help = "Test the code with pytest" }
 check-complexity = { cmd = "uv run radon cc --min C --show-complexity --average iscc_web/", help = "Check code complexity with radon" }
 run = { cmd = "uv run uvicorn iscc_web.asgi:application --reload", help = "Run dev server" }
+docs-serve = { cmd = "uv run zensical serve", help = "Serve docs locally with live reload" }
+docs-build = { sequence = [
+    { cmd = "uv run zensical build" },
+    { cmd = "uv run python -m develop.gen_llms_full" },
+], help = "Build docs site with llms-full.txt" }
 all = { sequence = ["formatopenapi", "codegen", "format", "test", "check-complexity"], help = "Run all tasks" }

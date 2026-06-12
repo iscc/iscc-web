@@ -3,7 +3,7 @@
 #   test      ->  uv run poe test
 #   lint      ->  uv run prek run --all-files
 #   frontend  ->  pnpm install && pnpm exec eslint frontend/ && pnpm exec vue-tsc --noEmit
-#                 && pnpm run build
+#                 && pnpm run test && pnpm run build
 #   docker    ->  docker build -t iscc-web:smoke . && docker run -p 8000:8000 iscc-web:smoke
 #                 (hadolint: docker run --rm -v "$PWD:/repo" -w /repo hadolint/hadolint hadolint Dockerfile)
 name: CI
@@ -99,7 +99,7 @@ jobs:
         run: uv run prek run --all-files
 
   frontend:
-    name: Frontend (eslint, vue-tsc, build)
+    name: Frontend (eslint, vue-tsc, vitest, build)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -121,6 +121,9 @@ jobs:
 
       - name: Type check  # local parity: pnpm exec vue-tsc --noEmit
         run: pnpm exec vue-tsc --noEmit
+
+      - name: Test  # local parity: pnpm run test
+        run: pnpm run test
 
       - name: Build  # local parity: pnpm run build
         run: pnpm run build

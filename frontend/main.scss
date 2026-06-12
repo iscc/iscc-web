@@ -19,14 +19,67 @@ $font-family-monospace: "JetBrains Mono", Consolas, monospace;
   --iscc-lime-green: #a6db50;
   --iscc-sky-blue: #4596f5;
   --iscc-light-cyan: #7ac2f7;
-  // ISCC component colors for unit visualization
-  --iscc-unit-meta: var(--iscc-sky-blue);
-  --iscc-unit-semantic: #6c757d;
-  --iscc-unit-content: var(--iscc-blue);
-  --iscc-unit-data: var(--iscc-light-cyan);
-  --iscc-unit-instance: var(--iscc-deep-navy);
+  // ISCC-UNIT layer colors (Concept 4 decoder readout palette; mirrored in frontend/lib/iscc.ts)
+  --iscc-unit-meta: #7ac2f7;
+  --iscc-unit-semantic: #4596f5;
+  --iscc-unit-content: #0054b2;
+  --iscc-unit-data: #123663;
+  --iscc-unit-instance: #a6db50;
 }
 
 body {
-  background-color: #f8f9fa;
+  background-color: #fbf7f2;
+  -webkit-font-smoothing: antialiased;
+}
+
+// Grain texture overlay; the element sets its own background-color to blend with.
+.grain {
+  background-image: url("./assets/grain.png");
+  background-size: 256px 256px;
+  background-blend-mode: overlay;
+}
+
+// Keyframes used via inline animation styles (must be global - scoped keyframes
+// get rewritten and would not match inline animation names).
+@keyframes bit-flick {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.15;
+  }
+}
+
+@keyframes scan-sweep {
+  0% {
+    top: 0;
+  }
+
+  100% {
+    top: calc(100% - 2px);
+  }
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.25;
+  }
+}
+
+// Collapse all decode/upload animations to static state for users who opt out of motion.
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

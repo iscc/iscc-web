@@ -99,6 +99,8 @@ Run `pnpm install` to install the frontend dependencies.
 
 Run `pnpm run dev` to run the development server.
 
+Run `pnpm run test` to run the frontend test suite (vitest).
+
 # Special thanks to the developers of
 
 - [Blacksheep](https://github.com/Neoteroi/BlackSheep) (see [benchmarks](http://klen.github.io/py-frameworks-bench/))

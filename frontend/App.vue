@@ -1,150 +1,374 @@
 <script setup lang="ts">
+// Single-page orchestrator: navy header, hero with the intake instrument, and an
+// education strip that morphs in place into the decoder-readout feed once the
+// first result lands (Concept 4 — Canvas × Decoder).
 import { ref } from "vue";
-
-import IsccHeader from "./components/IsccHeader.vue";
-import UploadZone from "./components/UploadZone.vue";
-import UploadedFile from "./components/UploadedFile.vue";
-import IsccFooter from "./components/IsccFooter.vue";
-import type { UppyFile, Meta, Body } from "@uppy/core";
+import type { Meta, Body, UppyFile } from "@uppy/core";
+import AppFooter from "./components/AppFooter.vue";
+import AppHeader from "./components/AppHeader.vue";
+import EducationStrip from "./components/EducationStrip.vue";
+import IntakeCard from "./components/IntakeCard.vue";
+import ResultCard from "./components/ResultCard.vue";
+import UiIcon from "./components/UiIcon.vue";
 import { apiService } from "./services/api.service";
 
-const uploadedMediaFiles = ref<Array<IsccWeb.FileUpload>>([]);
+const specimens = ref<IsccWeb.Specimen[]>([]);
+let sequence = 0;
 
-const updateUploadedMediaFile = (fileId: string, data: Partial<IsccWeb.FileUpload>) => {
-  uploadedMediaFiles.value = uploadedMediaFiles.value.map((f) => {
-    if (f.id == fileId) {
-      return {
-        ...f,
-        ...data,
-      };
-    }
+const findSpecimen = (id: string) => specimens.value.find((s) => s.id === id);
 
-    return f;
-  });
-};
-
-const loadHashBitsForFile = async (fileId: string, iscc: string) => {
-  const isccDecomposition = await apiService.explainIscc(iscc);
-  const hashBits = isccDecomposition.units.map((unit) => unit.hash_bits).join("");
-
-  updateUploadedMediaFile(fileId, { hashBits, units: isccDecomposition.units });
-};
-
-const onFileAdded = (file: UppyFile<Meta, Body>) => {
-  uploadedMediaFiles.value.unshift({
-    id: file.id,
-    name: file.name ?? "",
+const baseSpecimen = (partial: Partial<IsccWeb.Specimen> & Pick<IsccWeb.Specimen, "id" | "kind" | "label">) => {
+  const specimen: IsccWeb.Specimen = {
+    status: "processing",
     progress: 0,
-    status: "UPLOADING",
-    isccMetadata: null,
-    metadataChanged: false,
+    bytesUploaded: 0,
+    bytesTotal: 0,
+    typeHint: "",
+    startedAt: performance.now(),
+    elapsed: null,
     error: null,
-    hashBits: null,
-    units: null,
-  });
-};
-
-const onUploadProgress = (file: UppyFile<Meta, Body>, percentage: number) => {
-  const data: Partial<IsccWeb.FileUpload> = {
-    progress: percentage,
+    semantic: false,
+    granular: false,
+    metadata: null,
+    explain: null,
+    previewUrl: null,
+    metadataChanged: false,
+    embedBusy: false,
+    embedError: null,
+    compareWithId: null,
+    compareSwapped: false,
+    ...partial,
   };
-
-  if (percentage > 99) {
-    data.status = "PROCESSING";
-  }
-
-  updateUploadedMediaFile(file.id, data);
+  specimens.value.unshift(specimen);
+  // Return the reactive proxy, not the raw object - mutations on the raw object
+  // would update state without triggering a re-render.
+  return specimens.value[0];
 };
 
-const onUploadError = (file: UppyFile<Meta, Body>, error: Error) => {
-  updateUploadedMediaFile(file.id, {
-    status: "ERROR",
-    error: error,
-  });
-};
-
-const onUploadSuccess = async (file: UppyFile<Meta, Body>, isccMetadata: Api.IsccMetadata) => {
-  updateUploadedMediaFile(file.id, {
-    progress: 100,
-    status: "PROCESSED",
-    isccMetadata: isccMetadata,
-  });
-
-  await loadHashBitsForFile(file.id, isccMetadata.iscc);
-};
-
-const onRemoveUploadedFile = (file: IsccWeb.FileUpload) => {
-  uploadedMediaFiles.value = uploadedMediaFiles.value.filter((v) => v.id !== file.id);
-};
-
-const onUpdateMetadata = async (file: IsccWeb.FileUpload, formData: IsccWeb.MetadataFormData) => {
-  updateUploadedMediaFile(file.id, {
-    status: "UPDATING_METADATA",
-  });
-
+// Resolve the readout: store metadata, decompose the composite for bit-level
+// units, stamp the elapsed time and settle the card.
+const finalize = async (id: string, metadata: Api.IsccMetadata) => {
+  const specimen = findSpecimen(id);
+  if (!specimen) return;
+  specimen.metadata = metadata;
   try {
-    const newMetadata = await apiService.embedMetadata(file.isccMetadata?.media_id ?? "", formData);
+    specimen.explain = await apiService.explainIscc(metadata.iscc);
+  } catch {
+    specimen.explain = null;
+  }
+  specimen.elapsed = (performance.now() - specimen.startedAt) / 1000;
+  specimen.status = "done";
+};
 
-    updateUploadedMediaFile(file.id, {
-      isccMetadata: newMetadata,
-      metadataChanged: true,
-      status: "PROCESSED",
-      hashBits: null,
-      units: null,
-    });
+const fail = (id: string, message: string) => {
+  const specimen = findSpecimen(id);
+  if (!specimen) return;
+  specimen.status = "error";
+  specimen.error = message;
+};
 
-    await loadHashBitsForFile(file.id, newMetadata.iscc);
-  } catch (e) {
-    updateUploadedMediaFile(file.id, {
-      status: "ERROR",
-      error: e instanceof Error ? e : new Error(String(e)),
-    });
+// --- file intake -----------------------------------------------------------------
+
+const onFileAdded = (
+  file: UppyFile<Meta, Body>,
+  options: { semantic: boolean; granular: boolean; previewUrl: string | null },
+) => {
+  baseSpecimen({
+    id: file.id,
+    kind: "file",
+    label: file.name ?? "file",
+    status: "uploading",
+    bytesTotal: file.size ?? 0,
+    typeHint: file.type ?? "",
+    semantic: options.semantic,
+    granular: options.granular,
+    previewUrl: options.previewUrl,
+  });
+};
+
+const onUploadProgress = (fileId: string, progress: { percent: number; bytesUploaded: number; bytesTotal: number }) => {
+  const specimen = findSpecimen(fileId);
+  if (!specimen || specimen.status === "error") return;
+  specimen.progress = progress.percent;
+  specimen.bytesUploaded = progress.bytesUploaded;
+  if (progress.bytesTotal) specimen.bytesTotal = progress.bytesTotal;
+  if (progress.percent >= 100) specimen.status = "processing";
+};
+
+const onUploadError = (fileId: string, message: string) => fail(fileId, message);
+
+const onUploadSuccess = async (fileId: string, metadata: Api.IsccMetadata) => {
+  const specimen = findSpecimen(fileId);
+  if (!specimen || specimen.status === "error") return;
+  specimen.status = "processing";
+  await finalize(fileId, metadata);
+};
+
+// --- text intake -------------------------------------------------------------------
+
+const onTextSubmit = async (text: string, options: { semantic: boolean; granular: boolean }) => {
+  const specimen = baseSpecimen({
+    id: `text-${++sequence}`,
+    kind: "text",
+    label: "Pasted text",
+    typeHint: "text/plain",
+    semantic: options.semantic,
+    granular: options.granular,
+  });
+  try {
+    const metadata = await apiService.createIsccFromText(text, options.semantic, options.granular);
+    await finalize(specimen.id, metadata);
+  } catch (error) {
+    fail(specimen.id, error instanceof Error ? error.message : String(error));
   }
 };
 
-const buildComparisonForFileAtIndex = (index: number) => {
-  if (uploadedMediaFiles.value.length < 2) {
-    return;
+// --- code intake ---------------------------------------------------------------------
+
+const onCodeSubmit = async (iscc: string) => {
+  const specimen = baseSpecimen({ id: `code-${++sequence}`, kind: "code", label: "Decoded ISCC" });
+  try {
+    specimen.explain = await apiService.explainIscc(iscc);
+    specimen.elapsed = (performance.now() - specimen.startedAt) / 1000;
+    specimen.status = "done";
+  } catch (error) {
+    fail(specimen.id, error instanceof Error ? error.message : String(error));
   }
-
-  if (index > 1) {
-    return;
-  }
-
-  const comparisonFileUpload = uploadedMediaFiles.value[index === 0 ? 1 : 0];
-
-  return {
-    name: comparisonFileUpload.name,
-    hashBits: comparisonFileUpload.hashBits,
-  };
 };
+
+// --- per-card actions ------------------------------------------------------------------
+
+const onEmbed = async (specimen: IsccWeb.Specimen, formData: IsccWeb.MetadataFormData) => {
+  const mediaId = specimen.metadata?.media_id;
+  if (!mediaId) return;
+  specimen.embedBusy = true;
+  specimen.embedError = null;
+  try {
+    const metadata = await apiService.embedMetadata(mediaId, formData);
+    specimen.metadata = metadata;
+    specimen.metadataChanged = true;
+    try {
+      specimen.explain = await apiService.explainIscc(metadata.iscc);
+    } catch {
+      specimen.explain = null;
+    }
+  } catch (error) {
+    specimen.embedError = error instanceof Error ? error.message : String(error);
+  } finally {
+    specimen.embedBusy = false;
+  }
+};
+
+const onRemove = (specimen: IsccWeb.Specimen) => {
+  const mediaId = specimen.metadata?.media_id;
+  if (mediaId && specimen.status === "done") {
+    apiService.deleteMedia(mediaId).catch(() => undefined);
+  }
+  if (specimen.previewUrl && typeof URL.revokeObjectURL === "function") {
+    URL.revokeObjectURL(specimen.previewUrl);
+  }
+  specimens.value = specimens.value.filter((s) => s.id !== specimen.id);
+  for (const other of specimens.value) {
+    if (other.compareWithId === specimen.id) {
+      other.compareWithId = null;
+      other.compareSwapped = false;
+    }
+  }
+};
+
+const onCompare = (specimen: IsccWeb.Specimen, targetId: string) => {
+  specimen.compareWithId = targetId;
+  specimen.compareSwapped = false;
+};
+
+const onEject = (specimen: IsccWeb.Specimen) => {
+  specimen.compareWithId = null;
+  specimen.compareSwapped = false;
+};
+
+const onSwap = (specimen: IsccWeb.Specimen) => {
+  specimen.compareSwapped = !specimen.compareSwapped;
+};
+
+const compareTargetFor = (specimen: IsccWeb.Specimen) => {
+  if (!specimen.compareWithId) return null;
+  const target = findSpecimen(specimen.compareWithId);
+  return target && target.status === "done" && target.explain ? target : null;
+};
+
+const compareOptionsFor = (specimen: IsccWeb.Specimen) =>
+  specimens.value
+    .filter((other) => other.id !== specimen.id && other.status === "done" && other.explain)
+    .map((other) => ({
+      id: other.id,
+      label: other.label,
+      iscc: other.metadata?.iscc ?? other.explain?.iscc ?? "",
+    }));
 </script>
 
 <template lang="pug">
-div
-  IsccHeader.mb-3
-  UploadZone(
-    @upload-success="onUploadSuccess"
-    @upload-progress="onUploadProgress"
-    @file-added="onFileAdded"
-    @upload-error="onUploadError"
-  )
-  .container.mt-4
-    .row.mb-3(v-for="(file, index) in uploadedMediaFiles" :key="file.id")
-      h2(v-if="uploadedMediaFiles.length > 1 && index == 0") Comparison
-      h2(v-if="uploadedMediaFiles.length > 2 && index == 2") Previous uploads
-      .col
-        UploadedFile(
-          :file="file"
-          :comparison="buildComparisonForFileAtIndex(index)"
-          @remove-uploaded-file="onRemoveUploadedFile"
-          @update-metadata="onUpdateMetadata"
+.app-shell
+  AppHeader
+  section.hero.grain
+    .container-xl
+      .hero-grid
+        .intake-col
+          IntakeCard(
+            @file-added="onFileAdded"
+            @upload-progress="onUploadProgress"
+            @upload-error="onUploadError"
+            @upload-success="onUploadSuccess"
+            @text-submit="onTextSubmit"
+            @code-submit="onCodeSubmit"
+          )
+        .copy-col
+          .iso-badge
+            UiIcon(name="check-circle" :size="13")
+            span ISO 24138:2024
+          h1.hero-title The #[span.accent DNA] of your digital content#[span.accent .]
+          p.hero-sub An ISCC is a fingerprint generated #[b from the content itself] — no registry, no signup. Drop a file and read its code layer by layer.
+          ul.hero-points
+            li
+              UiIcon(
+                name="shield"
+                :size="15"
+                :stroke-width="2.2"
+              )
+              span Files stay private to you and are #[b auto-deleted after one hour]
+            li
+              UiIcon(
+                name="image"
+                :size="15"
+                :stroke-width="2.2"
+              )
+              span Text, image, audio &amp; video — anything else still gets a Data + Instance code
+  main.feed
+    .container-xl
+      EducationStrip(v-if="!specimens.length")
+      .results(v-else)
+        ResultCard(
+          v-for="specimen in specimens"
+          :key="specimen.id"
+          :specimen="specimen"
+          :compare-target="compareTargetFor(specimen)"
+          :compare-options="compareOptionsFor(specimen)"
+          @remove="onRemove(specimen)"
+          @embed="(formData) => onEmbed(specimen, formData)"
+          @compare="(targetId) => onCompare(specimen, targetId)"
+          @eject="onEject(specimen)"
+          @swap="onSwap(specimen)"
         )
-    IsccFooter
+  AppFooter
 </template>
 
 <style scoped lang="scss">
-code {
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.hero {
+  background-color: var(--iscc-blue);
+  padding: 2.75rem 0 3.25rem;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 3rem;
+  align-items: start;
+
+  @media (max-width: 991.98px) {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+.copy-col {
+  color: #ffffff;
+}
+
+.iso-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  padding: 0.35rem 0.8rem;
+  border-radius: 9999px;
   font-size: 0.75rem;
+  font-weight: 500;
+  margin-bottom: 1.1rem;
+}
+
+.hero-title {
+  margin: 0 0 1rem;
+  font-size: clamp(1.8rem, 3.4vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+
+  .accent {
+    color: var(--iscc-bright-yellow);
+  }
+}
+
+.hero-sub {
+  margin: 0 0 1.35rem;
+  color: rgba(255, 255, 255, 0.94);
+  font-size: 0.94rem;
+  font-weight: 300;
+  line-height: 1.6;
+  max-width: 26rem;
+
+  b {
+    font-weight: 600;
+    color: #ffffff;
+  }
+}
+
+.hero-points {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+
+  li {
+    display: flex;
+    gap: 0.55rem;
+    align-items: flex-start;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.82rem;
+    font-weight: 300;
+
+    .ui-icon {
+      margin-top: 2px;
+      color: var(--iscc-lime-green);
+    }
+
+    &:last-child .ui-icon {
+      color: var(--iscc-light-cyan);
+    }
+
+    b {
+      font-weight: 500;
+      color: #ffffff;
+    }
+  }
+}
+
+.feed {
+  flex: 1;
+  padding: 2.5rem 0 3.5rem;
+}
+
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 </style>

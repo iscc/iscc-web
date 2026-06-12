@@ -5,6 +5,7 @@ import {
   type UnitKind,
   compareUnits,
   formatBytes,
+  isValidIscc,
   matchPercent,
   normalizeIscc,
   pctColor,
@@ -67,14 +68,22 @@ describe("pctColor", () => {
 
 describe("normalizeIscc", () => {
   it("canonicalizes valid input", () => {
-    expect(normalizeIscc("ISCC:KACYPXW445FTYNJ3")).toBe("ISCC:KACYPXW445FTYNJ3");
-    expect(normalizeIscc("kacypxw445ftynj3")).toBe("ISCC:KACYPXW445FTYNJ3");
-    expect(normalizeIscc("  iscc:kacypxw445ftynj3  ")).toBe("ISCC:KACYPXW445FTYNJ3");
+    expect(normalizeIscc("ISCC:AAAWN77F73NA44D7")).toBe("ISCC:AAAWN77F73NA44D7");
+    expect(normalizeIscc("aaawn77f73na44d7")).toBe("ISCC:AAAWN77F73NA44D7");
+    expect(normalizeIscc("  iscc:aaawn77f73na44d7  ")).toBe("ISCC:AAAWN77F73NA44D7");
+  });
+
+  it("validates canonical ISCC prefixes, headers and payload lengths", () => {
+    expect(isValidIscc("ISCC:AAAWN77F73NA44D7")).toBe(true);
+    expect(isValidIscc("ISCC:KAAZEB4IFIVIXYL7NE7IGL6MTNBKH2UPCY63HBUCSI")).toBe(true);
+    expect(isValidIscc("ISCC:NOTAREALCODE")).toBe(false);
+    expect(isValidIscc("ISCC:KACYPXW445FTYNJ3")).toBe(false);
   });
 
   it("rejects invalid input", () => {
     expect(normalizeIscc("")).toBeNull();
     expect(normalizeIscc("not an iscc")).toBeNull();
+    expect(normalizeIscc("ISCC:NOTAREALCODE")).toBeNull();
     expect(normalizeIscc("ISCC:ABC")).toBeNull(); // too short
     expect(normalizeIscc("ISCC:" + "A".repeat(74))).toBeNull(); // too long
     expect(normalizeIscc("ISCC:KACY01")).toBeNull(); // 0 and 1 are not base32

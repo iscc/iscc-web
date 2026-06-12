@@ -16,6 +16,7 @@ dependencies = [
     "aiofiles>=24.1",
     "iscc-sdk[sct,sci]==0.9.3",
     "iscc-core>=1.2.1",
+    "iscc-lib>=0.4.0",
     "xxhash>=3.5",
     "httpx>=0.28",
     "pathvalidate>=3.2",

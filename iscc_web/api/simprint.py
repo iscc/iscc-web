@@ -2,7 +2,7 @@
 """Plaintext simprint endpoint - generates granular fingerprints compatible with iscc-search."""
 
 import asyncio
-import iscc_core as ic
+import iscc_lib as il
 import iscc_sct as sct
 import xxhash
 from blacksheep.server.controllers import APIController, post
@@ -23,7 +23,7 @@ def text_chunks(text, avg_size=512):
     """
     data = text.encode("utf-32-be")
     avg_size_bytes = avg_size * 4  # 4 bytes per character in utf-32-be
-    for chunk_bytes in ic.alg_cdc_chunks(data, utf32=True, avg_chunk_size=avg_size_bytes):
+    for chunk_bytes in il.alg_cdc_chunks(data, utf32=True, avg_chunk_size=avg_size_bytes):
         yield chunk_bytes.decode("utf-32-be")
 
 
@@ -43,17 +43,17 @@ def text_simprints(text, avg_chunk_size=512, ngram_size=13):
     result = {}
 
     # Generate CONTENT_TEXT_V0 simprints
-    cleaned_text = ic.text_clean(text)
+    cleaned_text = il.text_clean(text)
     content_simprints = []
     for chunk in text_chunks(cleaned_text, avg_size=avg_chunk_size):
         # Generate n-grams from collapsed/normalized text
-        ngrams = ("".join(chars) for chars in ic.sliding_window(ic.text_collapse(chunk), ngram_size))
+        ngrams = ("".join(chars) for chars in il.sliding_window(il.text_collapse(chunk), ngram_size))
         # Hash each n-gram
         features = [xxhash.xxh32_intdigest(s.encode("utf-8")) for s in ngrams]
         # Apply minhash to create similarity-preserving fingerprint
-        minimum_hash_digest = ic.alg_minhash_256(features)
+        minimum_hash_digest = il.alg_minhash_256(features)
         # Encode as base64 simprint
-        content_simprints.append(ic.encode_base64(minimum_hash_digest))
+        content_simprints.append(il.encode_base64(minimum_hash_digest))
 
     result["CONTENT_TEXT_V0"] = content_simprints
 

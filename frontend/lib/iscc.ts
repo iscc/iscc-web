@@ -88,14 +88,122 @@ export function pctColor(pct: number): string {
   return pct >= 80 ? "#a6db50" : pct >= 55 ? "#ffc300" : "#f56169";
 }
 
-export const ISCC_PATTERN = /^ISCC:[A-Z2-7]{10,73}$/;
+export const ISCC_PATTERN = /^ISCC:[A-Z2-7]{10,68}$/;
+
+const ISCC_PREFIXES = new Set([
+  "AA",
+  "CA",
+  "CE",
+  "CI",
+  "CM",
+  "CQ",
+  "EA",
+  "EE",
+  "EI",
+  "EM",
+  "EQ",
+  "GA",
+  "IA",
+  "KA",
+  "KE",
+  "KI",
+  "KM",
+  "KQ",
+  "KU",
+  "KY",
+  "K4",
+  "MA",
+  "ME",
+  "MI",
+  "MM",
+  "OA",
+]);
+const ISCC_COMPOSITE_UNITS = [0, 1, 1, 2, 1, 2, 2, 3];
+const INVALID_BASE32_REMAINDERS = new Set([1, 3, 6]);
+
+const base32Bits = (code: string): number[] | null => {
+  const body = code.split(":")[1] ?? "";
+  if (INVALID_BASE32_REMAINDERS.has(body.length % 8)) return null;
+  const bits: number[] = [];
+  for (const char of body) {
+    const value = BASE32.indexOf(char);
+    if (value < 0) return null;
+    for (let bit = 4; bit >= 0; bit--) bits.push((value >> bit) & 1);
+  }
+  bits.length = Math.floor(bits.length / 8) * 8;
+  return bits;
+};
+
+const bitsToInt = (bits: number[], start: number, length: number) => {
+  let value = 0;
+  for (let idx = start; idx < start + length; idx++) value = (value << 1) | bits[idx];
+  return value;
+};
+
+const decodeVarnibble = (bits: number[], offset: number): [number, number] | null => {
+  const remaining = bits.length - offset;
+  if (remaining < 4) return null;
+  if (bits[offset] === 0) return [bitsToInt(bits, offset, 4), offset + 4];
+  if (remaining >= 8 && bits[offset + 1] === 0) return [bitsToInt(bits, offset + 2, 6) + 8, offset + 8];
+  if (remaining >= 12 && bits[offset + 1] === 1 && bits[offset + 2] === 0) {
+    return [bitsToInt(bits, offset + 3, 9) + 72, offset + 12];
+  }
+  if (remaining >= 16 && bits[offset + 1] === 1 && bits[offset + 2] === 1 && bits[offset + 3] === 0) {
+    return [bitsToInt(bits, offset + 4, 12) + 584, offset + 16];
+  }
+  return null;
+};
+
+const expectedPayloadBytes = (mainType: number, subType: number, length: number): number | null => {
+  if ([0, 1, 2, 3, 4, 7].includes(mainType)) {
+    const bytes = (length + 1) * 4;
+    return bytes <= 40 ? bytes : null;
+  }
+  if (mainType === 5) {
+    if (subType === 7) return 32;
+    const unitCount = ISCC_COMPOSITE_UNITS[length];
+    return unitCount === undefined ? null : unitCount * 8 + 16;
+  }
+  if (mainType === 6) return length <= 4 ? length + 8 : null;
+  return null;
+};
+
+const hasSupportedVersion = (mainType: number, version: number) =>
+  version === 0 || (mainType === 6 && version === 1);
+
+/** True when an ISCC passes the same canonical prefix/header/length checks as iscc-core. */
+export function isValidIscc(code: string): boolean {
+  if (!ISCC_PATTERN.test(code)) return false;
+  const body = code.split(":")[1];
+  if (!ISCC_PREFIXES.has(body.slice(0, 2))) return false;
+  const bits = base32Bits(code);
+  if (!bits) return false;
+
+  let offset = 0;
+  const header: number[] = [];
+  for (let idx = 0; idx < 4; idx++) {
+    const decoded = decodeVarnibble(bits, offset);
+    if (!decoded) return false;
+    header.push(decoded[0]);
+    offset = decoded[1];
+  }
+
+  const [mainType, subType, version, length] = header;
+  if (!hasSupportedVersion(mainType, version)) return false;
+  const expectedBytes = expectedPayloadBytes(mainType, subType, length);
+  if (expectedBytes === null) return false;
+
+  let payloadBits = bits.length - offset;
+  if (payloadBits % 8 && bits.slice(offset, offset + 4).every((bit) => bit === 0)) payloadBits -= 4;
+  return Math.ceil(payloadBits / 8) === expectedBytes;
+}
 
 /** Canonical form of a user-entered ISCC (trimmed, uppercased, prefixed) or null if invalid. */
 export function normalizeIscc(input: string): string | null {
   let code = input.trim().toUpperCase();
   if (!code) return null;
   if (!code.startsWith("ISCC:")) code = `ISCC:${code}`;
-  return ISCC_PATTERN.test(code) ? code : null;
+  return isValidIscc(code) ? code : null;
 }
 
 /** Human-readable byte count: 53256 -> "52.0 KB". */

@@ -1,3 +1,9 @@
+---
+# Generated from CHANGELOG.md by develop/copy_changelog.py - do not edit.
+icon: lucide/history
+description: Release history of the iscc-web microservice.
+---
+
 # Changelog
 
 ## [0.3.0] - 2026-06-12

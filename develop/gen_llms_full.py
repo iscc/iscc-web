@@ -16,6 +16,7 @@ PAGES = [
     "reference/rest-api.md",
     "reference/for-coding-agents.md",
     "development/contributing.md",
+    "development/changelog.md",
 ]
 
 # Regex to strip YAML frontmatter

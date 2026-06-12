@@ -115,7 +115,9 @@ test = { cmd = "uv run python -m pytest -n auto --tb=line --no-header -q --cov -
 check-complexity = { cmd = "uv run radon cc --min C --show-complexity --average iscc_web/", help = "Check code complexity with radon" }
 run = { cmd = "uv run uvicorn iscc_web.asgi:application --reload", help = "Run dev server" }
 docs-serve = { cmd = "uv run zensical serve", help = "Serve docs locally with live reload" }
+docs-changelog = { cmd = "uv run python -m develop.copy_changelog", help = "Sync CHANGELOG.md into the docs site" }
 docs-build = { sequence = [
+    { cmd = "uv run python -m develop.copy_changelog" },
     { cmd = "uv run zensical build" },
     { cmd = "uv run python -m develop.gen_llms_full" },
 ], help = "Build docs site with llms-full.txt" }

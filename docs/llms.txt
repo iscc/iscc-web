@@ -36,3 +36,4 @@ Run: `docker run -p 8000:8000 ghcr.io/iscc/iscc-web:main`
 ## Development
 
 - [Contributing](https://web.iscc.codes/development/contributing.md): Dev setup, testing, and contribution guidelines
+- [Changelog](https://web.iscc.codes/development/changelog.md): Release history of the iscc-web microservice

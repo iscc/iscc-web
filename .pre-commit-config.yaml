@@ -22,6 +22,14 @@ repos:
       - id: ruff-format
       - id: ruff-check
         args: [--fix]
+  - repo: local
+    hooks:
+      - id: copy-changelog
+        name: sync docs changelog from CHANGELOG.md
+        entry: uv run python -m develop.copy_changelog
+        language: system
+        files: ^(CHANGELOG\.md|docs/development/changelog\.md)$
+        pass_filenames: false
   - repo: https://github.com/executablebooks/mdformat
     rev: 1.0.0
     hooks:

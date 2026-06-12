@@ -56,11 +56,12 @@ describe("IntakeCard", () => {
     expect(wrapper.find(".valid-dot").classes()).toContain("invalid");
     expect(button.attributes("disabled")).toBeDefined();
 
-    await input.setValue("kacypxw445ftynj3cysxhafjma2hu");
+    await input.setValue("aaawn77f73na44d7");
     expect(wrapper.find(".valid-dot").classes()).toContain("valid");
+    expect(wrapper.find(".input-note").text()).toBe("ready to decode");
     await button.trigger("click");
 
-    expect(wrapper.emitted("code-submit")).toEqual([["ISCC:KACYPXW445FTYNJ3CYSXHAFJMA2HU"]]);
+    expect(wrapper.emitted("code-submit")).toEqual([["ISCC:AAAWN77F73NA44D7"]]);
     wrapper.unmount();
   });
 

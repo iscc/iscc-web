@@ -158,7 +158,7 @@ const codeHint = computed(() =>
   codeState.value === "empty"
     ? "validates as you type — prefix optional"
     : codeState.value === "valid"
-      ? "looks like a valid ISCC"
+      ? "ready to decode"
       : "not a valid ISCC yet",
 );
 const submitCode = () => {

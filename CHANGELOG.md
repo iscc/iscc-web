@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1] - 2026-06-14
+
+- Added an opt-in GPU Docker image variant published under `-gpu` tags (`:0.3.1-gpu`,
+    `:0.3-gpu`, `:main-gpu`) on a CUDA base that runs the experimental semantic codes on an
+    NVIDIA GPU; the default image stays the lean CPU `python:3.13-slim` build
+- Tightened client-side ISCC code input validation in the demo frontend decoder
+
 ## [0.3.0] - 2026-06-12
 
 - Added optional semantic ISCC-UNITs for text and image content via the `semantic` query

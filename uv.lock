@@ -2,9 +2,19 @@ version = 1
 revision = 3
 requires-python = ">=3.13"
 resolution-markers = [
-    "python_full_version >= '3.14'",
-    "python_full_version < '3.14'",
+    "extra != 'extra-8-iscc-web-cpu' and extra == 'extra-8-iscc-web-gpu' and extra != 'group-8-iscc-web-dev'",
+    "python_full_version >= '3.14' and extra == 'extra-8-iscc-web-cpu' and extra != 'extra-8-iscc-web-gpu'",
+    "python_full_version < '3.14' and extra == 'extra-8-iscc-web-cpu' and extra != 'extra-8-iscc-web-gpu'",
+    "python_full_version >= '3.14' and extra != 'extra-8-iscc-web-cpu' and extra != 'extra-8-iscc-web-gpu'",
+    "python_full_version < '3.14' and extra != 'extra-8-iscc-web-cpu' and extra != 'extra-8-iscc-web-gpu'",
 ]
+conflicts = [[
+    { package = "iscc-web", extra = "cpu" },
+    { package = "iscc-web", extra = "gpu" },
+], [
+    { package = "iscc-web", extra = "gpu" },
+    { package = "iscc-web", group = "dev" },
+]]
 
 [[package]]
 name = "aiofile"
@@ -169,7 +179,7 @@ dependencies = [
     { name = "guardpost" },
     { name = "h11" },
     { name = "h2" },
-    { name = "httptools", marker = "platform_python_implementation != 'PyPy'" },
+    { name = "httptools", marker = "platform_python_implementation != 'PyPy' or (extra == 'extra-8-iscc-web-cpu' and extra == 'extra-8-iscc-web-gpu') or (extra == 'extra-8-iscc-web-gpu' and extra == 'group-8-iscc-web-dev')" },
     { name = "itsdangerous" },
     { name = "rodi" },
 ]
@@ -348,7 +358,7 @@ name = "click"
 version = "8.4.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32'" },
+    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-8-iscc-web-cpu' and extra == 'extra-8-iscc-web-gpu') or (extra == 'extra-8-iscc-web-gpu' and extra == 'group-8-iscc-web-dev')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/9b/98/518d8e5081007684232226f475082b30087d0f585e8457db087298259f49/click-8.4.1.tar.gz", hash = "sha256:918b5633eddf6b41c32d4f454bf0de810065c74e3f7dbf8ee5452f8be88d3e96", size = 353007, upload-time = "2026-05-22T04:08:37.769Z" }
 wheels = [
@@ -738,7 +748,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "filelock" },
     { name = "fsspec" },
-    { name = "hf-xet", marker = "platform_machine == 'AMD64' or platform_machine == 'aarch64' or platform_machine == 'amd64' or platform_machine == 'arm64' or platform_machine == 'x86_64'" },
+    { name = "hf-xet", marker = "platform_machine == 'AMD64' or platform_machine == 'aarch64' or platform_machine == 'amd64' or platform_machine == 'arm64' or platform_machine == 'x86_64' or (extra == 'extra-8-iscc-web-cpu' and extra == 'extra-8-iscc-web-gpu') or (extra == 'extra-8-iscc-web-gpu' and extra == 'group-8-iscc-web-dev')" },
     { name = "httpx" },
     { name = "packaging" },
     { name = "pyyaml" },
@@ -887,24 +897,31 @@ wheels = [
 
 [[package]]
 name = "iscc-sci"
-version = "0.2.0"
+version = "0.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "blake3" },
     { name = "loguru" },
-    { name = "onnxruntime" },
     { name = "pillow" },
     { name = "platformdirs" },
     { name = "pydantic-settings" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/71/37/a1e283c4915f010012f00aaab3d3d0568b8de9810467066f0351443adc6a/iscc_sci-0.2.0.tar.gz", hash = "sha256:edf540f4900e1c777fb9c6d9ae90fff091907f05b2b3a83478cd36ee31491ba0", size = 11825, upload-time = "2025-04-28T19:03:46.486Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a2/e3/3c899244e6e04789a1d0af3920b07846e398b25aeb5476f65e97de3841d9/iscc_sci-0.3.0.tar.gz", hash = "sha256:68f85086dccb0e4433a5601f73c66daf8e50e19df8cba4522853a0437283ea79", size = 8833, upload-time = "2026-06-14T16:10:17.002Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/72/be/5725dd11804cefb0799165ca3270f7b87531dde14947d66f533a1f5053bc/iscc_sci-0.2.0-py3-none-any.whl", hash = "sha256:9ca00161a8df0a34811bc01d3ae33babd1edff6b2135083566cee7f94bc46178", size = 13613, upload-time = "2025-04-28T19:03:45.096Z" },
+    { url = "https://files.pythonhosted.org/packages/60/cd/32c16d1b87c47195c8943332705ab3bd29e357f355040bbaa2bf732f84fb/iscc_sci-0.3.0-py3-none-any.whl", hash = "sha256:5ddf3d50bb078eec9e26bce905c4786a227dd09726d1b802bd880bd4973a37a2", size = 10205, upload-time = "2026-06-14T16:10:17.776Z" },
+]
+
+[package.optional-dependencies]
+cpu = [
+    { name = "onnxruntime" },
+]
+gpu = [
+    { name = "onnxruntime-gpu" },
 ]
 
 [[package]]
 name = "iscc-sct"
-version = "0.1.4"
+version = "0.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "blake3" },
@@ -912,7 +929,6 @@ dependencies = [
     { name = "charset-normalizer" },
     { name = "loguru" },
     { name = "numpy" },
-    { name = "onnxruntime" },
     { name = "platformdirs" },
     { name = "pybase64" },
     { name = "pydantic" },
@@ -921,9 +937,17 @@ dependencies = [
     { name = "semantic-text-splitter" },
     { name = "tokenizers" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5d/e4/75f029d8faeed9b08985d8d1c86597758b91c5c9ecb63840ebfbd13bcc6b/iscc_sct-0.1.4.tar.gz", hash = "sha256:e426ef89d9dc7c0aef02a511a543d1d0d3de09383f4b91df485ecfe1fc019922", size = 3553961, upload-time = "2025-04-24T16:26:30.594Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/5d/d1/7c97139c1494703df13c26957d08e267432fc7b6970f498e3e454eb4d28b/iscc_sct-0.2.0.tar.gz", hash = "sha256:46e9710e517ef43daefb81999bc7cab5249f19544a146313220bfeb0ab228492", size = 3673921, upload-time = "2026-06-14T19:13:08.592Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/de/66/b924d77539a1bdef71fe5b98d821b910702fcab89bfd058817348c893882/iscc_sct-0.1.4-py3-none-any.whl", hash = "sha256:1966698ee5142afb00605cbb76c20cf6d73fe47d786dc72363eca77ed260cbb5", size = 3578513, upload-time = "2025-04-24T16:26:22.49Z" },
+    { url = "https://files.pythonhosted.org/packages/ed/42/9a0f89bca0b3e446ad838bb894f04bae03168034e1caf8aa3e73c48449d4/iscc_sct-0.2.0-py3-none-any.whl", hash = "sha256:ac6fe1d1a36125749c1437735a8dd947e72e69227d8fefb2e3b3a87d34182936", size = 3673713, upload-time = "2026-06-14T19:13:10.082Z" },
+]
+
+[package.optional-dependencies]
+cpu = [
+    { name = "onnxruntime" },
+]
+gpu = [
+    { name = "onnxruntime-gpu" },
 ]
 
 [[package]]
@@ -1005,10 +1029,21 @@ dependencies = [
     { name = "xxhash" },
 ]
 
+[package.optional-dependencies]
+cpu = [
+    { name = "iscc-sci", extra = ["cpu"], marker = "extra == 'extra-8-iscc-web-cpu' or (extra == 'extra-8-iscc-web-gpu' and extra == 'group-8-iscc-web-dev')" },
+    { name = "iscc-sct", extra = ["cpu"], marker = "extra == 'extra-8-iscc-web-cpu' or (extra == 'extra-8-iscc-web-gpu' and extra == 'group-8-iscc-web-dev')" },
+]
+gpu = [
+    { name = "iscc-sci", extra = ["gpu"], marker = "extra == 'extra-8-iscc-web-gpu'" },
+    { name = "iscc-sct", extra = ["gpu"], marker = "extra == 'extra-8-iscc-web-gpu'" },
+]
+
 [package.dev-dependencies]
 dev = [
     { name = "datamodel-code-generator" },
     { name = "iscc-samples" },
+    { name = "onnxruntime" },
     { name = "poethepoet" },
     { name = "prek" },
     { name = "pytest" },
@@ -1029,6 +1064,10 @@ requires-dist = [
     { name = "httpx", specifier = ">=0.28" },
     { name = "iscc-core", specifier = ">=1.2.1" },
     { name = "iscc-lib", specifier = ">=0.4.0" },
+    { name = "iscc-sci", extras = ["cpu"], marker = "extra == 'cpu'", specifier = ">=0.3.0" },
+    { name = "iscc-sci", extras = ["gpu"], marker = "extra == 'gpu'", specifier = ">=0.3.0" },
+    { name = "iscc-sct", extras = ["cpu"], marker = "extra == 'cpu'", specifier = ">=0.2.0" },
+    { name = "iscc-sct", extras = ["gpu"], marker = "extra == 'gpu'", specifier = ">=0.2.0" },
     { name = "iscc-sdk", extras = ["sct", "sci"], specifier = "==0.9.3" },
     { name = "jinja2-simple-tags", specifier = ">=0.6" },
     { name = "pathvalidate", specifier = ">=3.2" },
@@ -1040,11 +1079,13 @@ requires-dist = [
     { name = "watchfiles", specifier = ">=0.21" },
     { name = "xxhash", specifier = ">=3.5" },
 ]
+provides-extras = ["cpu", "gpu"]
 
 [package.metadata.requires-dev]
 dev = [
     { name = "datamodel-code-generator", specifier = ">=0.61" },
     { name = "iscc-samples", specifier = ">=0.6" },
+    { name = "onnxruntime" },
     { name = "poethepoet", specifier = ">=0.30" },
     { name = "prek", specifier = ">=0.2.9" },
     { name = "pytest", specifier = ">=8.4" },
@@ -1200,8 +1241,8 @@ name = "loguru"
 version = "0.7.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32'" },
-    { name = "win32-setctime", marker = "sys_platform == 'win32'" },
+    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-8-iscc-web-cpu' and extra == 'extra-8-iscc-web-gpu') or (extra == 'extra-8-iscc-web-gpu' and extra == 'group-8-iscc-web-dev')" },
+    { name = "win32-setctime", marker = "sys_platform == 'win32' or (extra == 'extra-8-iscc-web-cpu' and extra == 'extra-8-iscc-web-gpu') or (extra == 'extra-8-iscc-web-gpu' and extra == 'group-8-iscc-web-dev')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/3a/05/a1dae3dffd1116099471c643b8924f5aa6524411dc6c63fdae648c4f1aca/loguru-0.7.3.tar.gz", hash = "sha256:19480589e77d47b8d85b2c827ad95d49bf31b0dcde16593892eb51dd18706eb6", size = 63559, upload-time = "2024-12-06T11:20:56.608Z" }
 wheels = [
@@ -1457,6 +1498,25 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/19/e4/0f9d1a5718b1781c610c1e354765a3820597081754277a6a9a2b50705702/onnxruntime-1.26.0-cp314-cp314-win_arm64.whl", hash = "sha256:31d71a53490e46910877d0902b5ad99c69a5955e5c7ea6c82863519410e1ba7c", size = 13140121, upload-time = "2026-05-08T19:07:57.804Z" },
     { url = "https://files.pythonhosted.org/packages/1c/42/3b8e635f067d06d9f45bede470b8d539d101a4166c272213158dfd08b6ce/onnxruntime-1.26.0-cp314-cp314t-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:d7b6d258fb78fdfcf049795bcfaa74dcb90ae7baa277afd21e6fd28b83f2c496", size = 16057240, upload-time = "2026-05-08T19:07:25.163Z" },
     { url = "https://files.pythonhosted.org/packages/93/99/f2be40a31b908d96b861ae0ce98582fa376c18a7f816b9d5eb4cd6aa0a4c/onnxruntime-1.26.0-cp314-cp314t-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:4eefd386a45202aefb7a5132b94f32df9d506c9edcc7faf2fc60d65183f4b183", size = 18197382, upload-time = "2026-05-08T19:07:46.965Z" },
+]
+
+[[package]]
+name = "onnxruntime-gpu"
+version = "1.26.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "flatbuffers" },
+    { name = "numpy" },
+    { name = "packaging" },
+    { name = "protobuf" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/dd/97/fe8979f44b9275654b42f7bb556e30789b71a1b22998c83b540df2b1b774/onnxruntime_gpu-1.26.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:cfda2fad535595bfc3e570eb588092717711dcb2957656d814695e0c9ceb1508", size = 276974871, upload-time = "2026-05-08T19:15:58.052Z" },
+    { url = "https://files.pythonhosted.org/packages/67/3f/59f1777a394625ecc9a85636de57dc47c25dbb5f888da050f1463955a0ce/onnxruntime_gpu-1.26.0-cp313-cp313-win_amd64.whl", hash = "sha256:6ab9f9c741d2e239b2e321ab0d389c04329d4ab7f11e3b92dd3aa7db1c59dee4", size = 226548083, upload-time = "2026-05-08T19:09:44.408Z" },
+    { url = "https://files.pythonhosted.org/packages/89/96/360328e3c463f7ea08e853c4239c397e83363dd0204de71a710dc1a544bd/onnxruntime_gpu-1.26.0-cp313-cp313t-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:bcf6f347cad9f88a9a625c2b352cf9de927528aedb627ebbc089a201f1990b94", size = 276992052, upload-time = "2026-05-08T19:16:09.892Z" },
+    { url = "https://files.pythonhosted.org/packages/fd/c8/aa2dc0e79bba577f37d5448bcb32fea79977e07506684d8138c19a0f1077/onnxruntime_gpu-1.26.0-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:9e6e4fb1ec9ae1cf456534d9115f106ab2a1ae96fa513b4ed0f4795302b4a2c6", size = 276978254, upload-time = "2026-05-08T19:16:22.096Z" },
+    { url = "https://files.pythonhosted.org/packages/41/e7/923298431e669567d7ccc2a4c898b6534a47641a051569fd97165fe6d9b8/onnxruntime_gpu-1.26.0-cp314-cp314-win_amd64.whl", hash = "sha256:3e592439b0183d303c2374517b5b392599a3d50b2dc9de949b9b15731ac921c9", size = 229142768, upload-time = "2026-05-08T19:09:54.589Z" },
+    { url = "https://files.pythonhosted.org/packages/97/91/93ffe5431d154989f5e04864a25a97eea480997d771232bcbbc538188241/onnxruntime_gpu-1.26.0-cp314-cp314t-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:56dc7b73954ff4bdc71f5b8ab306b6f61be5d007881b6ef423a609e2b9cd088b", size = 276991545, upload-time = "2026-05-08T19:16:33.347Z" },
 ]
 
 [[package]]
@@ -1997,7 +2057,7 @@ name = "pytest-cov"
 version = "7.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "coverage" },
+    { name = "coverage", marker = "extra == 'extra-8-iscc-web-cpu' or extra != 'extra-8-iscc-web-gpu' or (extra == 'extra-8-iscc-web-gpu' and extra == 'group-8-iscc-web-dev')" },
     { name = "pluggy" },
     { name = "pytest" },
 ]
@@ -2537,7 +2597,7 @@ name = "tqdm"
 version = "4.68.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32'" },
+    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-8-iscc-web-cpu' and extra == 'extra-8-iscc-web-gpu') or (extra == 'extra-8-iscc-web-gpu' and extra == 'group-8-iscc-web-dev')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/85/05/0d5260f1f1ca784f4a4a0def9cbe6affe587f5b4025328d446c3d67765f4/tqdm-4.68.2.tar.gz", hash = "sha256:89c230e8dbc67c7615c142487111222f878c77427ea09549960f62389e258add", size = 171923, upload-time = "2026-06-09T13:26:42.539Z" }
 wheels = [
@@ -2562,7 +2622,7 @@ version = "0.26.7"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "annotated-doc" },
-    { name = "colorama", marker = "sys_platform == 'win32'" },
+    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-8-iscc-web-cpu' and extra == 'extra-8-iscc-web-gpu') or (extra == 'extra-8-iscc-web-gpu' and extra == 'group-8-iscc-web-dev')" },
     { name = "rich" },
     { name = "shellingham" },
 ]

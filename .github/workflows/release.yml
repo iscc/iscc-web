@@ -30,27 +30,28 @@ jobs:
       - name: Install dependencies
         run: uv sync --frozen
 
-      # Same iscc-sct model cache plumbing as ci.yml — a no-op until iscc-sdk[sct] lands.
-      - name: Cache iscc-sct model
+      # Cache the iscc-sct/iscc-sci ONNX models across runs (same plumbing as ci.yml). Parallel
+      # pytest-xdist workers would otherwise race on the download and can corrupt the ONNX file.
+      - name: Cache semantic-code models
         uses: actions/cache@v5
         with:
           path: |
             ~/.local/share/iscc-sct
+            ~/.local/share/iscc-sci
             ~\AppData\Local\iscc\iscc-sct
-          key: iscc-sct-model-${{ runner.os }}-${{ hashFiles('uv.lock') }}
+            ~\AppData\Local\iscc\iscc-sci
+          key: iscc-models-${{ runner.os }}-${{ hashFiles('uv.lock') }}
           restore-keys: |
-            iscc-sct-model-${{ runner.os }}-
+            iscc-models-${{ runner.os }}-
 
-      - name: Pre-download iscc-sct model (serial, before parallel tests)
+      - name: Pre-download semantic-code models (serial, before parallel tests)
         run: |
-          mkdir -p ~/.local/share/iscc-sct  # ensure at least one cache path exists
           uv run python - <<'EOF'
-          try:
-              import iscc_sct.code_semantic_text as sct
-              sct.model()
-              print("iscc-sct model ready")
-          except ImportError:
-              print("iscc-sct not installed - nothing to pre-download")
+          import iscc_sct.utils
+          import iscc_sci.utils
+          iscc_sct.utils.get_model()
+          iscc_sci.utils.get_model()
+          print("semantic-code models ready")
           EOF
 
       - name: Run tests  # local parity: uv run poe test
@@ -74,6 +75,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # --- CPU image (default, slim base): :X.Y.Z and :X.Y ---
       - id: meta
         uses: docker/metadata-action@v6
         with:
@@ -85,13 +87,40 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
 
-      - name: Build and push
+      - name: Build and push (CPU)
         uses: docker/build-push-action@v7
         with:
           context: .
           file: ./Dockerfile
+          # Pin the CPU stage: appending the GPU stage makes it the last (default) stage, so an
+          # untargeted build would silently publish the ~3 GB CUDA image under the plain tags.
+          target: prod-runtime
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      # --- GPU image (opt-in CUDA base): :X.Y.Z-gpu and :X.Y-gpu ---
+      - id: meta-gpu
+        uses: docker/metadata-action@v6
+        with:
+          images: ghcr.io/${{ github.repository }}
+          flavor: |
+            latest=false
+            suffix=-gpu
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      - name: Build and push (GPU)
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile
+          target: prod-runtime-gpu
+          push: true
+          tags: ${{ steps.meta-gpu.outputs.tags }}
+          labels: ${{ steps.meta-gpu.outputs.labels }}
+          cache-from: type=gha,scope=gpu
+          cache-to: type=gha,mode=max,scope=gpu

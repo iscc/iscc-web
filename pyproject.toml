@@ -30,6 +30,13 @@ dependencies = [
     "watchfiles>=0.21",
 ]
 
+[project.optional-dependencies]
+# onnxruntime now lives in the cpu|gpu extras of iscc-sct/iscc-sci (variant wheels that clobber
+# each other in site-packages). Pick exactly one per built image; never both. iscc-sdk[sct,sci]
+# forwards the bare libs; these extras attach the onnxruntime variant and the >=0.2.0/>=0.3.0 floor.
+cpu = ["iscc-sct[cpu]>=0.2.0", "iscc-sci[cpu]>=0.3.0"]
+gpu = ["iscc-sct[gpu]>=0.2.0", "iscc-sci[gpu]>=0.3.0"]
+
 [project.urls]
 Homepage = "https://github.com/iscc/iscc-web"
 
@@ -49,10 +56,18 @@ dev = [
     "prek>=0.2.9",
     "radon>=6.0.1",
     "zensical>=0.0.21",
+    # CPU onnxruntime for local dev/tests so `uv sync` runs semantic inference without the gpu extra.
+    "onnxruntime",
 ]
 
 [tool.uv]
 default-groups = "all"
+conflicts = [
+    # The two image variants: cpu and gpu pull mutually-clobbering onnxruntime variant wheels.
+    [{ extra = "cpu" }, { extra = "gpu" }],
+    # dev brings CPU onnxruntime; never co-resolve it with the gpu extra's onnxruntime-gpu.
+    [{ group = "dev" }, { extra = "gpu" }],
+]
 
 [tool.uv.build-backend]
 module-name = "iscc_web"

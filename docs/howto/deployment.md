@@ -29,17 +29,18 @@ Production images are published to the GitHub Container Registry as
 | Tag     | Example                           | Published                                 |
 | ------- | --------------------------------- | ----------------------------------------- |
 | `main`  | `ghcr.io/iscc/iscc-web:main`      | On every push to `main` after CI passes   |
-| `X.Y.Z` | `ghcr.io/iscc/iscc-web:0.3.0`     | On GitHub releases — immutable            |
+| `X.Y.Z` | `ghcr.io/iscc/iscc-web:0.3.1`     | On GitHub releases — immutable            |
 | `X.Y`   | `ghcr.io/iscc/iscc-web:0.3`       | On GitHub releases — tracks latest patch  |
-| `*-gpu` | `ghcr.io/iscc/iscc-web:0.3.0-gpu` | GPU variant of each tag above (see below) |
+| `*-gpu` | `ghcr.io/iscc/iscc-web:0.3.1-gpu` | GPU variant of each tag above (see below) |
 
 No `:latest` tag is published. Pin a semver tag for reproducible deployments, or use `:main` to
 follow the development branch.
 
 ### GPU image (opt-in)
 
-Every tag also ships a `-gpu` variant (`:0.3.0-gpu`, `:0.3-gpu`, `:main-gpu`) built on the
-`nvidia/cuda:12.6.3-cudnn-runtime-ubuntu24.04` base with the CUDA build of onnxruntime. It runs
+Every tag from 0.3.1 onward also ships a `-gpu` variant (`:0.3.1-gpu`, `:0.3-gpu`, `:main-gpu`)
+built on the `nvidia/cuda:12.6.3-cudnn-runtime-ubuntu24.04` base with the CUDA build of
+onnxruntime. It runs
 the experimental semantic codes (iscc-sct text, iscc-sci image) on an NVIDIA GPU instead of the
 CPU. The default (non-`-gpu`) image is what most deployments want — only reach for `-gpu` if you
 serve semantic codes at volume.

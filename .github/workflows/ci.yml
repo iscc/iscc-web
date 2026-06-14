@@ -11,7 +11,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main, v0.3.0]
+    branches: [main, v0.3.1]
   workflow_dispatch:
 
 # Cancel stale in-flight PR runs; let branch-push runs complete so :main publishing isn't cancelled.
@@ -147,6 +147,8 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
+          # CPU stage only: the GPU stage is last (default) but is huge and never smoke-tested here.
+          target: prod-runtime
           load: true
           tags: iscc-web:smoke
           cache-from: type=gha
@@ -201,12 +203,61 @@ jobs:
           tags: |
             type=ref,event=branch
 
-      - name: Build and push
+      - name: Build and push (CPU :main)
         uses: docker/build-push-action@v7
         with:
           context: .
           file: ./Dockerfile
+          # Pin the CPU stage so the plain :main tag never gets the GPU (last/default) stage.
+          target: prod-runtime
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
+
+  # Build the opt-in CUDA image. Runs on pushes (main + the working branch) and manual dispatch,
+  # NEVER on PRs — the ~3 GB CUDA base is too costly for every PR. Build-only proves the image
+  # compiles and its imports resolve (the in-image model bake runs Python against the GPU venv);
+  # functional GPU inference is verified manually on the GPU host, not in CI (runners have no GPU).
+  # Pushes :main-gpu only on main; on the working branch it builds without pushing (verification).
+  docker-gpu:
+    name: Docker GPU (build; push :main-gpu on main)
+    if: github.event_name != 'pull_request'
+    needs: [test, lint, frontend, docker]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: docker/setup-buildx-action@v4
+
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ghcr.io/${{ github.repository }}
+          flavor: |
+            latest=false
+            suffix=-gpu
+          tags: |
+            type=ref,event=branch
+
+      - name: Build (and push :main-gpu on main)
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile
+          target: prod-runtime-gpu
+          push: ${{ github.ref == 'refs/heads/main' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          # Separate gha cache scope so the CUDA layers never evict the CPU image's cache.
+          cache-from: type=gha,scope=gpu
+          cache-to: type=gha,mode=max,scope=gpu

@@ -26,14 +26,32 @@ Production images are published to the GitHub Container Registry as
 
 ### Image tags
 
-| Tag     | Example                       | Published                                |
-| ------- | ----------------------------- | ---------------------------------------- |
-| `main`  | `ghcr.io/iscc/iscc-web:main`  | On every push to `main` after CI passes  |
-| `X.Y.Z` | `ghcr.io/iscc/iscc-web:0.3.0` | On GitHub releases — immutable           |
-| `X.Y`   | `ghcr.io/iscc/iscc-web:0.3`   | On GitHub releases — tracks latest patch |
+| Tag     | Example                           | Published                                 |
+| ------- | --------------------------------- | ----------------------------------------- |
+| `main`  | `ghcr.io/iscc/iscc-web:main`      | On every push to `main` after CI passes   |
+| `X.Y.Z` | `ghcr.io/iscc/iscc-web:0.3.0`     | On GitHub releases — immutable            |
+| `X.Y`   | `ghcr.io/iscc/iscc-web:0.3`       | On GitHub releases — tracks latest patch  |
+| `*-gpu` | `ghcr.io/iscc/iscc-web:0.3.0-gpu` | GPU variant of each tag above (see below) |
 
 No `:latest` tag is published. Pin a semver tag for reproducible deployments, or use `:main` to
 follow the development branch.
+
+### GPU image (opt-in)
+
+Every tag also ships a `-gpu` variant (`:0.3.0-gpu`, `:0.3-gpu`, `:main-gpu`) built on the
+`nvidia/cuda:12.6.3-cudnn-runtime-ubuntu24.04` base with the CUDA build of onnxruntime. It runs
+the experimental semantic codes (iscc-sct text, iscc-sci image) on an NVIDIA GPU instead of the
+CPU. The default (non-`-gpu`) image is what most deployments want — only reach for `-gpu` if you
+serve semantic codes at volume.
+
+The GPU image needs an NVIDIA driver, the
+[NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/),
+and the container started with GPU access (`docker run --gpus all …`, or a Compose `deploy.resources`
+device reservation). On a host without a usable GPU it still runs but falls back to CPU inference —
+with no benefit over the much smaller default image (the CUDA base is ~3 GB).
+
+GPU deployment specifics (Compose device reservation, worker sizing, on-box verification) live in
+the [`iscc-infra`](https://github.com/iscc/iscc-infra) repository rather than being duplicated here.
 
 ## Deploy with Docker Compose
 

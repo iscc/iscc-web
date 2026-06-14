@@ -20,6 +20,10 @@ with `main` and semver tags):
 docker run -p 8000:8000 ghcr.io/iscc/iscc-web:main
 ```
 
+Each tag also has an opt-in `-gpu` variant (e.g. `:main-gpu`) on a CUDA base that runs the
+experimental semantic codes on an NVIDIA GPU. Most deployments want the smaller default image;
+see the [deployment guide](https://web.iscc.codes/howto/deployment/) for GPU requirements.
+
 ## Overview
 
 <img align="left" width="200" src="docs/assets/iscc-web-rest-api.jpg?raw=true">

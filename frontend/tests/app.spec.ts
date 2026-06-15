@@ -66,6 +66,22 @@ describe("App", () => {
     wrapper.unmount();
   });
 
+  it("clears stale result cards when the active input mode changes", async () => {
+    vi.mocked(apiService.explainIscc).mockRejectedValue(new Error("400: bad code"));
+    const wrapper = mountApp();
+    const intake = wrapper.findComponent(IntakeCard);
+
+    intake.vm.$emit("code-submit", "ISCC:KACYPXW445FTYNJ3");
+    await flushPromises();
+    expect(wrapper.findComponent(ResultCard).find(".alert-strip").text()).toContain("400: bad code");
+
+    intake.vm.$emit("mode-change", "text");
+    await flushPromises();
+    expect(wrapper.findComponent(ResultCard).exists()).toBe(false);
+    expect(wrapper.findComponent(EducationStrip).exists()).toBe(true);
+    wrapper.unmount();
+  });
+
   it("docks a second specimen for comparison and ejects it again", async () => {
     const wrapper = mountApp();
     const intake = wrapper.findComponent(IntakeCard);

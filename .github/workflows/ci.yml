@@ -11,7 +11,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main, v0.4.0]
+    branches: [main]
   workflow_dispatch:
 
 # Cancel stale in-flight PR runs; let branch-push runs complete so :main publishing isn't cancelled.

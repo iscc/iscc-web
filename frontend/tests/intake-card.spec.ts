@@ -1,7 +1,11 @@
 /** Tests for the intake instrument: tabs, toggles, validation and drop catcher. */
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { mount } from "@vue/test-utils";
 import IntakeCard from "../components/IntakeCard.vue";
+
+const injectConfig = (config: { semanticDefault?: boolean }) => {
+  (globalThis as typeof globalThis & { __ISCC_WEB__?: unknown }).__ISCC_WEB__ = config;
+};
 
 const tabButton = (wrapper: ReturnType<typeof mount>, label: string) => {
   const button = wrapper.findAll("button.intake-tab").find((b) => b.text().includes(label));
@@ -18,12 +22,28 @@ const dragEvent = (type: string, files: File[] = []) => {
 };
 
 describe("IntakeCard", () => {
+  afterEach(() => {
+    delete (globalThis as typeof globalThis & { __ISCC_WEB__?: unknown }).__ISCC_WEB__;
+  });
+
   it("shows the drop zone and toggles on the file tab by default", () => {
     const wrapper = mount(IntakeCard);
     expect(wrapper.find(".drop-zone").exists()).toBe(true);
     expect(wrapper.find("#semantic-toggle").exists()).toBe(true);
     expect(wrapper.find("#granular-toggle").exists()).toBe(true);
     wrapper.unmount();
+  });
+
+  it("initializes the semantic toggle from the injected runtime config", () => {
+    injectConfig({ semanticDefault: false });
+    const off = mount(IntakeCard);
+    expect((off.find("#semantic-toggle").element as HTMLInputElement).checked).toBe(false);
+    off.unmount();
+
+    injectConfig({ semanticDefault: true });
+    const on = mount(IntakeCard);
+    expect((on.find("#semantic-toggle").element as HTMLInputElement).checked).toBe(true);
+    on.unmount();
   });
 
   it("generates from plain text with the current toggle state", async () => {
@@ -66,6 +86,7 @@ describe("IntakeCard", () => {
   });
 
   it("emits file-added with the toggle state when files are added", async () => {
+    injectConfig({ semanticDefault: true });
     const wrapper = mount(IntakeCard);
     await wrapper.find("#granular-toggle").setValue(true);
 
@@ -77,7 +98,8 @@ describe("IntakeCard", () => {
     expect(emitted).toHaveLength(1);
     const [uppyFile, options] = emitted![0] as [{ name: string }, { semantic: boolean; granular: boolean }];
     expect(uppyFile.name).toBe("sample.txt");
-    expect(options).toMatchObject({ semantic: false, granular: true });
+    // semantic comes from the injected config; granular explicitly toggled on
+    expect(options).toMatchObject({ semantic: true, granular: true });
     wrapper.unmount();
   });
 

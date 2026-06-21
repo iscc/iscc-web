@@ -59,6 +59,16 @@ class IsccWebOptions(BaseSettings):
     )
     storage_expiry: int = Field(3600, description="Number of seconds after which uploaded files are deleted")
     cleanup_interval: int = Field(600, description="Interval in seconds for running file cleanup. Use 0 to deactivate")
+    semantic_default: bool = Field(
+        False,
+        description="Backend default for the `semantic` query param on POST /iscc when omitted. Off by "
+        "default - the Semantic-Code ISCC-UNIT is experimental and only applies to image and text media.",
+    )
+    ui_semantic_default: bool = Field(
+        True,
+        description="Initial state of the Semantic Code toggle in the bundled frontend. Independent of "
+        "`semantic_default`; the frontend always sends the toggle value explicitly per request.",
+    )
     log_level: str = Field("DEBUG", description="Set logging level")
     sentry_dsn: Optional[str] = Field(default="", description="Sentry DSN for error reporting")
 

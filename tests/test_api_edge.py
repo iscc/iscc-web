@@ -1,6 +1,7 @@
 """Edge-case tests against the live API server: upload validation, index page, explain errors."""
 
 import base64
+import re
 import shutil
 
 import httpx
@@ -19,6 +20,11 @@ def test_index_page():
     response = httpx.get(f"http://{server_host}:{server_port}/")
     assert response.status_code == codes.OK
     assert "<html" in response.text
+    # The frontend reads its initial toggle state and the storage-expiry copy from this
+    # injected config (defaults: semantic toggle on, 3600s expiry).
+    assert "window.__ISCC_WEB__" in response.text
+    assert re.search(r'"semanticDefault"\s*:\s*true', response.text)
+    assert re.search(r'"storageExpiry"\s*:\s*3600', response.text)
 
 
 def test_upload_missing_filename_header(api):

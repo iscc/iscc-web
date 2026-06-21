@@ -4,6 +4,7 @@ from typing import Optional
 import aiofile
 from blacksheep import Request, ContentDispositionType, Response
 from blacksheep.server.controllers import APIController, post, get
+from iscc_web import opts
 from iscc_web.api.mixins import FileHandler
 from iscc_web.api.common import base_url
 from loguru import logger as log
@@ -33,10 +34,13 @@ class Iscc(APIController, FileHandler):
         """
         Upload and create ISCC-CODE for media asset.
 
-        Omitted `semantic`/`granular` query params defer to the service defaults (semantic off,
-        granular on unless configured otherwise via ISCC_SDK_* environment variables); explicit
-        values override per request.
+        An omitted `semantic` query param resolves to the backend default (ISCC_WEB_SEMANTIC_DEFAULT,
+        off by default); an omitted `granular` param defers to the iscc-sdk default (on unless
+        configured otherwise via ISCC_SDK_GRANULAR). Explicit values override per request.
         """
+
+        if semantic is None:
+            semantic = opts.semantic_default
 
         result = await self.handle_upload(request)
         if isinstance(result, Response):

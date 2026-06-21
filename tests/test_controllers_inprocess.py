@@ -5,6 +5,7 @@ import types
 from concurrent.futures import Future
 
 import iscc_sdk as idk
+from blacksheep import Response
 
 import iscc_web.api.mixins as mixins
 import iscc_web.api.simprint as simprint_module
@@ -49,6 +50,50 @@ def _make_package(media_path, file_name="file.jpg", with_file=True):
     if with_file:
         (package / file_name).write_bytes(b"fake image data")
     return media_id
+
+
+def test_create_iscc_resolves_semantic_default(monkeypatch):
+    """An omitted `semantic` param resolves to opts.semantic_default; explicit values override it.
+
+    `granular` is left as None so the worker still defers to the iscc-sdk default.
+    """
+    monkeypatch.setattr(opts, "semantic_default", True)
+    captured = {}
+
+    async def fake_handle_upload(self, request):
+        return UploadMeta(media_id="x", file_name="file.jpg", content_type="image/jpeg", user="0" * 64)
+
+    async def fake_process_iscc(self, file_path, semantic=None, granular=None):
+        captured.update(semantic=semantic, granular=granular)
+        return Response(204)
+
+    monkeypatch.setattr(Iscc, "handle_upload", fake_handle_upload)
+    monkeypatch.setattr(Iscc, "process_iscc", fake_process_iscc)
+
+    asyncio.run(Iscc().create_iscc(None, semantic=None, granular=None))
+    assert captured == {"semantic": True, "granular": None}
+
+    asyncio.run(Iscc().create_iscc(None, semantic=False, granular=None))
+    assert captured == {"semantic": False, "granular": None}
+
+
+def test_code_iscc_defers_none_semantic_to_sdk_default(monkeypatch):
+    """A None `semantic` resolves to the iscc-sdk experimental default in the worker (fallback path).
+
+    The HTTP API resolves `semantic` to opts.semantic_default in the controller, so this worker-side
+    fallback is exercised directly here. iscc-sdk processing is stubbed to keep the test light.
+    """
+    captured = {}
+
+    def fake_code_iscc(fp, experimental, granular):
+        captured.update(experimental=experimental, granular=granular)
+        return types.SimpleNamespace(features=None)
+
+    monkeypatch.setattr(mixins.idk, "code_iscc", fake_code_iscc)
+    monkeypatch.setattr(mixins.idk.sdk_opts, "experimental", True)
+    result = mixins.code_iscc("file.jpg", semantic=None, granular=True)
+    assert captured["experimental"] is True  # resolved from sdk_opts.experimental
+    assert result.features is None
 
 
 def test_process_iscc_error_result(monkeypatch, tmp_path):

@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ISCC Generator - International Standard Content Code</title>
 
+    <script>window.__ISCC_WEB__ = {{ config | default({}) | tojson }};</script>
     {% vite_hmr_client %}
     {% vite_asset("main.ts") %}
   </head>

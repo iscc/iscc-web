@@ -11,7 +11,10 @@ import IntakeCard from "./components/IntakeCard.vue";
 import ResultCard from "./components/ResultCard.vue";
 import UiIcon from "./components/UiIcon.vue";
 import { apiService } from "./services/api.service";
+import { expiryLabel } from "./lib/config";
 
+// Static service config injected before mount; the storage-expiry window never changes per page.
+const expiry = expiryLabel();
 const specimens = ref<IsccWeb.Specimen[]>([]);
 let sequence = 0;
 
@@ -234,7 +237,7 @@ const compareOptionsFor = (specimen: IsccWeb.Specimen) =>
                 :size="15"
                 :stroke-width="2.2"
               )
-              span Files stay private to you and are #[b auto-deleted after one hour]
+              span Files stay private to you and are #[b auto-deleted after {{ expiry }}]
             li
               UiIcon(
                 name="image"

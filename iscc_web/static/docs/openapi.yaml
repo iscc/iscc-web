@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: ISCC-WEB Generator API
   description: Simple ISCC Generator Service
-  version: 0.3.1
+  version: 0.3.2
 servers:
 - url: /api/v1
 tags:
@@ -38,7 +38,7 @@ paths:
           that becomes part of the composite ISCC-CODE (5 units - Meta, Semantic, Content,
           Data, Instance - instead of 4). The resulting ISCC-CODE is not a standard ISO 24138
           identifier, and Semantic-Code algorithms may change before their v1.0 release. If
-          omitted, the service default applies (disabled unless configured otherwise via ISCC_SDK_EXPERIMENTAL).
+          omitted, the service default applies (disabled unless configured otherwise via ISCC_WEB_SEMANTIC_DEFAULT).
         required: false
         schema:
           type: boolean

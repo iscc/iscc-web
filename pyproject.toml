@@ -1,6 +1,6 @@
 [project]
 name = "iscc-web"
-version = "0.3.1"
+version = "0.3.2"
 description = "ISCC - Generator Web Application"
 authors = [{ name = "Titusz", email = "tp@py7.de" }]
 requires-python = ">=3.13"
@@ -62,6 +62,10 @@ dev = [
 
 [tool.uv]
 default-groups = "all"
+# onnxruntime 1.27.0 dropped CUDA 12 from its default PyPI wheels (moved to CUDA 13); the GPU image
+# base is nvidia/cuda:12.6.3-cudnn, so onnxruntime-gpu 1.27.0 fails to import there. Pin the whole
+# onnxruntime family to the last CUDA-12 release until the GPU base migrates to CUDA 13.
+constraint-dependencies = ["onnxruntime==1.26.0", "onnxruntime-gpu==1.26.0"]
 conflicts = [
     # The two image variants: cpu and gpu pull mutually-clobbering onnxruntime variant wheels.
     [{ extra = "cpu" }, { extra = "gpu" }],

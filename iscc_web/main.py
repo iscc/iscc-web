@@ -47,7 +47,10 @@ get = app.router.get
 
 @get("/")
 async def index():
-    return await view_async("index", {})
+    # Inject service config the frontend reads before mount (initial toggle state, storage
+    # expiry for the privacy copy, etc.).
+    config = {"semanticDefault": opts.ui_semantic_default, "storageExpiry": opts.storage_expiry}
+    return await view_async("index", {"config": config})
 
 
 async def logging_sink(msg):

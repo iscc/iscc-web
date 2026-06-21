@@ -6,6 +6,7 @@ import type { Meta, Body, UppyFile } from "@uppy/core";
 import XhrUpload from "@uppy/xhr-upload";
 import { Base64 } from "js-base64";
 import { computed, onMounted, onUnmounted, ref } from "vue";
+import { runtimeConfig } from "../lib/config";
 import { normalizeIscc } from "../lib/iscc";
 import { apiService } from "../services/api.service";
 import UiIcon from "./UiIcon.vue";
@@ -28,7 +29,8 @@ const emit = defineEmits<{
 }>();
 
 const tab = ref<"file" | "text" | "code">("file");
-const semantic = ref(false);
+// Initial toggle state comes from the backend (ISCC_WEB_UI_SEMANTIC_DEFAULT, true by default).
+const semantic = ref(runtimeConfig().semanticDefault);
 const granular = ref(false);
 const text = ref("");
 const codeInput = ref("");
@@ -253,7 +255,7 @@ const submitCode = () => {
           label.toggle-label(for="semantic-toggle")
             span Semantic code
             span.chip-experimental EXPERIMENTAL
-          .toggle-desc Adds a 5th unit from ML embeddings of #[i meaning]. Slower; the result is not a plain ISO 24138 code.
+          .toggle-desc Create experimental ML-based Semantic Code (images and text only).
       .toggle-row
         .form-check.form-switch.m-0
           input#granular-toggle.form-check-input(type="checkbox" v-model="granular")

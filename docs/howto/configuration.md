@@ -14,20 +14,22 @@ options accept the usual pydantic spellings (`true`/`false`, `1`/`0`).
 
 ## Option reference
 
-| Variable                    | Type   | Default                                | Description                                                                                                                   |
-| --------------------------- | ------ | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `ISCC_WEB_ENVIRONMENT`      | string | `development`                          | `development` or `production`. Development enables debug error details and resolves frontend assets from the Vite dev server. |
-| `ISCC_WEB_SITE_ADDRESS`     | URL    | `http://localhost:8000`                | Public site address. The dev server binds to its host/port; its origin is always CORS-allowed.                                |
-| `ISCC_WEB_MEDIA_PATH`       | path   | `media/` beside the `iscc_web` package | Directory for uploaded media packages (one subdirectory per upload).                                                          |
-| `ISCC_WEB_MAX_WORKERS`      | int    | CPU count                              | Max number of ISCC worker processes. See [Worker processes](#worker-processes-and-memory).                                    |
-| `ISCC_WEB_MAX_UPLOAD_SIZE`  | int    | `1073741824`                           | Max file size per upload in bytes (1 GB).                                                                                     |
-| `ISCC_WEB_IO_READ_SIZE`     | int    | `2097152`                              | File read chunk size in bytes (2 MB).                                                                                         |
-| `ISCC_WEB_PRIVATE_FILES`    | bool   | `true`                                 | Restrict file download/delete/embed to the original uploader. See [Private files](#private-files).                            |
-| `ISCC_WEB_CORS_ORIGINS`     | string | *(empty)*                              | Origins allowed for cross-origin API requests. Empty disables CORS. See [CORS origins](#cors-origins).                        |
-| `ISCC_WEB_STORAGE_EXPIRY`   | int    | `3600`                                 | Seconds after which uploaded files are deleted.                                                                               |
-| `ISCC_WEB_CLEANUP_INTERVAL` | int    | `600`                                  | Interval in seconds for the file cleanup task. `0` deactivates cleanup.                                                       |
-| `ISCC_WEB_LOG_LEVEL`        | string | `DEBUG`                                | Logging level (loguru level name, e.g. `INFO`).                                                                               |
-| `ISCC_WEB_SENTRY_DSN`       | string | *(empty)*                              | Optional Sentry DSN for error reporting.                                                                                      |
+| Variable                       | Type   | Default                                | Description                                                                                                                         |
+| ------------------------------ | ------ | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `ISCC_WEB_ENVIRONMENT`         | string | `development`                          | `development` or `production`. Development enables debug error details and resolves frontend assets from the Vite dev server.       |
+| `ISCC_WEB_SITE_ADDRESS`        | URL    | `http://localhost:8000`                | Public site address. The dev server binds to its host/port; its origin is always CORS-allowed.                                      |
+| `ISCC_WEB_MEDIA_PATH`          | path   | `media/` beside the `iscc_web` package | Directory for uploaded media packages (one subdirectory per upload).                                                                |
+| `ISCC_WEB_MAX_WORKERS`         | int    | CPU count                              | Max number of ISCC worker processes. See [Worker processes](#worker-processes-and-memory).                                          |
+| `ISCC_WEB_MAX_UPLOAD_SIZE`     | int    | `1073741824`                           | Max file size per upload in bytes (1 GB).                                                                                           |
+| `ISCC_WEB_IO_READ_SIZE`        | int    | `2097152`                              | File read chunk size in bytes (2 MB).                                                                                               |
+| `ISCC_WEB_PRIVATE_FILES`       | bool   | `true`                                 | Restrict file download/delete/embed to the original uploader. See [Private files](#private-files).                                  |
+| `ISCC_WEB_CORS_ORIGINS`        | string | *(empty)*                              | Origins allowed for cross-origin API requests. Empty disables CORS. See [CORS origins](#cors-origins).                              |
+| `ISCC_WEB_STORAGE_EXPIRY`      | int    | `3600`                                 | Seconds after which uploaded files are deleted.                                                                                     |
+| `ISCC_WEB_CLEANUP_INTERVAL`    | int    | `600`                                  | Interval in seconds for the file cleanup task. `0` deactivates cleanup.                                                             |
+| `ISCC_WEB_SEMANTIC_DEFAULT`    | bool   | `false`                                | Backend default for the `semantic` query param on `POST /iscc` when omitted. See [Semantic Code defaults](#semantic-code-defaults). |
+| `ISCC_WEB_UI_SEMANTIC_DEFAULT` | bool   | `true`                                 | Initial state of the Semantic Code toggle in the bundled frontend. See [Semantic Code defaults](#semantic-code-defaults).           |
+| `ISCC_WEB_LOG_LEVEL`           | string | `DEBUG`                                | Logging level (loguru level name, e.g. `INFO`).                                                                                     |
+| `ISCC_WEB_SENTRY_DSN`          | string | *(empty)*                              | Optional Sentry DSN for error reporting.                                                                                            |
 
 ## CORS origins
 
@@ -99,7 +101,7 @@ environment defaults before those libraries are imported. Worker processes inher
 of these variables you set explicitly takes precedence over the service default:
 
 ```shell
-ISCC_SDK_EXPERIMENTAL=false  # Semantic-Code ISCC-UNIT as part of the ISCC-CODE
+ISCC_SDK_EXPERIMENTAL=false  # iscc-sdk experimental default (API default is ISCC_WEB_SEMANTIC_DEFAULT)
 ISCC_SDK_GRANULAR=true       # granular fingerprints for ISCC-CODEs
 ISCC_SDK_BYTE_OFFSETS=true   # UTF-8 byte offsets (instead of characters) for granular features
 ISCC_SDK_ADD_UNITS=true      # ISCC-UNITs in the `units` field
@@ -119,14 +121,32 @@ ISCC_SCI_BITS=256            # bit-length of Semantic Image-Code units
 
 Two of these defaults can be overridden per request on `POST /api/v1/iscc`:
 
-| Query parameter | Service default         | Effect                                                                                                                   |
-| --------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `semantic`      | `ISCC_SDK_EXPERIMENTAL` | Adds an experimental Semantic-Code ISCC-UNIT to the composite ISCC-CODE (5 units — not a standard ISO 24138 identifier). |
-| `granular`      | `ISCC_SDK_GRANULAR`     | Includes granular simprint features in the `features` field.                                                             |
+| Query parameter | Service default             | Effect                                                                                                                   |
+| --------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `semantic`      | `ISCC_WEB_SEMANTIC_DEFAULT` | Adds an experimental Semantic-Code ISCC-UNIT to the composite ISCC-CODE (5 units — not a standard ISO 24138 identifier). |
+| `granular`      | `ISCC_SDK_GRANULAR`         | Includes granular simprint features in the `features` field.                                                             |
 
-Omitted query parameters resolve to the corresponding environment default; explicit values
+Omitted query parameters resolve to the corresponding service default; explicit values
 override it for that request only. See the [REST API reference](../reference/rest-api.md) for
 details.
+
+## Semantic Code defaults
+
+The Semantic-Code unit (experimental, image and text media only) has separate defaults for the
+backend API and the bundled frontend:
+
+- `ISCC_WEB_SEMANTIC_DEFAULT` (default `false`) is the backend default applied when a `POST /iscc`
+    request omits the `semantic` query param. Off by default so direct API callers get standard
+    ISO 24138 codes unless they opt in.
+- `ISCC_WEB_UI_SEMANTIC_DEFAULT` (default `true`) is the initial state of the Semantic Code toggle
+    in the bundled frontend. The frontend always sends the toggle value as an explicit `semantic`
+    param, so this setting is independent of `ISCC_WEB_SEMANTIC_DEFAULT` — it only controls how the
+    switch is rendered on page load.
+
+```shell
+ISCC_WEB_SEMANTIC_DEFAULT=false      # API default when ?semantic is omitted
+ISCC_WEB_UI_SEMANTIC_DEFAULT=true    # frontend toggle starts enabled
+```
 
 ### Further library options
 

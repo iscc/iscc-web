@@ -90,10 +90,11 @@ the `X-Upload-Filename` header. Applies to `POST /iscc` and `POST /media`.
 ### API behaviors to plan around
 
 - `semantic`/`granular` omitted on `POST /iscc` → service defaults apply (semantic off, granular
-    on, via `ISCC_SDK_EXPERIMENTAL`/`ISCC_SDK_GRANULAR`); explicit values override per request.
+    on, via `ISCC_WEB_SEMANTIC_DEFAULT`/`ISCC_SDK_GRANULAR`); explicit values override per request.
     `semantic=true` yields a 5-unit ISCC-CODE that is **not** a standard ISO 24138 identifier.
-- `POST /metadata/{media_id}` has no `semantic` param — it reprocesses with service defaults, so
-    embedding into a 5-unit result returns a 4-unit code.
+- `POST /metadata/{media_id}` has no `semantic` param — it reprocesses with the iscc-sdk worker
+    defaults (`ISCC_SDK_EXPERIMENTAL`, off by default), so embedding into a 5-unit result returns a
+    4-unit code.
 - Unsupported media types do not fail: they yield a 2-unit wide ISCC-SUM (Data + Instance)
     because `ISCC_SDK_FALLBACK=true` is the service default.
 - Uploads are ephemeral: a cleanup task deletes media packages older than

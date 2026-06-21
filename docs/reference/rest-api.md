@@ -49,7 +49,7 @@ ISCC-CODE, individual ISCC-UNITs, technical metadata, and a thumbnail where appl
 | Parameter           | In     | Type    | Required | Description                                                                                                                                                                                     |
 | ------------------- | ------ | ------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `X-Upload-Filename` | header | string  | yes      | Base64-encoded filename of the upload.                                                                                                                                                          |
-| `semantic`          | query  | boolean | no       | Add an experimental Semantic-Code ISCC-UNIT (text and image content) to the composite ISCC-CODE — 5 units instead of 4. Default: service setting `ISCC_SDK_EXPERIMENTAL` (ships `false`).       |
+| `semantic`          | query  | boolean | no       | Add an experimental Semantic-Code ISCC-UNIT (text and image content) to the composite ISCC-CODE — 5 units instead of 4. Default: service setting `ISCC_WEB_SEMANTIC_DEFAULT` (ships `false`).   |
 | `granular`          | query  | boolean | no       | Include granular simprint features in the `features` field (text content only; with `semantic=true` also semantic text simprints). Default: service setting `ISCC_SDK_GRANULAR` (ships `true`). |
 
 Request body: the raw file bytes (`application/octet-stream` or the file's actual media type).

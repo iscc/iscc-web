@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.3.2] - 2026-06-21
+
+- Added `ISCC_WEB_SEMANTIC_DEFAULT` to set the backend default for the `semantic` query parameter
+    on `POST /api/v1/iscc` when it is omitted (off by default), decoupled from the iscc-sdk
+    `ISCC_SDK_EXPERIMENTAL` default
+- Added `ISCC_WEB_UI_SEMANTIC_DEFAULT` to control the initial state of the Semantic Code toggle in
+    the bundled demo frontend (on by default)
+- The demo frontend now reads runtime configuration from the backend, so the Semantic Code toggle
+    default and the file auto-deletion notice follow the server settings (`ISCC_WEB_UI_SEMANTIC_DEFAULT`
+    and `ISCC_WEB_STORAGE_EXPIRY`) instead of hardcoded values
+
 ## [0.3.1] - 2026-06-14
 
 - Added an opt-in GPU Docker image variant published under `-gpu` tags (`:0.3.1-gpu`,

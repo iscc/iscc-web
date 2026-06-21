@@ -3,6 +3,7 @@
 // specimen preview (or code structure) and the per-layer experiment.
 import { computed, ref, watch } from "vue";
 import { UNIT_STYLE, type UnitKind, formatBytes, unitTypeLabel } from "../lib/iscc";
+import { expiryLabel } from "../lib/config";
 import { unitCopy } from "../lib/unit-copy";
 import { apiService } from "../services/api.service";
 import UiIcon from "./UiIcon.vue";
@@ -15,6 +16,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{ (e: "embed", formData: IsccWeb.MetadataFormData): void }>();
 
+const expiry = expiryLabel();
 const style = computed(() => UNIT_STYLE[props.kind]);
 const copy = computed(() => unitCopy(props.kind, props.specimen.metadata?.mode));
 const pillText = computed(
@@ -83,7 +85,7 @@ const previewFacts = computed(() => {
         .preview-facts
           .pf-name(v-text="specimen.label")
           .pf-meta(v-text="previewFacts")
-      .privacy-note Private to you · auto-deleted after one hour
+      .privacy-note Private to you · auto-deleted after {{ expiry }}
     .panel(v-else-if="specimen.explain")
       .panel-label Code structure
       dl.structure

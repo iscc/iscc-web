@@ -1,6 +1,6 @@
 [project]
 name = "iscc-web"
-version = "0.3.2"
+version = "0.3.3"
 description = "ISCC - Generator Web Application"
 authors = [{ name = "Titusz", email = "tp@py7.de" }]
 requires-python = ">=3.13"
@@ -14,9 +14,13 @@ dependencies = [
     "blacksheep>=2.6,<3",
     "uvicorn>=0.34",
     "aiofiles>=24.1",
-    "iscc-sdk[sct,sci]==0.9.3",
-    "iscc-core>=1.2.1",
-    "iscc-lib>=0.4.0",
+    # Not iscc-sdk[sct,sci]: since iscc-sdk 0.9.5 those extras request iscc-sct[cpu]/iscc-sci[cpu],
+    # which would put CPU onnxruntime into the gpu image. The bare libs carry no onnxruntime.
+    "iscc-sdk==0.9.6",
+    "iscc-sct>=0.2.0",
+    "iscc-sci>=0.3.0",
+    "iscc-core>=1.5.0",
+    "iscc-lib>=0.7.0",
     "xxhash>=3.5",
     "httpx>=0.28",
     "pathvalidate>=3.2",
@@ -32,8 +36,8 @@ dependencies = [
 
 [project.optional-dependencies]
 # onnxruntime now lives in the cpu|gpu extras of iscc-sct/iscc-sci (variant wheels that clobber
-# each other in site-packages). Pick exactly one per built image; never both. iscc-sdk[sct,sci]
-# forwards the bare libs; these extras attach the onnxruntime variant and the >=0.2.0/>=0.3.0 floor.
+# each other in site-packages). Pick exactly one per built image; never both. The base
+# dependencies carry the bare libs; these extras attach the onnxruntime variant and the >=0.2.0/>=0.3.0 floor.
 cpu = ["iscc-sct[cpu]>=0.2.0", "iscc-sci[cpu]>=0.3.0"]
 gpu = ["iscc-sct[gpu]>=0.2.0", "iscc-sci[gpu]>=0.3.0"]
 

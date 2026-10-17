@@ -6,6 +6,17 @@ description: Release history of the iscc-web microservice.
 
 # Changelog
 
+## [0.3.3] - 2026-10-18
+
+- Updated `iscc-core` to 1.5.0 and `iscc-lib` to 0.7.0 (now the minimum required versions), which
+    fix Image-Codes longer than 64 bits to follow ISO 24138:2024 - the 256-bit Image-Code units
+    returned with `units` change beyond the first 64 bits, while ISCC-CODEs and 64-bit units are
+    unaffected
+- Updated `iscc-sdk` to 0.9.6 - extracted text is no longer truncated at 500,000 characters
+    (Text-Codes and granular text features change for longer documents), granular text features
+    drop a final chunk shorter than the CDC minimum chunk size, M4A audio is supported, and several
+    image metadata extraction fixes change the Meta-Code for affected images
+
 ## [0.3.2] - 2026-06-21
 
 - Added `ISCC_WEB_SEMANTIC_DEFAULT` to set the backend default for the `semantic` query parameter

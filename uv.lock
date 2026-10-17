@@ -2,10 +2,10 @@ version = 1
 revision = 3
 requires-python = ">=3.13"
 resolution-markers = [
-    "extra != 'extra-8-iscc-web-cpu' and extra == 'extra-8-iscc-web-gpu' and extra != 'group-8-iscc-web-dev'",
     "python_full_version >= '3.14' and extra == 'extra-8-iscc-web-cpu' and extra != 'extra-8-iscc-web-gpu'",
-    "python_full_version < '3.14' and extra == 'extra-8-iscc-web-cpu' and extra != 'extra-8-iscc-web-gpu'",
     "python_full_version >= '3.14' and extra != 'extra-8-iscc-web-cpu' and extra != 'extra-8-iscc-web-gpu'",
+    "extra != 'extra-8-iscc-web-cpu' and extra == 'extra-8-iscc-web-gpu' and extra != 'group-8-iscc-web-dev'",
+    "python_full_version < '3.14' and extra == 'extra-8-iscc-web-cpu' and extra != 'extra-8-iscc-web-gpu'",
     "python_full_version < '3.14' and extra != 'extra-8-iscc-web-cpu' and extra != 'extra-8-iscc-web-gpu'",
 ]
 conflicts = [[
@@ -832,7 +832,7 @@ wheels = [
 
 [[package]]
 name = "iscc-core"
-version = "1.3.0"
+version = "1.5.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "base58" },
@@ -848,23 +848,32 @@ dependencies = [
     { name = "uvarint" },
     { name = "xxhash" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/53/11/13cdef46ff83aefb68ff740ab88395357a88bdb45c3951121013c46fa6b9/iscc_core-1.3.0.tar.gz", hash = "sha256:0fd19d4586225440401b07e45b5a38fe46d9953eb7c36fa7467b6ea72d0c4141", size = 94854, upload-time = "2026-03-02T18:02:44.765Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a8/45/08f163a5eb22d7d2d1185886c3b9d9a82164d58f4b6d9d07d5b57575bc48/iscc_core-1.5.0.tar.gz", hash = "sha256:282ad55a469abe61044a4cdd6dc80dd6285a237c57872c75897466d083257741", size = 101462, upload-time = "2026-10-17T07:57:44.254Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/76/59/b665ab8244eea3bd4d63ef3a9588ad4cb91ce16a098e0b66405a35f44ad1/iscc_core-1.3.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:109ae955d44eb704ac86f5e9bc8ed55617e0bf71e9b25ac947e1c319a7b9e3fe", size = 697486, upload-time = "2026-03-02T18:02:32.842Z" },
-    { url = "https://files.pythonhosted.org/packages/d4/6d/454f7c4406f9df8605d22b12a8dbdf0fab3968224c2cf287b511d2835ed2/iscc_core-1.3.0-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:19a862e953f337b3ab114d9359080e08b2ca9f29d261d169c4175b296680fcc9", size = 1576641, upload-time = "2026-03-02T18:02:34.061Z" },
-    { url = "https://files.pythonhosted.org/packages/f0/6a/58a198359598cdcbd4e1ba7e5fc14ef9d3dde9fa8fd50f677841e46ce57b/iscc_core-1.3.0-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:ee7208c401da944bceba9c7f59553e7b69fdbf4a8fb22d7ece1aa1cc879d5f39", size = 1595417, upload-time = "2026-03-02T18:02:35.472Z" },
-    { url = "https://files.pythonhosted.org/packages/29/d1/6fb09748325a5723baa1fca2a6b18f1183d4772d6ac61427d6781b301bea/iscc_core-1.3.0-cp313-cp313-win_amd64.whl", hash = "sha256:197c05156da873c18cffb7ff8d674534caed7cdca6147d38ffc99649f205a862", size = 686750, upload-time = "2026-03-02T18:02:36.756Z" },
+    { url = "https://files.pythonhosted.org/packages/88/91/3eb4a4601c6c1de2dbcdabde8001f6209bfe5d138d92c00c114c782cd175/iscc_core-1.5.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:daa5c9d727771b464a58b6b542485b08c9ab8037cec45b26a2d97ba8800bf889", size = 743678, upload-time = "2026-10-17T07:57:18.496Z" },
+    { url = "https://files.pythonhosted.org/packages/b3/95/4f7f7fc78a3b4ebc01362ac4e03b1dcadbfd05121c7f83e0815ca8e480b4/iscc_core-1.5.0-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:ea0bbad20f7465304d2b27a499d34b4f7525170de938b4a853fb07bac632e6a5", size = 1748712, upload-time = "2026-10-17T07:57:20.154Z" },
+    { url = "https://files.pythonhosted.org/packages/28/e9/7edbd98c43248345fee0655837d62ced77d29fd8e9ad3cf72d9dea783198/iscc_core-1.5.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:bb93f1dd5d7f2c2b68cd1c0b2816d526e08ac29fd26358c9af6f7313e175bfd1", size = 1765018, upload-time = "2026-10-17T07:57:21.467Z" },
+    { url = "https://files.pythonhosted.org/packages/34/48/e6de7b0f94d9075b3af412ab63b1264b9afdd7cee0e449f077d401f47a90/iscc_core-1.5.0-cp313-cp313-musllinux_1_2_aarch64.whl", hash = "sha256:77352ccded8e6c21e733b578ff109e36da6de84487e98c75b45f7fda9a063b67", size = 1728887, upload-time = "2026-10-17T07:57:22.83Z" },
+    { url = "https://files.pythonhosted.org/packages/e6/29/dcc281c86b36b53b52877cc580eca3ab3fac5affacbb876f9aaf0d3ed3e2/iscc_core-1.5.0-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:a98a47538809a2f92e732e4527e486f2869e7f3fdf40bffd22154e803a9f6017", size = 1763719, upload-time = "2026-10-17T07:57:24.381Z" },
+    { url = "https://files.pythonhosted.org/packages/32/3f/f0ed531d3bcc6989b3fd951008f348f0ad59429b4813c6527bcf3773fd9c/iscc_core-1.5.0-cp313-cp313-win_amd64.whl", hash = "sha256:63489cd87b9e61f022377344da1111c295b62afe83817dfe2a39565a32409ea2", size = 719450, upload-time = "2026-10-17T07:57:25.865Z" },
+    { url = "https://files.pythonhosted.org/packages/77/49/a78d02105cc72c3902f6aa83354d0f6249a72086a1faf85d6ccfd75b284a/iscc_core-1.5.0-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:3bc109085b3794206e29827cc1b50f691632c46e343674c7a91b80caa8eb15f1", size = 744752, upload-time = "2026-10-17T07:57:27.233Z" },
+    { url = "https://files.pythonhosted.org/packages/63/c1/1b9f97896859d46606b6e2ffe6b5ea16f6427d5ed76952ba857b98916db7/iscc_core-1.5.0-cp314-cp314-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:b17f42f12a4ea3934bc8bbed24de8b49546d33b67c64868a21ef8af06ffd0b2c", size = 1746035, upload-time = "2026-10-17T07:57:28.624Z" },
+    { url = "https://files.pythonhosted.org/packages/36/35/d5f0974d4ed41b38f9a8824355965c6d6358fbb09760646e43f51f2d0e6a/iscc_core-1.5.0-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:1e0450d8b2210a6fe4253456407d86d7a7ceda267118b2f9fbab84f2dd2e77ce", size = 1754268, upload-time = "2026-10-17T07:57:30.375Z" },
+    { url = "https://files.pythonhosted.org/packages/7a/66/76d19624799af6db3ceb5bc805b747972e8d08c69e07fb4c1cebea5a9860/iscc_core-1.5.0-cp314-cp314-musllinux_1_2_aarch64.whl", hash = "sha256:718a0fb460ecdb488e6c4961e4e5ede05b343a53478c8446acc884e214fb58e7", size = 1726548, upload-time = "2026-10-17T07:57:31.73Z" },
+    { url = "https://files.pythonhosted.org/packages/a4/ea/16a6ac0413a62b034f95c97a125b0f83e2f829895091571091a4b3af9367/iscc_core-1.5.0-cp314-cp314-musllinux_1_2_x86_64.whl", hash = "sha256:390c06f6ac58170d97ddebc3c6b1816ec9473d9a1126106f959004de81aad65d", size = 1753114, upload-time = "2026-10-17T07:57:33.195Z" },
+    { url = "https://files.pythonhosted.org/packages/0f/e6/2c0d6863f0658c2a566a9d5bed92698d774f837ee879e74178192bcf7461/iscc_core-1.5.0-cp314-cp314-win_amd64.whl", hash = "sha256:03c3eab24e9d3eff570d4dc1ce63fe0585a6372278fa6f80a9c6b4d3e0100e96", size = 722870, upload-time = "2026-10-17T07:57:34.532Z" },
 ]
 
 [[package]]
 name = "iscc-lib"
-version = "0.5.0"
+version = "0.7.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/c3/72/e815e72deca85daaedd7a4a74464818e3204af9fe9ed2cf703ce0dfd27a9/iscc_lib-0.5.0.tar.gz", hash = "sha256:a9a0376f3cb715f3b21cf7cd4779c7e41e30959350bd458101b61c2a7003d52b", size = 110214, upload-time = "2026-06-18T19:07:40.226Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d4/84/8481efc3d48533e539243f364485ad24dcc761991f1b925e296453a23c0c/iscc_lib-0.7.0.tar.gz", hash = "sha256:d7a31a48a2efe515798216b76f750dc18949204cead7ddcc2730256324ca3b54", size = 119966, upload-time = "2026-10-17T19:19:19.909Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/87/90/aeb1eae164f156c47cd30765ba0d6273559da7acc3d0269edeebfdd69692/iscc_lib-0.5.0-cp310-abi3-macosx_10_12_x86_64.macosx_11_0_arm64.macosx_10_12_universal2.whl", hash = "sha256:9bf6dd3b3236714df427d786c5eca2ab221105e017091c4a26b0cf5515e673d0", size = 972579, upload-time = "2026-06-18T19:07:35.861Z" },
-    { url = "https://files.pythonhosted.org/packages/79/37/7b4db3c0575f7ffd0a3e47d508b5d322bc4951995eca1711f9c34f81beef/iscc_lib-0.5.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:5da17d975a7fa638269b605c6001345e07cc4718b79540ca6cefd43b7a6af360", size = 530373, upload-time = "2026-06-18T19:07:37.445Z" },
-    { url = "https://files.pythonhosted.org/packages/1b/7c/26eb1f95ac52b707419e4399860ee0b6d76b50afa5b666a140c18e8321ad/iscc_lib-0.5.0-cp310-abi3-win_amd64.whl", hash = "sha256:444caff1c7654e11df43d2ceaea5dd45bdacc3a71a61412f4890fae80d86bcba", size = 430283, upload-time = "2026-06-18T19:07:39.006Z" },
+    { url = "https://files.pythonhosted.org/packages/d7/f6/4dfa6a706222470ca070765fa00bbe921bbad05386f9c5120ba105dfdad1/iscc_lib-0.7.0-cp310-abi3-macosx_10_12_x86_64.macosx_11_0_arm64.macosx_10_12_universal2.whl", hash = "sha256:9e0d8fa7f0def17b9da0340040b94ff3dcc4dd3b582cfee7e9331eca840d66b4", size = 987957, upload-time = "2026-10-17T19:19:14.01Z" },
+    { url = "https://files.pythonhosted.org/packages/93/74/0929fa87b5a96c307c1db68d2797cb279d186ffa848317989def7020ab9d/iscc_lib-0.7.0-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:674c00317fa632e6dcae53baa787c9952e3573f4cfcfadc0e4e48fbb51a683c7", size = 499564, upload-time = "2026-10-17T19:19:15.693Z" },
+    { url = "https://files.pythonhosted.org/packages/61/30/5c6995c9a05c8dda4665c27fec412ad3d363d9d8fbce3f3044f77a34754e/iscc_lib-0.7.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:337b436751644c73b1af28a526ade57bd2a7842947a67c4e9fe29c32226163d0", size = 535142, upload-time = "2026-10-17T19:19:16.919Z" },
+    { url = "https://files.pythonhosted.org/packages/94/fa/f59427460a6a6b73a20862b1afc58622f288fbb64fbf66c9a30b5da69f2e/iscc_lib-0.7.0-cp310-abi3-win_amd64.whl", hash = "sha256:a4f1892a1a0be65a8819dc9063a97dc08651163f982df70999cac83d1948abd7", size = 441679, upload-time = "2026-10-17T19:19:18.458Z" },
 ]
 
 [[package]]
@@ -943,7 +952,7 @@ gpu = [
 
 [[package]]
 name = "iscc-sdk"
-version = "0.9.3"
+version = "0.9.6"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "bitarray" },
@@ -972,17 +981,9 @@ dependencies = [
     { name = "typer" },
     { name = "xxhash" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d4/7f/795fbddba86acddab67b225cfefb7db844140a823e94f795f8c11808365c/iscc_sdk-0.9.3.tar.gz", hash = "sha256:f49e52ad4986959641e28ca6e3b5455f4452884643dfa9f873273164b7d2b346", size = 47780, upload-time = "2026-06-04T11:20:59.373Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/cd/d4/23b6fd77f8fa41fa6cb0adc76a44fa8ffdf15f4dddd1300b7c20fc82ab06/iscc_sdk-0.9.6.tar.gz", hash = "sha256:7fda3087f98c7efb936caeb0448794424cd59dcdd9561e439193efa688e1d059", size = 50994, upload-time = "2026-10-17T21:38:38.042Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/8d/6f/e470a326c0a3f34e98eb9ca584c000f26f70546ee948e113f652dfaf391f/iscc_sdk-0.9.3-py3-none-any.whl", hash = "sha256:a115b353703e7242ca87bf26f2f119aad62bd62370ea37ec6aeabed3f9e4b718", size = 56776, upload-time = "2026-06-04T11:20:58.066Z" },
-]
-
-[package.optional-dependencies]
-sci = [
-    { name = "iscc-sci" },
-]
-sct = [
-    { name = "iscc-sct" },
+    { url = "https://files.pythonhosted.org/packages/35/8e/5f8bbc572e6fca06b4713a6b3a7f1429316520e834ee24a85784b095d586/iscc_sdk-0.9.6-py3-none-any.whl", hash = "sha256:63efcc184759c331ff4600969b97c0837f858795b6ef38935196de01347987a3", size = 58167, upload-time = "2026-10-17T21:38:36.509Z" },
 ]
 
 [[package]]
@@ -998,7 +999,7 @@ wheels = [
 
 [[package]]
 name = "iscc-web"
-version = "0.3.2"
+version = "0.3.3"
 source = { editable = "." }
 dependencies = [
     { name = "aiofile" },
@@ -1008,7 +1009,9 @@ dependencies = [
     { name = "httpx" },
     { name = "iscc-core" },
     { name = "iscc-lib" },
-    { name = "iscc-sdk", extra = ["sci", "sct"] },
+    { name = "iscc-sci" },
+    { name = "iscc-sct" },
+    { name = "iscc-sdk" },
     { name = "jinja2-simple-tags" },
     { name = "pathvalidate" },
     { name = "pydantic" },
@@ -1053,13 +1056,15 @@ requires-dist = [
     { name = "blacksheep", specifier = ">=2.6,<3" },
     { name = "gunicorn", specifier = ">=23" },
     { name = "httpx", specifier = ">=0.28" },
-    { name = "iscc-core", specifier = ">=1.2.1" },
-    { name = "iscc-lib", specifier = ">=0.4.0" },
+    { name = "iscc-core", specifier = ">=1.5.0" },
+    { name = "iscc-lib", specifier = ">=0.7.0" },
+    { name = "iscc-sci", specifier = ">=0.3.0" },
     { name = "iscc-sci", extras = ["cpu"], marker = "extra == 'cpu'", specifier = ">=0.3.0" },
     { name = "iscc-sci", extras = ["gpu"], marker = "extra == 'gpu'", specifier = ">=0.3.0" },
+    { name = "iscc-sct", specifier = ">=0.2.0" },
     { name = "iscc-sct", extras = ["cpu"], marker = "extra == 'cpu'", specifier = ">=0.2.0" },
     { name = "iscc-sct", extras = ["gpu"], marker = "extra == 'gpu'", specifier = ">=0.2.0" },
-    { name = "iscc-sdk", extras = ["sct", "sci"], specifier = "==0.9.3" },
+    { name = "iscc-sdk", specifier = "==0.9.6" },
     { name = "jinja2-simple-tags", specifier = ">=0.6" },
     { name = "pathvalidate", specifier = ">=3.2" },
     { name = "pydantic", specifier = ">=2.10" },

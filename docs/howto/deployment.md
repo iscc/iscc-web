@@ -166,12 +166,25 @@ through Caddy on the internal Compose network.
     Conversely, never set `FORWARDED_ALLOW_IPS=*` on a service whose application port is
     directly reachable from the internet, since clients could then spoof their IP via headers.
 
+## Health check
+
+Both images declare a Docker `HEALTHCHECK` that probes
+[`GET /health`](../reference/rest-api.md#get-health) with the image's own Python. The endpoint
+answers `503` until the ONNX models are loaded in all ISCC workers, and on the GPU image also when
+the models fell back to CPU (for example after an NVIDIA driver update broke CUDA). The container
+reports `healthy` once the endpoint answers `200`; `docker compose ps` shows the state.
+
+The check probes every 30 seconds (every 5 seconds during a 120-second start period, where failed
+probes do not count) and marks the container `unhealthy` after three consecutive failures. External
+monitors can poll the same endpoint — it answers from cached state and stays fast while workers are
+busy.
+
 ## Resource sizing
 
 CPU-bound ISCC processing runs in a pool of worker processes. `ISCC_WEB_MAX_WORKERS` caps the
-pool size and defaults to the CPU count. Each worker lazy-loads the iscc-sdk toolchain and — when
-semantic features are requested — the iscc-sct/iscc-sci ONNX models, which can take several
-hundred MB of RAM per worker. Lower `ISCC_WEB_MAX_WORKERS` on memory-constrained hosts.
+pool size and defaults to the CPU count. All workers start with the service and load the
+iscc-sdk toolchain and the iscc-sct/iscc-sci ONNX models up front — roughly 1 GB of RAM per
+worker on CPU. Set `ISCC_WEB_MAX_WORKERS` explicitly on many-core or memory-constrained hosts.
 
 Also budget for uploads: files up to `ISCC_WEB_MAX_UPLOAD_SIZE` (default 1 GB) are kept on disk
 inside the container until the cleanup task removes them after `ISCC_WEB_STORAGE_EXPIRY` seconds.

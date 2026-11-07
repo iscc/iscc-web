@@ -2,12 +2,13 @@
 import asyncio
 import uvicorn
 from blacksheep import Application, Route
-from blacksheep.server.responses import view_async
+from blacksheep.server.responses import json, view_async
 from jinja2 import PackageLoader
 import pathlib
 from iscc_web.vite import register_extensions
 from iscc_web.options import opts
 from iscc_web.api.pool import Pool
+from iscc_web import health
 from loguru import logger as log
 from iscc_web.cleanup import cleanup_task
 from blacksheep.server.rendering.jinja2 import JinjaRenderer
@@ -43,6 +44,7 @@ Route.value_patterns["mid"] = r"[a-v0-9]{13}$"
 Route.value_patterns["iscc"] = r"ISCC:[A-Z2-7]{10,73}$"
 
 get = app.router.get
+background_tasks = set()
 
 
 @get("/")
@@ -51,6 +53,13 @@ async def index():
     # expiry for the privacy copy, etc.).
     config = {"semanticDefault": opts.ui_semantic_default, "storageExpiry": opts.storage_expiry}
     return await view_async("index", {"config": config})
+
+
+@get("/health")
+async def health_check():
+    """Readiness probe for monitors and the Docker HEALTHCHECK - answers from cached warm-up state."""
+    status, body = health.report(health.state, opts.build_version, opts.build_revision)
+    return json(body, status=status)
 
 
 async def logging_sink(msg):
@@ -71,6 +80,14 @@ async def configure_cleanup(application):
     else:
         log.info(f"Install cleanup task with {opts.cleanup_interval} seconds interval", enqueue=True)
         asyncio.get_event_loop().create_task(cleanup_task())
+
+
+@app.after_start
+async def warm_up_models(application):
+    """Load the ONNX models in all pool workers in the background; /health answers 503 until done."""
+    pool = application.services.provider[Pool]
+    # Keep a reference - the event loop holds tasks only weakly.
+    background_tasks.add(asyncio.get_running_loop().create_task(health.warm_up(pool, pool.max_workers)))
 
 
 @app.on_stop

@@ -2,6 +2,13 @@
 
 ## [0.4.0] - Unreleased
 
+- Added `GET /health` (at the site root) as a readiness probe: it reports whether the
+    semantic-code ONNX models are loaded, which execution provider they run on, and the image
+    version and revision, and answers `503` while models load or when a GPU image's models fell
+    back to CPU. Both Docker images declare a matching `HEALTHCHECK`
+- All ISCC worker processes now start with the service and load the ONNX models up front instead
+    of on first use, so no request waits for a model load (about 700 MB of RAM per worker on CPU;
+    set `ISCC_WEB_MAX_WORKERS` on many-core hosts)
 - Requires Python 3.14; the Docker images run CPython 3.14.10 (`python:3.14-slim` on Debian
     trixie for the CPU image, a uv-managed CPython on the CUDA base for the GPU image)
 - Updated `iscc-sdk` to 0.9.7, `iscc-sci` to 0.4.1, `iscc-sct` to 0.2.2 and `iscc-tika` to 0.6.0;

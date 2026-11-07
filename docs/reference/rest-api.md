@@ -5,7 +5,8 @@ description: Complete REST API reference - endpoints, parameters, headers, respo
 
 # REST API
 
-All endpoints live under the base path `/api/v1`. The OpenAPI 3.0 document at
+All endpoints live under the base path `/api/v1`, except the [`GET /health`](#get-health)
+readiness probe at the site root. The OpenAPI 3.0 document at
 `iscc_web/static/docs/openapi.yaml` is the source of truth for the API; every running instance
 serves interactive API documentation (Stoplight Elements) at `/docs` and the raw spec at
 `/docs/openapi.yaml`. Examples below target a local instance at `http://localhost:8000` — the
@@ -38,6 +39,7 @@ See [Configuration](../howto/configuration.md) for all `ISCC_WEB_*` and `ISCC_SD
 | `POST`   | `/metadata/{media_id}` | Embed metadata into a copy of a file and re-create its ISCC |
 | `GET`    | `/explain/{iscc}`      | Decompose an ISCC into its units and representations        |
 | `POST`   | `/simprint`            | Create granular simprints from plain text                   |
+| `GET`    | `/health` (site root)  | Readiness probe: model warm-up, execution provider, version |
 
 ## ISCC
 
@@ -350,5 +352,47 @@ Response (`200`):
   "SEMANTIC_TEXT_V0": [
     "emhK25dQAqnkcdcMuworif5t5GzDy8A3zmlDCEdAyWk"
   ]
+}
+```
+
+## Health
+
+### GET /health
+
+Readiness probe for monitors and container health checks. It lives at the site root
+(`http://localhost:8000/health`), not under `/api/v1`, and answers from cached state — no
+inference per request, so it stays fast while ISCC workers are busy.
+
+At startup the service loads the iscc-sct and iscc-sci ONNX models in every ISCC worker process.
+The endpoint returns `200` once they are loaded and run on the expected execution provider. If the
+installed onnxruntime build offers CUDA (the GPU image), every model must actually run on
+`CUDAExecutionProvider` — onnxruntime silently falls back to CPU when CUDA fails to initialize,
+and the service would keep working, only slowly.
+
+| Status | `status`   | Meaning                                                     |
+| ------ | ---------- | ----------------------------------------------------------- |
+| `200`  | `ok`       | Models loaded on the expected execution provider.           |
+| `503`  | `starting` | Models are still loading.                                   |
+| `503`  | `degraded` | The onnxruntime build offers CUDA, but a model runs on CPU. |
+| `503`  | `error`    | Loading the models failed (details in the service log).     |
+
+Response fields: `status`, `version` and `revision` (the image's
+`org.opencontainers.image.version`/`.revision` labels, `null` for local builds),
+`execution_provider` (the slowest provider any model runs on, `null` until loaded) and
+`models_loaded`.
+
+```shell
+curl http://localhost:8000/health
+```
+
+Response (`200`, GPU image):
+
+```json
+{
+  "status": "ok",
+  "version": "0.4.0-gpu",
+  "revision": "1bb0c619a73069023df02decf529c3d20a0c34ae",
+  "execution_provider": "CUDAExecutionProvider",
+  "models_loaded": true
 }
 ```

@@ -187,6 +187,41 @@ class IsccDetail(BaseModel):
     units: list[Unit] | None = Field(None, description="Different representations of the individial units of the ISCC")
 
 
+class Status(StrEnum):
+    ok = "ok"
+    starting = "starting"
+    degraded = "degraded"
+    error = "error"
+
+
+class Health(BaseModel):
+    status: Status = Field(
+        ...,
+        description="`ok` (ready), `starting` (models loading), `degraded` (CUDA offered but a model runs on CPU) or `error` (models failed to load).",
+        examples=["ok"],
+    )
+    version: str | None = Field(
+        None,
+        description="Image version (same as the `org.opencontainers.image.version` label); null for local builds.",
+        examples=["0.4.0-gpu"],
+    )
+    revision: str | None = Field(
+        None,
+        description="Git commit the image was built from (same as the `org.opencontainers.image.revision` label); null for local builds.",
+        examples=["1bb0c619a73069023df02decf529c3d20a0c34ae"],
+    )
+    execution_provider: str | None = Field(
+        None,
+        description="ONNX Runtime execution provider the models run on (the slowest one if they differ); null until the models are loaded.",
+        examples=["CUDAExecutionProvider"],
+    )
+    models_loaded: bool = Field(
+        ...,
+        description="Whether the semantic-code ONNX models are loaded in all ISCC worker processes.",
+        examples=[True],
+    )
+
+
 class TechnicalMetadata(BaseModel):
     mode: Mode | None = Field(None, description="The perceptual mode used to create the ISCC.", examples=["image"])
     filename: str | None = Field(

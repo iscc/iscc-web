@@ -11,10 +11,12 @@ from tests.conftest import server_api_path, server_host, server_port
 
 HERE = pathlib.Path(__file__).parent.absolute()
 SCHEMA_PATH = HERE.parent / "iscc_web/static/docs/openapi.yaml"
+# GET /health lives at the site root (not under the /api/v1 base) and answers 503 until the model
+# warm-up finished, so it is covered by tests/test_health.py instead.
 schema = schemathesis.openapi.from_path(
     SCHEMA_PATH,
     config=Config(suppress_health_check=[HealthCheck.too_slow]),
-)
+).exclude(path="/health")
 schema.location = f"http://{server_host}:{server_port}/{server_api_path}"
 
 

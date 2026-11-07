@@ -117,10 +117,13 @@ Two properties of the pool matter operationally:
 - **Self-healing** — if a worker dies (out-of-memory kill, crash in a native library), the executor
     raises `BrokenProcessPool`. `Pool.submit` catches it, discards the broken executor, creates a
     fresh one, and retries the submission once.
-- **Lazy loading** — worker processes import `iscc-sdk` (and, for semantic features, the
-    `iscc-sct`/`iscc-sci` ONNX models) on first use. The first ISCC or simprint request per worker is
-    therefore noticeably slower, and each warm worker holds several hundred MB of RAM. The worker
-    count is capped via `ISCC_WEB_MAX_WORKERS` (default: CPU count).
+- **Warm-up** — every worker loads `iscc-sdk` and the `iscc-sct`/`iscc-sci` ONNX models in its
+    initializer, before it takes its first job, so no request reaches a cold worker. After startup
+    the service downloads any missing model files once, then submits one probe per worker
+    (`iscc_web/health.py`), which starts all workers and reports which execution provider the models
+    run on; `GET /health` answers `503` until the probes finish and flags a GPU image whose models
+    fell back to CPU. Each warm worker holds several hundred MB of RAM; the worker count is capped
+    via `ISCC_WEB_MAX_WORKERS` (default: CPU count).
 
 `iscc_web/options.py` seeds `ISCC_SDK_*`, `ISCC_SCT_*` and `ISCC_SCI_*` environment defaults with
 `os.environ.setdefault` before those libraries are imported, so workers inherit consistent

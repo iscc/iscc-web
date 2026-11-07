@@ -170,6 +170,13 @@ jobs:
           curl -sf http://localhost:8000/ > /dev/null
           # Backend API answers: explain a known ISCC
           curl -sf "http://localhost:8000/api/v1/explain/ISCC:KMDMRJYGHHVRCZ5TM6U4G6D4MXA6LAXC4ZRPOKFU7JBEQXR2BJOS6NA"
+          # Docker HEALTHCHECK turns healthy once GET /health answers 200 (ONNX models loaded)
+          for i in $(seq 1 60); do
+            [ "$(docker inspect --format '{{.State.Health.Status}}' iscc-web-smoke)" = healthy ] && break
+            sleep 2
+          done
+          curl -sf http://localhost:8000/health && echo
+          [ "$(docker inspect --format '{{.State.Health.Status}}' iscc-web-smoke)" = healthy ]
 
   # Publish the :main image on pushes to main, after all checks pass. Nothing auto-pulls
   # :main, so this is safe by itself. `latest=false` is deliberate: demo.iscc.io pins
@@ -213,6 +220,10 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          # GET /health reports the same version/revision as the OCI labels.
+          build-args: |
+            VERSION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
+            REVISION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.revision'] }}
           cache-from: type=gha
 
   # Build the opt-in CUDA image. Runs on pushes (main + the working branch) and manual dispatch,
@@ -258,6 +269,10 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          # GET /health reports the same version/revision as the OCI labels.
+          build-args: |
+            VERSION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
+            REVISION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.revision'] }}
           # Separate gha cache scope so the CUDA layers never evict the CPU image's cache.
           cache-from: type=gha,scope=gpu
           cache-to: type=gha,mode=max,scope=gpu

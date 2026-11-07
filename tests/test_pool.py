@@ -16,6 +16,24 @@ class BrokenExecutor:
         pass
 
 
+def models_cached():
+    # type: () -> bool
+    """Whether this process already holds both ONNX inference sessions (runs in a pool worker)."""
+    import iscc_sci.code_semantic_image as image
+    import iscc_sct.code_semantic_text as text
+
+    return image._model is not None and text.model.cache_info().currsize == 1
+
+
+def test_pool_workers_load_models_before_their_first_job(monkeypatch):
+    monkeypatch.setattr(pool_module.opts, "max_workers", 1)
+    pool = Pool()
+    try:
+        assert pool.submit(models_cached).result(timeout=120) is True
+    finally:
+        pool.shutdown(wait=True)
+
+
 def test_pool_submit(monkeypatch):
     monkeypatch.setattr(pool_module.opts, "max_workers", 1)
     pool = Pool()

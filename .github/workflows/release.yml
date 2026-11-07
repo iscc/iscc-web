@@ -98,6 +98,10 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          # GET /health reports the same version/revision as the OCI labels.
+          build-args: |
+            VERSION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
+            REVISION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.revision'] }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -122,5 +126,9 @@ jobs:
           push: true
           tags: ${{ steps.meta-gpu.outputs.tags }}
           labels: ${{ steps.meta-gpu.outputs.labels }}
+          # GET /health reports the same version/revision as the OCI labels.
+          build-args: |
+            VERSION=${{ fromJSON(steps.meta-gpu.outputs.json).labels['org.opencontainers.image.version'] }}
+            REVISION=${{ fromJSON(steps.meta-gpu.outputs.json).labels['org.opencontainers.image.revision'] }}
           cache-from: type=gha,scope=gpu
           cache-to: type=gha,mode=max,scope=gpu

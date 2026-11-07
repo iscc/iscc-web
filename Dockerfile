@@ -84,6 +84,17 @@ WORKDIR /app
 
 EXPOSE 8000/tcp
 
+# Build metadata reported by GET /health: the same values as the OCI version/revision labels (CI passes
+# them as build args), empty for local builds. Declared late so a new revision only rebuilds this layer.
+ARG VERSION=""
+ARG REVISION=""
+ENV ISCC_WEB_BUILD_VERSION=${VERSION} ISCC_WEB_BUILD_REVISION=${REVISION}
+
+# Readiness probe with the image's own Python (no curl needed). GET /health answers 503 until the ONNX
+# models are loaded in all ISCC workers; failed probes within the start period do not count.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=120s --start-interval=5s --retries=3 \
+  CMD ["python", "-c", "import os, urllib.request as r; r.urlopen('http://127.0.0.1:%s/health' % os.environ.get('PORT', '8000'), timeout=4)"]
+
 CMD ["gunicorn", "iscc_web.main:app", "-k", "uvicorn_worker.UvicornWorker"]
 
 #
@@ -139,5 +150,16 @@ COPY . /app/
 COPY --from=frontend-build /app/iscc_web/static/dist /app/iscc_web/static/dist
 
 EXPOSE 8000/tcp
+
+# Build metadata reported by GET /health: the same values as the OCI version/revision labels (CI passes
+# them as build args), empty for local builds. Declared late so a new revision only rebuilds this layer.
+ARG VERSION=""
+ARG REVISION=""
+ENV ISCC_WEB_BUILD_VERSION=${VERSION} ISCC_WEB_BUILD_REVISION=${REVISION}
+
+# Readiness probe with the image's own Python (no curl needed). GET /health answers 503 until the ONNX
+# models are loaded in all ISCC workers; failed probes within the start period do not count.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=120s --start-interval=5s --retries=3 \
+  CMD ["python", "-c", "import os, urllib.request as r; r.urlopen('http://127.0.0.1:%s/health' % os.environ.get('PORT', '8000'), timeout=4)"]
 
 CMD ["gunicorn", "iscc_web.main:app", "-k", "uvicorn_worker.UvicornWorker"]

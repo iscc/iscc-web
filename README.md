@@ -34,7 +34,10 @@ The microservice provides a REST API for generating ISCCs. The endpoints support
 upload/download, metadata extraction/embedding and ISCC processing.<br>
 
 Files uploaded for processing are automatically deleted after a configurable timeout.
-An interactive API documentation is available at [/docs](https://web.iscc.io/docs)<br><br>
+An interactive API documentation is available at [/docs](https://web.iscc.io/docs). `GET /health`
+(at the site root) is a readiness probe for monitors and the Docker `HEALTHCHECK`: it reports
+whether the semantic-code ONNX models are loaded, which execution provider (GPU or CPU) they run
+on, and the image version and revision.<br><br>
 
 **Experimental features** (not part of ISO 24138, algorithms may change before their v1.0
 release):

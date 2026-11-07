@@ -86,7 +86,7 @@ description: Release history of the iscc-web microservice.
 
 - Added support for pdf, epub thumbnails and metadata embedding
 - Added support for audio cover art extraction
-- Addded support for keyword metadata field
+- Added support for keyword metadata field
 - Updated dependencies
 
 ## [0.1.0] - 2022-11-16
@@ -96,3 +96,7 @@ description: Release history of the iscc-web microservice.
 [0.1.0]: https://github.com/iscc/iscc-web/releases/tag/v0.1.0
 [0.2.0]: https://github.com/iscc/iscc-web/compare/v0.1.0...v0.2.0
 [0.3.0]: https://github.com/iscc/iscc-web/compare/v0.2.0...v0.3.0
+[0.3.1]: https://github.com/iscc/iscc-web/compare/v0.3.0...v0.3.1
+[0.3.2]: https://github.com/iscc/iscc-web/compare/v0.3.1...v0.3.2
+[0.3.3]: https://github.com/iscc/iscc-web/compare/v0.3.2...v0.3.3
+[0.4.0]: https://github.com/iscc/iscc-web/compare/v0.3.3...HEAD

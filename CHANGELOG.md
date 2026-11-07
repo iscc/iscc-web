@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.4.0] - Unreleased
+
+- Requires Python 3.14; the Docker images run CPython 3.14.10 (`python:3.14-slim` on Debian
+    trixie for the CPU image, a uv-managed CPython on the CUDA base for the GPU image)
+- Updated `iscc-sdk` to 0.9.7, `iscc-sci` to 0.4.1, `iscc-sct` to 0.2.2 and `iscc-tika` to 0.6.0;
+    the `generator` field reports `iscc-sdk - v0.9.7`, and metadata embedding
+    (`POST /api/v1/metadata/{media_id}`) writes slightly different file bytes, so the Data-Code,
+    Instance-Code and `datahash` of embedded files change (Meta-Code and Content-Code do not)
+- Updated all other backend and frontend dependencies; the frontend builds with Node.js 26 LTS
+    and pnpm 12
+- Builds are reproducible: Docker base images are pinned by digest, GitHub Actions by commit SHA,
+    and the Python, Node.js and uv versions in `.python-version` and `.tool-versions`
+
 ## [0.3.3] - 2026-10-18
 
 - Updated `iscc-core` to 1.5.0 and `iscc-lib` to 0.7.0 (now the minimum required versions), which

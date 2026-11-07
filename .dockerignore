@@ -14,7 +14,6 @@ Dockerfile
 eslint.config.js
 vitest.config.ts
 renovate.json
-.python-version
 .tool-versions
 
 # Local environments and secrets

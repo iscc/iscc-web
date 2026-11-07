@@ -1,4 +1,4 @@
-FROM python:3.13-slim AS builder
+FROM python:3.14.10-slim-trixie@sha256:af8a5aa14780025dbfbcfbc81bd8a91ebd87711dd5b0f48ed71090949dd7cb1d AS builder
 
 # Disable stdout/stderr buffering, can cause issues with Docker logs
 ENV PYTHONUNBUFFERED=1
@@ -9,7 +9,7 @@ RUN apt-get update && \
   rm -rf /var/lib/apt/lists
 
 # Install uv
-COPY --from=ghcr.io/astral-sh/uv:0.11 /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:0.13.7@sha256:96f40d3904aad8d0bd010539001d36c8e2188b981e1334471a90c4a1d93bb490 /uv /uvx /bin/
 
 WORKDIR /app
 
@@ -37,10 +37,10 @@ COPY . /app/
 #
 # frontend-build
 #
-FROM node:24.4.1-slim AS frontend-build
+FROM node:26.13.0-trixie-slim@sha256:5adad64f9a1fca2d51972caa65983634c8a774eb300d72b20f7f2a0f60368072 AS frontend-build
 
 # Match the packageManager field in package.json
-RUN npm install -g pnpm@11.5.3
+RUN npm install -g pnpm@12.18.0
 
 WORKDIR /app
 
@@ -56,7 +56,7 @@ RUN pnpm run build
 # prod-runtime
 #
 
-FROM python:3.13-slim AS prod-runtime
+FROM python:3.14.10-slim-trixie@sha256:af8a5aa14780025dbfbcfbc81bd8a91ebd87711dd5b0f48ed71090949dd7cb1d AS prod-runtime
 
 LABEL org.opencontainers.image.source=https://github.com/iscc/iscc-web
 
@@ -95,11 +95,11 @@ CMD ["gunicorn", "iscc_web.main:app", "-k", "uvicorn_worker.UvicornWorker"]
 # CPU build invocation must pass `target: prod-runtime` (see release.yml / ci.yml). NVIDIA driver +
 # nvidia-container-toolkit + `--gpus all` are needed for GPU; without them it falls back to CPU.
 #
-FROM nvidia/cuda:12.6.3-cudnn-runtime-ubuntu24.04 AS prod-runtime-gpu
+FROM nvidia/cuda:12.6.3-cudnn-runtime-ubuntu24.04@sha256:8aef630a54bc5c5146ae5ce68e6af5caa3df0fb690bb91544175c91f307e4356 AS prod-runtime-gpu
 
 LABEL org.opencontainers.image.source=https://github.com/iscc/iscc-web
 
-# ca-certificates: the CUDA base ships none (python:3.13-slim does); the model/tool fetch below plus
+# ca-certificates: the CUDA base ships none (the python slim base does); the model/tool fetch below plus
 # runtime HTTPS (Sentry, URL fetches) need TLS trust. libexpat1: the exiv2 wheel's native lib.
 RUN apt-get update && \
   apt-get install --no-install-recommends -y libexpat1 ca-certificates && \
@@ -115,17 +115,18 @@ ENV ISCC_WEB_ENVIRONMENT=production
 ENV PORT=8000
 
 # Install uv
-COPY --from=ghcr.io/astral-sh/uv:0.11 /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:0.13.7@sha256:96f40d3904aad8d0bd010539001d36c8e2188b981e1334471a90c4a1d93bb490 /uv /uvx /bin/
 
 WORKDIR /app
 
-COPY pyproject.toml uv.lock /app/
+COPY pyproject.toml uv.lock .python-version /app/
 
-# The CUDA base ships system Python 3.12; the lock targets 3.13. Use a uv-managed 3.13.
-RUN uv python install 3.13
+# The CUDA base ships system Python 3.12; install the uv-managed CPython pinned in .python-version,
+# which uv sync then picks up as well.
+RUN uv python install
 
 # Install dependencies into /app/.venv with the GPU onnxruntime variant.
-RUN uv sync --frozen --no-dev --no-install-project --extra gpu --python 3.13
+RUN uv sync --frozen --no-dev --no-install-project --extra gpu
 
 # Fetch content processing tools (ffmpeg, ffprobe, fpcalc) into /root/.local/share/iscc-sdk
 RUN /app/.venv/bin/iscc-sdk install

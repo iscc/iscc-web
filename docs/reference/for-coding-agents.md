@@ -196,9 +196,13 @@ reference in [Configuration](../howto/configuration.md):
     `text_simprints`, `idk.extract_metadata`, `idk.embed_metadata`).
 - `iscc_web/options.py` must be imported before `iscc_sdk`/`iscc_sct`/`iscc_sci` — it seeds their
     environment defaults at import time, and pool workers inherit them.
-- Style: ruff with line-length 120, LF line endings, target py313; prek hooks enforce
+- Style: ruff with line-length 120, LF line endings, target py314, rule selection pinned in
+    `pyproject.toml`; prek hooks enforce
     whitespace/EOL fixes, mdformat for Markdown, and openapi-spec-validator for the spec.
-- Renovate ignores `iscc-tika` (`renovate.json` `ignoreDeps`) — it must stay `<0.5.0`.
+- Builds are pinned: Python in `.python-version`, Python/Node.js/uv for CI in `.tool-versions`,
+    Docker base images by digest and GitHub Actions by commit SHA. Renovate maintains all of
+    them and holds `onnxruntime` below 1.27 and the GPU base on CUDA 12.6 (the production GPU is
+    a Pascal card that CUDA 13 no longer supports).
 
 ### Change playbook
 

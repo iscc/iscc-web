@@ -24,7 +24,7 @@ def test_create_iscc_location_and_result(api):
         "datahash": "1e209db4c0d9e68c5203dc8c2fefe52fa5d54671be3a3253e06888cace7c60e5a743",
         "filename": "test-image.jpg",
         "filesize": 53256,
-        "generator": "iscc-sdk - v0.9.6",
+        "generator": "iscc-sdk - v0.9.7",
         "height": 133,
         "iscc": "ISCC:KECXNDSZVTTX2LDQYNBTBHR4T2HGOYBAGBNWZ767PKO3JQGZ42GFEAY",
         "mediatype": "image/jpeg",
@@ -61,7 +61,7 @@ def test_create_iscc_unsupported_mediatype_fallback(api):
         "datahash": "1e20e71d4ae9d38271d900dd98e8ca9ff1f42075038d2139f5aed93c8329da6e7b4e",
         "filename": "data.bin",
         "filesize": 43,
-        "generator": "iscc-sdk - v0.9.6",
+        "generator": "iscc-sdk - v0.9.7",
         "iscc": "ISCC:K4ANLI74MSJU22HRO6FI2IOR3IVCNZY5JLU5HATR3EAN3GHIZKP7D5A",
         "mediatype": "application/octet-stream",
         "units": [

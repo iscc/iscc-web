@@ -22,7 +22,7 @@ working against the real API.
     ```
 
 1. Install dependencies with [uv](https://docs.astral.sh/uv/) (the Python version is pinned in
-    `.python-version`):
+    `.python-version`, the uv version used by CI in `.tool-versions`):
 
     ```bash
     uv sync

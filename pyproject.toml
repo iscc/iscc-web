@@ -3,12 +3,12 @@ name = "iscc-web"
 version = "0.3.3"
 description = "ISCC - Generator Web Application"
 authors = [{ name = "Titusz", email = "tp@py7.de" }]
-requires-python = ">=3.13"
+requires-python = ">=3.14"
 readme = "README.md"
 license = "Apache-2.0"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
     "blacksheep>=2.6,<3",
@@ -16,9 +16,9 @@ dependencies = [
     "aiofiles>=24.1",
     # Not iscc-sdk[sct,sci]: since iscc-sdk 0.9.5 those extras request iscc-sct[cpu]/iscc-sci[cpu],
     # which would put CPU onnxruntime into the gpu image. The bare libs carry no onnxruntime.
-    "iscc-sdk==0.9.6",
-    "iscc-sct>=0.2.0",
-    "iscc-sci>=0.3.0",
+    "iscc-sdk==0.9.7",
+    "iscc-sct>=0.2.2",
+    "iscc-sci>=0.4.1",
     "iscc-core>=1.5.0",
     "iscc-lib>=0.7.0",
     "xxhash>=3.5",
@@ -37,9 +37,9 @@ dependencies = [
 [project.optional-dependencies]
 # onnxruntime now lives in the cpu|gpu extras of iscc-sct/iscc-sci (variant wheels that clobber
 # each other in site-packages). Pick exactly one per built image; never both. The base
-# dependencies carry the bare libs; these extras attach the onnxruntime variant and the >=0.2.0/>=0.3.0 floor.
-cpu = ["iscc-sct[cpu]>=0.2.0", "iscc-sci[cpu]>=0.3.0"]
-gpu = ["iscc-sct[gpu]>=0.2.0", "iscc-sci[gpu]>=0.3.0"]
+# dependencies carry the bare libs; these extras attach the onnxruntime variant and the >=0.2.2/>=0.4.1 floor.
+cpu = ["iscc-sct[cpu]>=0.2.2", "iscc-sci[cpu]>=0.4.1"]
+gpu = ["iscc-sct[gpu]>=0.2.2", "iscc-sci[gpu]>=0.4.1"]
 
 [project.urls]
 Homepage = "https://github.com/iscc/iscc-web"
@@ -82,17 +82,21 @@ module-name = "iscc_web"
 module-root = ""
 
 [build-system]
-requires = ["uv_build>=0.11.7,<0.12.0"]
+requires = ["uv_build>=0.13.7,<0.14.0"]
 build-backend = "uv_build"
 
 [tool.ruff]
-target-version = "py313"
+target-version = "py314"
 line-length = 120
 fix = true
 
 [tool.ruff.format]
 preview = true
 line-ending = "lf"
+
+[tool.ruff.lint]
+# Explicit rule set (the ruff <0.17 defaults); ruff 0.17 widened its default selection considerably.
+select = ["E4", "E7", "E9", "F"]
 
 [tool.ruff.lint.per-file-ignores]
 # Star imports register BlackSheep controllers as an import side effect.
@@ -126,7 +130,7 @@ output = "iscc_web/api/schema.py"
 output-model-type = "pydantic_v2.BaseModel"
 encoding = "UTF-8"
 disable-timestamp = true
-target-python-version = "3.13"
+target-python-version = "3.14"
 formatters = []
 
 [tool.poe.tasks]

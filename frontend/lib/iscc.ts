@@ -168,8 +168,7 @@ const expectedPayloadBytes = (mainType: number, subType: number, length: number)
   return null;
 };
 
-const hasSupportedVersion = (mainType: number, version: number) =>
-  version === 0 || (mainType === 6 && version === 1);
+const hasSupportedVersion = (mainType: number, version: number) => version === 0 || (mainType === 6 && version === 1);
 
 /** True when an ISCC passes the same canonical prefix/header/length checks as iscc-core. */
 export function isValidIscc(code: string): boolean {

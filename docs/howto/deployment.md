@@ -15,7 +15,8 @@ management.
 Production images are published to the GitHub Container Registry as
 [`ghcr.io/iscc/iscc-web`](https://github.com/iscc/iscc-web/pkgs/container/iscc-web):
 
-- Built on `python:3.13-slim` and served by gunicorn with uvicorn workers.
+- Built on `python:3.14-slim` (Debian trixie, base images pinned by digest) and served by
+    gunicorn with uvicorn workers.
 - Listens on port `8000`. Gunicorn reads the `PORT` environment variable for its default bind
     address (see the [gunicorn docs](https://docs.gunicorn.org/en/stable/settings.html#bind)),
     so set `PORT` to change the container port.

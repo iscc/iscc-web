@@ -5,8 +5,22 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="/images/iscc-logo-icon-black.svg" />
-    <script src="https://unpkg.com/@stoplight/elements/web-components.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/@stoplight/elements/styles.min.css" />
+    <!--
+      Stoplight Elements is pinned to an exact version and checked by subresource integrity. To update,
+      change the version in both URLs and replace each hash with the output of:
+      curl -sL <url> | openssl dgst -sha384 -binary | openssl base64 -A
+    -->
+    <script
+      src="https://unpkg.com/@stoplight/elements@9.0.29/web-components.min.js"
+      integrity="sha384-enyjBaVmV00WFIo0D7AIVgtZ/4x0idVNWHotG8WUpvQo9HXgMSGAAW2YEOpiJTpP"
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@stoplight/elements@9.0.29/styles.min.css"
+      integrity="sha384-iVQBHadsD+eV0M5+ubRCEVXrXEBj+BqcuwjUwPoVJc0Pb1fmrhYSAhL+BFProHdV"
+      crossorigin="anonymous"
+    />
     <style>
       /* Override inline max-width on right panel to allow full width for long ISCC strings */
       .sl-elements .sl-relative.sl-w-2\/5.sl-ml-16 {

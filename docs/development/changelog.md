@@ -34,6 +34,8 @@ description: Release history of the iscc-web microservice.
     and pnpm 12
 - Builds are reproducible: Docker base images are pinned by digest, GitHub Actions by commit SHA,
     and the Python, Node.js and uv versions in `.python-version` and `.tool-versions`
+- The API reference page at `/docs` loads an exact Stoplight Elements version (9.0.29) with
+    subresource integrity checks instead of whatever version unpkg currently serves
 
 ## [0.3.3] - 2026-10-18
 

@@ -4,7 +4,9 @@
     <title>ISCC-WEB Generator API - Documentation</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" href="/images/iscc-logo-icon-black.svg" />
+    <link rel="icon" href="/static/images/favicon.ico" sizes="48x48" />
+    <link rel="icon" href="/static/images/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/static/images/apple-touch-icon.png" />
     <!--
       Stoplight Elements is pinned to an exact version and checked by subresource integrity. To update,
       change the version in both URLs and replace each hash with the output of:
@@ -22,6 +24,284 @@
       crossorigin="anonymous"
     />
     <style>
+      /*
+        Brand theme for Stoplight Elements, matching the demo frontend: Readex Pro and JetBrains Mono
+        (latin subsets served from /static/fonts), ISCC Blue as the accent, neutral greys for the
+        light surfaces, Deep Navy for the code panels, and a navy header like the generator's.
+        Elements reads its palette from the CSS variables below.
+      */
+      @font-face {
+        font-family: "Readex Pro";
+        font-weight: 300;
+        font-display: swap;
+        src: url("/static/fonts/readex-pro-latin-300-normal.woff2") format("woff2");
+      }
+
+      @font-face {
+        font-family: "Readex Pro";
+        font-weight: 400;
+        font-display: swap;
+        src: url("/static/fonts/readex-pro-latin-400-normal.woff2") format("woff2");
+      }
+
+      @font-face {
+        font-family: "Readex Pro";
+        font-weight: 500;
+        font-display: swap;
+        src: url("/static/fonts/readex-pro-latin-500-normal.woff2") format("woff2");
+      }
+
+      @font-face {
+        font-family: "Readex Pro";
+        font-weight: 600;
+        font-display: swap;
+        src: url("/static/fonts/readex-pro-latin-600-normal.woff2") format("woff2");
+      }
+
+      @font-face {
+        font-family: "Readex Pro";
+        font-weight: 700;
+        font-display: swap;
+        src: url("/static/fonts/readex-pro-latin-700-normal.woff2") format("woff2");
+      }
+
+      @font-face {
+        font-family: "JetBrains Mono";
+        font-weight: 400;
+        font-display: swap;
+        src: url("/static/fonts/jetbrains-mono-latin-400-normal.woff2") format("woff2");
+      }
+
+      @font-face {
+        font-family: "JetBrains Mono";
+        font-weight: 500;
+        font-display: swap;
+        src: url("/static/fonts/jetbrains-mono-latin-500-normal.woff2") format("woff2");
+      }
+
+      @font-face {
+        font-family: "JetBrains Mono";
+        font-weight: 700;
+        font-display: swap;
+        src: url("/static/fonts/jetbrains-mono-latin-700-normal.woff2") format("woff2");
+      }
+
+      :root {
+        --iscc-blue: #0054b2;
+        --iscc-deep-navy: #123663;
+        --iscc-bright-yellow: #ffc300;
+
+        --font-ui: "Readex Pro", Arial, sans-serif;
+        --font-prose: "Readex Pro", Arial, sans-serif;
+        --font-mono: "JetBrains Mono", Consolas, monospace;
+
+        /* text: near-black ink #212529 */
+        --text-h: 210;
+        --text-s: 11%;
+        --text-l: 15%;
+
+        /* light surfaces: white with the neutral greys of the generator */
+        --canvas-h: 210;
+        --color-canvas-dark: #123663;
+        --color-canvas-tint: rgba(248, 249, 250, 0.5);
+        --color-canvas-50: #f8f9fa;
+        --color-canvas-100: #f1f3f5;
+        --color-canvas-200: #e9ecef;
+        --color-canvas-300: #dee2e6;
+        --color-canvas-400: #ced4da;
+        --color-canvas-500: #adb5bd;
+
+        /* accents; text shades keep 4.5:1 on white (GET = success, POST = primary, DELETE = danger) */
+        --primary-h: 212;
+        --primary-s: 100%;
+        --primary-l: 35%;
+        --color-primary: #0054b2;
+        --color-primary-dark: #00468f;
+        --color-primary-darker: #123663;
+        --color-primary-light: #4596f5;
+        --color-primary-tint: rgba(0, 84, 178, 0.15);
+        --color-text-primary: #0054b2;
+        --success-h: 93;
+        --success-s: 71%;
+        --success-l: 25%;
+        --color-success: #3a6b12;
+        --color-success-dark: #2f5a0e;
+        --color-success-darker: #24470a;
+        --color-success-light: #a6db50;
+        --color-success-tint: rgba(166, 219, 80, 0.3);
+        --color-text-success: #3a6b12;
+        --warning-h: 46;
+        --warning-s: 100%;
+        --warning-l: 24%;
+        --color-warning: #7a5c00;
+        --color-warning-dark: #664d00;
+        --color-warning-darker: #523e00;
+        --color-warning-light: #ffc300;
+        --color-warning-tint: rgba(255, 195, 0, 0.25);
+        --color-text-warning: #7a5c00;
+        --danger-h: 357;
+        --danger-s: 65%;
+        --danger-l: 43%;
+        --color-danger: #b3262e;
+        --color-danger-dark: #96202a;
+        --color-danger-darker: #7a1a22;
+        --color-danger-light: #f56169;
+        --color-danger-tint: rgba(245, 97, 105, 0.2);
+        --color-text-danger: #b3262e;
+      }
+
+      /* code panels and the server box: Deep Navy instead of slate */
+      :root .sl-inverted {
+        --text-h: 213;
+        --text-s: 20%;
+        --text-l: 90%;
+        --canvas-h: 213;
+        --canvas-s: 69%;
+        --canvas-l: 23%;
+        --color-canvas-dark: #0d2a4f;
+        --color-canvas-pure: #0d2a4f;
+        --color-canvas-tint: rgba(122, 194, 247, 0.12);
+        --color-canvas-50: #284b78;
+        --color-canvas-100: #1b3f6d;
+        --color-canvas-200: #183b68;
+        --color-canvas-300: #163965;
+        --color-canvas-400: #153864;
+        --color-canvas-500: #143763;
+        --color-canvas-dialog: #1b3f6d;
+        --color-primary: #0054b2;
+        --color-primary-dark: #00468f;
+        --color-primary-darker: #003a75;
+        --color-primary-light: #4596f5;
+        --color-primary-tint: rgba(69, 150, 245, 0.25);
+        --color-text-primary: #7ac2f7;
+        --color-text-success: #a6db50;
+        --color-text-warning: #ffc300;
+        --color-text-danger: #f56169;
+      }
+
+      /* sidebar icons: Elements colours operations purple (inline) and schemas with its warning colour */
+      .sl-elements .fa-bullseye {
+        color: var(--iscc-blue) !important;
+      }
+
+      .sl-elements .fa-cube {
+        color: #4596f5;
+      }
+
+      /* 4 px corners on cards and panels, 2 px on controls (Elements' own small radius) */
+      .sl-elements .sl-rounded-lg,
+      .sl-elements .sl-rounded-xl {
+        border-radius: 4px;
+      }
+
+      /* the header sits above Elements, which fills the rest of the window */
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        background: #ffffff;
+      }
+
+      elements-api {
+        display: block;
+        flex: 1;
+        min-height: 0;
+      }
+
+      .docs-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.75rem 1.25rem;
+        background: var(--iscc-deep-navy);
+        font-family: var(--font-ui);
+      }
+
+      .docs-brand {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        text-decoration: none;
+      }
+
+      /* the SVG master carries its clear space in the viewBox; 2.5rem tall = 144 px wide */
+      .docs-brand img {
+        display: block;
+        height: 2.5rem;
+        width: auto;
+      }
+
+      .docs-divider {
+        width: 3px;
+        height: 1.6rem;
+        border-radius: 1px;
+        background: var(--iscc-bright-yellow);
+      }
+
+      .docs-product {
+        color: #ffffff;
+        font-size: 1.05rem;
+        font-weight: 300;
+        letter-spacing: 0.1em;
+      }
+
+      .docs-nav {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+      }
+
+      .docs-quiet-link {
+        color: rgba(255, 255, 255, 0.78);
+        font-size: 0.85rem;
+        font-weight: 300;
+        text-decoration: none;
+      }
+
+      .docs-quiet-link:hover {
+        color: #ffffff;
+      }
+
+      /* the brand kit's compact secondary button, on dark */
+      .docs-btn {
+        display: inline-flex;
+        align-items: center;
+        height: 36px;
+        padding: 0 15px;
+        color: #ffffff;
+        font-family: var(--font-mono);
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        text-decoration: none;
+        white-space: nowrap;
+        box-shadow: inset 0 0 0 1.5px currentColor;
+      }
+
+      .docs-btn:hover {
+        box-shadow: inset 0 0 0 2.5px currentColor;
+      }
+
+      @media (max-width: 767.98px) {
+        .docs-quiet-link {
+          display: none;
+        }
+      }
+
+      @media (max-width: 575.98px) {
+        .docs-divider,
+        .docs-product {
+          display: none;
+        }
+      }
+
       /* Override inline max-width on right panel to allow full width for long ISCC strings */
       .sl-elements .sl-relative.sl-w-2\/5.sl-ml-16 {
         max-width: none !important;
@@ -39,12 +319,22 @@
     </style>
   </head>
   <body>
+    <header class="docs-header">
+      <a class="docs-brand" href="/">
+        <img src="/static/images/iscc-logo-white-coral.svg" alt="ISCC" />
+        <span class="docs-divider"></span>
+        <span class="docs-product">API DOCS</span>
+      </a>
+      <nav class="docs-nav">
+        <a class="docs-quiet-link" href="/docs/openapi.yaml">OpenAPI spec</a>
+        <a class="docs-btn" href="/">Generator</a>
+      </nav>
+    </header>
     <elements-api
       apiDescriptionUrl="/docs/openapi.yaml"
       router="hash"
-      layout="sidebar"
+      layout="responsive"
       hideExport="true"
-      logo="/images/iscc-logo-icon-black.svg"
-    />
+    ></elements-api>
   </body>
 </html>

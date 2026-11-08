@@ -30,6 +30,12 @@
     and the Python, Node.js and uv versions in `.python-version` and `.tool-versions`
 - The API reference page at `/docs` loads an exact Stoplight Elements version (9.0.29) with
     subresource integrity checks instead of whatever version unpkg currently serves
+- The API reference page at `/docs` follows the ISCC brand like the demo frontend: a navy header
+    with the coral-dot logo and a link back to the generator, Readex Pro and JetBrains Mono served
+    by the service itself, ISCC Blue accents and Deep Navy panels; on phones the sidebar becomes a
+    menu instead of pushing the page wider than the screen
+- Removed the unused pre-rebrand ISCC logo files (`/images/iscc-logo-*.svg` and
+    `/images/iscc-icon-*.svg`)
 
 ## [0.3.3] - 2026-10-18
 

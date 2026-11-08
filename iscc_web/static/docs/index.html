@@ -89,7 +89,6 @@
       :root {
         --iscc-blue: #0054b2;
         --iscc-deep-navy: #123663;
-        --iscc-bright-yellow: #ffc300;
 
         --font-ui: "Readex Pro", Arial, sans-serif;
         --font-prose: "Readex Pro", Arial, sans-serif;
@@ -188,6 +187,22 @@
         color: #4596f5;
       }
 
+      /* body and secondary text one pixel larger than Elements' 12 px and 11 px: Readex Pro reads small there */
+      .sl-elements .sl-text-base {
+        font-size: 13px;
+      }
+
+      .sl-elements .sl-text-sm {
+        font-size: 12px;
+      }
+
+      /* field and parameter descriptions, which Elements sets to 12 px with these selectors */
+      .sl-elements .HttpOperation .JsonSchemaViewer .sl-markdown-viewer p,
+      .sl-elements .HttpOperation__Parameters .sl-markdown-viewer p,
+      .sl-elements .Model .JsonSchemaViewer .sl-markdown-viewer p {
+        font-size: 13px;
+      }
+
       /* 4 px corners on cards and panels, 2 px on controls (Elements' own small radius) */
       .sl-elements .sl-rounded-lg,
       .sl-elements .sl-rounded-xl {
@@ -218,7 +233,7 @@
         align-items: center;
         justify-content: space-between;
         gap: 1rem;
-        padding: 0.75rem 1.25rem;
+        padding: 0.75rem 1.25rem 0.75rem 1rem;
         background: var(--iscc-deep-navy);
         font-family: var(--font-ui);
       }
@@ -226,29 +241,35 @@
       .docs-brand {
         display: flex;
         align-items: center;
-        gap: 1rem;
         text-decoration: none;
       }
 
-      /* the SVG master carries its clear space in the viewBox; 2.5rem tall = 144 px wide */
+      /* Both SVGs carry the logo's clear space in their viewBox (25 units at the sides). The generator
+         project logo (the same file as in the demo frontend header) spans the Elements sidebar below
+         it: the logo runs from the sidebar's 16 px text inset (the header's left padding) to its 300 px
+         right edge, 284 px for the 1971.03 units between the clear spaces. Negative margins take the
+         left clear space and the descender of the g in "generator." out of the layout, so the logo
+         starts on the inset and the header centers the ISCC logo itself. Phones get the plain logo. */
       .docs-brand img {
         display: block;
-        height: 2.5rem;
         width: auto;
       }
 
-      .docs-divider {
-        width: 3px;
-        height: 1.6rem;
-        border-radius: 1px;
-        background: var(--iscc-bright-yellow);
+      .docs-lockup {
+        --unit: calc(284px / 1971.03);
+        height: calc(263.01 * var(--unit));
+        margin-left: calc(-25 * var(--unit));
+        margin-bottom: calc(-50.51 * var(--unit));
+        /* Elements caps images at 100 % of their container, which the negative margin makes narrower */
+        max-width: none;
       }
 
-      .docs-product {
-        color: #ffffff;
-        font-size: 1.05rem;
-        font-weight: 300;
-        letter-spacing: 0.1em;
+      .docs-logo {
+        height: 2.5rem;
+      }
+
+      .docs-brand .docs-logo {
+        display: none;
       }
 
       .docs-nav {
@@ -262,13 +283,14 @@
         font-size: 0.85rem;
         font-weight: 300;
         text-decoration: none;
+        white-space: nowrap;
       }
 
       .docs-quiet-link:hover {
         color: #ffffff;
       }
 
-      /* the brand kit's compact secondary button, on dark */
+      /* compact secondary button on dark, as in the demo header: 1 px outline, 2 px corners */
       .docs-btn {
         display: inline-flex;
         align-items: center;
@@ -282,23 +304,26 @@
         text-transform: uppercase;
         text-decoration: none;
         white-space: nowrap;
-        box-shadow: inset 0 0 0 1.5px currentColor;
+        border-radius: 2px;
+        box-shadow: inset 0 0 0 1px currentColor;
       }
 
       .docs-btn:hover {
-        box-shadow: inset 0 0 0 2.5px currentColor;
+        box-shadow: inset 0 0 0 2px currentColor;
       }
 
-      @media (max-width: 767.98px) {
+      /* phones: the plain ISCC logo and the Generator button only */
+      @media (max-width: 575.98px) {
         .docs-quiet-link {
           display: none;
         }
-      }
 
-      @media (max-width: 575.98px) {
-        .docs-divider,
-        .docs-product {
+        .docs-brand .docs-lockup {
           display: none;
+        }
+
+        .docs-brand .docs-logo {
+          display: block;
         }
       }
 
@@ -321,9 +346,8 @@
   <body>
     <header class="docs-header">
       <a class="docs-brand" href="/">
-        <img src="/static/images/iscc-logo-white-coral.svg" alt="ISCC" />
-        <span class="docs-divider"></span>
-        <span class="docs-product">API DOCS</span>
+        <img class="docs-lockup" src="/static/images/iscc-generator-white-coral.svg" alt="ISCC generator" />
+        <img class="docs-logo" src="/static/images/iscc-logo-white-coral.svg" alt="ISCC" />
       </a>
       <nav class="docs-nav">
         <a class="docs-quiet-link" href="/docs/openapi.yaml">OpenAPI spec</a>

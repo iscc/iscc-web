@@ -1,37 +1,32 @@
 <script setup lang="ts">
-// Navy footer mirroring the header: copyright, legal pages and developer exits. The name is
-// established in the header, so the footer carries the brand symbol only.
-import isccSymbol from "../assets/iscc-icon-white-coral.svg";
+// Navy footer mirroring the header: copyright, legal pages and developer exits. The product name
+// is established in the header, so the footer carries the plain ISCC logo, small and white only.
+import isccLogo from "../assets/iscc-logo-white.svg";
 import UiIcon from "./UiIcon.vue";
 </script>
 
 <template lang="pug">
 footer.app-footer.grain.on-dark
-  .container-xl.d-flex.align-items-center.justify-content-between.gap-4.flex-wrap.py-2
+  .container-xl.footer-row.d-flex.align-items-center.justify-content-between.gap-4.flex-wrap
     .d-flex.align-items-center.gap-2
-      img.logo(:src="isccSymbol" alt="ISCC")
+      img.logo(:src="isccLogo" alt="ISCC")
       span.copyright Copyright © 2022–2026 ISCC Foundation
     .d-flex.align-items-center.gap-4.flex-wrap
       a.legal(
-        href="https://iscc.foundation/privacy/"
+        href="https://iscc.io/privacy"
         target="_blank"
         rel="noopener"
       ) Privacy Policy
       a.legal(
-        href="https://iscc.foundation/cookies"
+        href="https://iscc.io/cookies"
         target="_blank"
         rel="noopener"
       ) Cookie Policy
       a.legal(
-        href="https://iscc.foundation/imprint"
+        href="https://iscc.io/imprint"
         target="_blank"
         rel="noopener"
       ) Imprint
-      a.legal(
-        href="https://iscc.foundation/disclaimer"
-        target="_blank"
-        rel="noopener"
-      ) Disclaimer
       .divider
       a.exit(href="/docs" target="_blank")
         UiIcon(name="code" :size="13")
@@ -54,9 +49,15 @@ footer.app-footer.grain.on-dark
   background-color: var(--iscc-deep-navy);
   margin-top: auto;
 
-  // The SVG symbol carries its clear space in the viewBox (brand screen minimum: 32 px wide).
+  // 51 px tall on one row: 0.85rem above and below the 1.5rem logo.
+  .footer-row {
+    padding-block: 0.85rem;
+  }
+
+  // The SVG master carries its clear space in the viewBox; 1.5rem tall = 86 px wide, below the
+  // brand's recommended 120 px screen minimum, hence the mono version the brand prefers there.
   .logo {
-    height: 2.25rem;
+    height: 1.5rem;
     width: auto;
     display: block;
   }

@@ -209,6 +209,16 @@ body {
   }
 }
 
+// Thin: a lighter secondary for exits to other pages - 1 px outline (2 px on hover), 2 px corners.
+.iscc-btn--thin {
+  border-radius: var(--iscc-radius-sm);
+  box-shadow: inset 0 0 0 1px currentColor;
+
+  &:hover:not(:disabled) {
+    box-shadow: inset 0 0 0 2px currentColor;
+  }
+}
+
 // ---------- ISCC-CODE bar ----------
 // The only text the brand kit allows on coral. White on coral is 3.09:1, which passes WCAG AA only as large
 // text (bold from 18.67 px); the brand kit sets the code in Bold, the demo a notch lighter in SemiBold at

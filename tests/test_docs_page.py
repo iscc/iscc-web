@@ -24,6 +24,7 @@ def test_docs_page_assets_are_served():
     page = httpx.get(f"{BASE_URL}/docs")
     assert page.status_code == 200
     paths = local_paths(page.text)
+    assert "/static/images/iscc-generator-white-coral.svg" in paths
     assert "/static/images/iscc-logo-white-coral.svg" in paths
     assert "/static/fonts/readex-pro-latin-400-normal.woff2" in paths
     for path in sorted(paths):

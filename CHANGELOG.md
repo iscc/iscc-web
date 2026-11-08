@@ -9,7 +9,8 @@
 - All ISCC worker processes now start with the service and load the ONNX models up front instead
     of on first use, so no request waits for a model load (about 700 MB of RAM per worker on CPU;
     set `ISCC_WEB_MAX_WORKERS` on many-core hosts)
-- The demo frontend adopts the ISCC brand identity: the coral-dot logo and favicon, brand-shaped
+- The demo frontend adopts the ISCC brand identity: the "ISCC | generator." project logo in
+    the header (the coral-dot logo alone on phones), the coral-dot favicon, brand-shaped
     buttons (a Generate button capped with the five ISCC-UNIT colours), tighter corners with
     hard-cornered ISCC-UNIT cards, and a bold ISCC-CODE bar that wraps onto two lines on phones
     instead of shrinking the code below a readable size; the page design is otherwise unchanged
@@ -31,9 +32,9 @@
 - The API reference page at `/docs` loads an exact Stoplight Elements version (9.0.29) with
     subresource integrity checks instead of whatever version unpkg currently serves
 - The API reference page at `/docs` follows the ISCC brand like the demo frontend: a navy header
-    with the coral-dot logo and a link back to the generator, Readex Pro and JetBrains Mono served
-    by the service itself, ISCC Blue accents and Deep Navy panels; on phones the sidebar becomes a
-    menu instead of pushing the page wider than the screen
+    with the "ISCC | generator." project logo and a link back to the generator, Readex Pro and
+    JetBrains Mono served by the service itself, ISCC Blue accents and Deep Navy panels; on phones
+    the sidebar becomes a menu instead of pushing the page wider than the screen
 - Documented what the reverse proxy in front of the service must do (forwarded headers, upload
     size, timeouts) without prescribing a specific proxy, running a permissioned instance behind an
     authenticating reverse proxy (basic auth or single sign-on), and the session affinity (sticky

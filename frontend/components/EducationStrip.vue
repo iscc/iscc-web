@@ -4,7 +4,6 @@
 // slot stays empty; coral appears only for a real code.
 import { UNIT_STYLE, type UnitKind } from "../lib/iscc";
 import CodeBar from "./CodeBar.vue";
-import UiIcon from "./UiIcon.vue";
 import UnitAxis from "./UnitAxis.vue";
 
 const CARDS: Array<{ kind: UnitKind; name: string; code: string; compares: string; from: string }> = [
@@ -49,12 +48,10 @@ const CARDS: Array<{ kind: UnitKind; name: string; code: string; compares: strin
 <template lang="pug">
 section.education-strip
   .edu-head
-    h2.edu-title Inside an ISCC-CODE
+    h2.edu-title Your ISCC
     span.edu-sub Each unit is a similarity fingerprint of a different layer of your content.
   CodeBar(:code="null" idle)
-  .edu-arrow
-    UiIcon(name="arrow-down" :size="18")
-  UnitAxis
+  UnitAxis.edu-axis
   .edu-grid
     .edu-card(v-for="card in CARDS" :key="card.kind")
       .edu-color(:style="{ background: UNIT_STYLE[card.kind].color }")
@@ -64,14 +61,6 @@ section.education-strip
       .edu-card-body
         .edu-compares(v-text="card.compares")
         .edu-from(v-text="card.from")
-  .api-pointer
-    .d-flex.align-items-center.gap-3
-      .api-icon
-        UiIcon(name="code" :size="18")
-      div
-        .api-head Generate #[span.text-nowrap ISO 24138:2024] #[span.text-nowrap ISCC-CODEs] through the REST API
-        .api-calls POST /api/v1/iscc · GET /api/v1/explain/{iscc} · POST /api/v1/simprint
-    a.api-btn.iscc-btn.iscc-btn--primary(href="/docs" target="_blank") Open API docs
 </template>
 
 <style scoped lang="scss">
@@ -109,11 +98,9 @@ section.education-strip
   color: #6c757d;
 }
 
-.edu-arrow {
-  display: flex;
-  justify-content: center;
-  margin: 0.25rem 0;
-  color: #adb5bd;
+// Same distance from the code bar as on the result card.
+.edu-axis {
+  margin-top: 0.9rem;
 }
 
 .edu-grid {
@@ -174,45 +161,5 @@ section.education-strip
   color: #6c757d;
   margin-top: 0.2rem;
   line-height: 1.45;
-}
-
-.api-pointer {
-  margin-top: 1.75rem;
-  background: #f8f9fa;
-  border: 1px solid #e9ecef;
-  border-radius: var(--iscc-radius-sm);
-  padding: 1rem 1.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.25rem;
-  flex-wrap: wrap;
-}
-
-.api-icon {
-  width: 2.4rem;
-  height: 2.4rem;
-  border-radius: var(--iscc-radius-sm);
-  background: rgba(0, 84, 178, 0.08);
-  color: var(--iscc-blue);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.api-head {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: #212529;
-  text-wrap: balance;
-}
-
-.api-calls {
-  font-family: var(--bs-font-monospace);
-  font-size: 0.72rem;
-  font-weight: 300;
-  color: #6c757d;
-  margin-top: 0.2rem;
 }
 </style>

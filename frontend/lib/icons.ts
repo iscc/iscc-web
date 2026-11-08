@@ -14,6 +14,7 @@ export const ICONS = {
   "arrow-down": '<path d="M12 5v14M5 12l7 7 7-7"/>',
   "chevron-right": '<path d="M9 18l6-6-6-6"/>',
   shield: '<path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/>',
+  "shield-check": '<path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/><path d="M9 12l2 2 4-4"/>',
   image:
     '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>',
   type: '<path d="M4 7V4h16v3M9 20h6M12 4v16"/>',

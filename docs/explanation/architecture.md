@@ -87,7 +87,7 @@ modified file into a fresh package with a new media ID and reprocesses its ISCC.
 
 ### Upload → ISCC flow
 
-![The client posts the raw body with X-Upload-Filename to POST /api/v1/iscc; the BlackSheep app creates media/{media_id}/, writes {media_id}.meta.json and streams the body to the media file, then runs code_iscc(file) in a pool worker process via run_in_executor; the worker does the CPU-bound iscc-sdk processing and returns the IsccMeta result; the app writes {media_id}.iscc.json and answers 201 Created with Location /api/v1/media/{media_id}](../assets/upload-flow.svg)
+[![The client posts the raw body with X-Upload-Filename to POST /api/v1/iscc; the BlackSheep app creates media/{media_id}/, writes {media_id}.meta.json and streams the body to the media file, then runs code_iscc(file) in a pool worker process via run_in_executor; the worker does the CPU-bound iscc-sdk processing and returns the IsccMeta result; the app writes {media_id}.iscc.json and answers 201 Created with Location /api/v1/media/{media_id}](../assets/upload-flow.svg)](../assets/upload-flow.svg){ .glightbox }
 
 ## CPU-bound work in worker processes
 

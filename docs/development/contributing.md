@@ -155,8 +155,10 @@ uv run poe docs-build
 uv run poe docs-check
 ```
 
-The check fails on findings such as a page that loads files from other sites or a Mermaid
-diagram: keep images in `docs/` and draw diagrams as SVG files.
+The check fails on findings such as a page that loads files from other sites (keep images in
+`docs/`) or a link in the Markdown copies that points at nothing. Mermaid diagrams render (the
+theme serves its own copy of Mermaid) but cannot be enlarged, so draw diagrams that need zooming
+as SVG files in `docs/assets/` and link them with `{ .glightbox }` to open them in a lightbox.
 
 ## Cross-platform support
 

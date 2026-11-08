@@ -79,7 +79,7 @@ conflicts = [
 ]
 
 [tool.uv.sources]
-zensical-iscc = { git = "https://github.com/iscc/zensical-iscc", tag = "v0.3.0" }
+zensical-iscc = { git = "https://github.com/iscc/zensical-iscc", tag = "v0.3.1" }
 
 [tool.uv.build-backend]
 module-name = "iscc_web"

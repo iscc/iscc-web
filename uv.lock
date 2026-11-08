@@ -2,13 +2,13 @@ version = 1
 revision = 5
 requires-python = ">=3.14"
 resolution-markers = [
-    "extra != 'extra-8-iscc-web-cpu' and extra == 'extra-8-iscc-web-gpu' and extra != 'group-8-iscc-web-dev'",
     "python_full_version >= '3.15' and sys_platform != 'emscripten' and extra == 'extra-8-iscc-web-cpu' and extra != 'extra-8-iscc-web-gpu'",
     "python_full_version >= '3.15' and sys_platform == 'emscripten' and extra == 'extra-8-iscc-web-cpu' and extra != 'extra-8-iscc-web-gpu'",
-    "python_full_version < '3.15' and sys_platform != 'emscripten' and extra == 'extra-8-iscc-web-cpu' and extra != 'extra-8-iscc-web-gpu'",
-    "python_full_version < '3.15' and sys_platform == 'emscripten' and extra == 'extra-8-iscc-web-cpu' and extra != 'extra-8-iscc-web-gpu'",
     "python_full_version >= '3.15' and sys_platform != 'emscripten' and extra != 'extra-8-iscc-web-cpu' and extra != 'extra-8-iscc-web-gpu'",
     "python_full_version >= '3.15' and sys_platform == 'emscripten' and extra != 'extra-8-iscc-web-cpu' and extra != 'extra-8-iscc-web-gpu'",
+    "extra != 'extra-8-iscc-web-cpu' and extra == 'extra-8-iscc-web-gpu' and extra != 'group-8-iscc-web-dev'",
+    "python_full_version < '3.15' and sys_platform != 'emscripten' and extra == 'extra-8-iscc-web-cpu' and extra != 'extra-8-iscc-web-gpu'",
+    "python_full_version < '3.15' and sys_platform == 'emscripten' and extra == 'extra-8-iscc-web-cpu' and extra != 'extra-8-iscc-web-gpu'",
     "python_full_version < '3.15' and sys_platform != 'emscripten' and extra != 'extra-8-iscc-web-cpu' and extra != 'extra-8-iscc-web-gpu'",
     "python_full_version < '3.15' and sys_platform == 'emscripten' and extra != 'extra-8-iscc-web-cpu' and extra != 'extra-8-iscc-web-gpu'",
 ]
@@ -71,7 +71,7 @@ version = "4.16.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "idna" },
-    { name = "typing-extensions", marker = "python_full_version < '3.15' or (extra == 'extra-8-iscc-web-cpu' and extra == 'extra-8-iscc-web-gpu') or (extra == 'extra-8-iscc-web-gpu' and extra == 'group-8-iscc-web-dev')" },
+    { name = "typing-extensions", marker = "python_full_version < '3.15'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/a1/98/7e457a3b014976887a050561955c0b76e1e7e2d6e27b78ecef2ef80518f2/anyio-4.16.0.tar.gz", hash = "sha256:59bb03251907983d1603d27c3087ddb1e93299ea2163adcdba37899a4fb12ffb", size = 310971, upload-time = "2026-11-01T11:20:07.282Z" }
 wheels = [
@@ -191,7 +191,7 @@ dependencies = [
     { name = "guardpost" },
     { name = "h11" },
     { name = "h2" },
-    { name = "httptools", marker = "platform_python_implementation != 'PyPy' or (extra == 'extra-8-iscc-web-cpu' and extra == 'extra-8-iscc-web-gpu') or (extra == 'extra-8-iscc-web-gpu' and extra == 'group-8-iscc-web-dev')" },
+    { name = "httptools", marker = "platform_python_implementation != 'PyPy'" },
     { name = "itsdangerous" },
     { name = "rodi" },
 ]
@@ -381,7 +381,7 @@ name = "cffi"
 version = "2.1.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "pycparser", marker = "implementation_name != 'PyPy' or (extra == 'extra-8-iscc-web-cpu' and extra == 'extra-8-iscc-web-gpu') or (extra == 'extra-8-iscc-web-gpu' and extra == 'group-8-iscc-web-dev')" },
+    { name = "pycparser", marker = "implementation_name != 'PyPy'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/9e/ef/008a1939e372c06329a3fce4279c02f328488f3526744906eeec3da7ad5f/cffi-2.1.1.tar.gz", hash = "sha256:dd31f52ea1086513bb9df30f8fcee9b8918323ae067a3d5b78bc826a000712be", size = 530807, upload-time = "2026-08-03T21:21:18.939Z" }
 wheels = [
@@ -786,8 +786,8 @@ wheels = [
 
 [package.optional-dependencies]
 woff = [
-    { name = "brotli", marker = "platform_python_implementation == 'CPython' or (extra == 'extra-8-iscc-web-cpu' and extra == 'extra-8-iscc-web-gpu') or (extra == 'extra-8-iscc-web-gpu' and extra == 'group-8-iscc-web-dev')" },
-    { name = "brotlicffi", marker = "platform_python_implementation != 'CPython' or (extra == 'extra-8-iscc-web-cpu' and extra == 'extra-8-iscc-web-gpu') or (extra == 'extra-8-iscc-web-gpu' and extra == 'group-8-iscc-web-dev')" },
+    { name = "brotli", marker = "platform_python_implementation == 'CPython'" },
+    { name = "brotlicffi", marker = "platform_python_implementation != 'CPython'" },
     { name = "zopfli" },
 ]
 
@@ -921,8 +921,8 @@ name = "httpcore2"
 version = "2.16.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "h11", marker = "sys_platform != 'emscripten' or extra == 'extra-8-iscc-web-gpu'" },
-    { name = "truststore", marker = "sys_platform != 'emscripten' or extra == 'extra-8-iscc-web-gpu'" },
+    { name = "h11" },
+    { name = "truststore" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/c0/61/afa9d6b7452f9eca73f73d45324eb0bb52f098fd5e6049bf6b8263be9b4e/httpcore2-2.16.0.tar.gz", hash = "sha256:c72cd0413563b17e1cd8354677dff887466f8ec2551679759e93126534428643", size = 69886, upload-time = "2026-10-21T07:09:45.31Z" }
 wheels = [
@@ -1009,11 +1009,11 @@ name = "httpx2"
 version = "2.16.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "anyio", marker = "sys_platform != 'emscripten' or (extra == 'extra-8-iscc-web-cpu' and extra == 'extra-8-iscc-web-gpu') or (extra == 'extra-8-iscc-web-gpu' and extra == 'group-8-iscc-web-dev')" },
-    { name = "httpcore2", marker = "sys_platform != 'emscripten' or (extra == 'extra-8-iscc-web-cpu' and extra == 'extra-8-iscc-web-gpu') or (extra == 'extra-8-iscc-web-gpu' and extra == 'group-8-iscc-web-dev')" },
-    { name = "httpx2-jsfetch", marker = "sys_platform == 'emscripten' or (extra == 'extra-8-iscc-web-cpu' and extra == 'extra-8-iscc-web-gpu') or (extra == 'extra-8-iscc-web-gpu' and extra == 'group-8-iscc-web-dev')" },
+    { name = "anyio", marker = "sys_platform != 'emscripten'" },
+    { name = "httpcore2", marker = "sys_platform != 'emscripten'" },
+    { name = "httpx2-jsfetch", marker = "sys_platform == 'emscripten'" },
     { name = "idna" },
-    { name = "truststore", marker = "sys_platform != 'emscripten' or (extra == 'extra-8-iscc-web-cpu' and extra == 'extra-8-iscc-web-gpu') or (extra == 'extra-8-iscc-web-gpu' and extra == 'group-8-iscc-web-dev')" },
+    { name = "truststore", marker = "sys_platform != 'emscripten'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/43/73/5ca2cedf5e4e50423d1c258877865a6b62793633b561c58499f8aeb33b7e/httpx2-2.16.0.tar.gz", hash = "sha256:0d54c98128e8f2ff7fbbde0fca8c359e5f032edeaaaac443cdb7f31f685bcd7f", size = 103116, upload-time = "2026-10-21T07:09:46.348Z" }
 wheels = [
@@ -1037,7 +1037,7 @@ dependencies = [
     { name = "click" },
     { name = "filelock" },
     { name = "fsspec" },
-    { name = "hf-xet", marker = "platform_machine == 'AMD64' or platform_machine == 'ARM64' or platform_machine == 'aarch64' or platform_machine == 'amd64' or platform_machine == 'arm64' or platform_machine == 'x86_64' or (extra == 'extra-8-iscc-web-cpu' and extra == 'extra-8-iscc-web-gpu') or (extra == 'extra-8-iscc-web-gpu' and extra == 'group-8-iscc-web-dev')" },
+    { name = "hf-xet", marker = "platform_machine == 'AMD64' or platform_machine == 'ARM64' or platform_machine == 'aarch64' or platform_machine == 'amd64' or platform_machine == 'arm64' or platform_machine == 'x86_64'" },
     { name = "httpx2" },
     { name = "packaging" },
     { name = "pyyaml" },
@@ -1424,7 +1424,7 @@ dev = [
     { name = "ruff", specifier = ">=0.15.1" },
     { name = "schemathesis", specifier = ">=4.21" },
 ]
-docs = [{ name = "zensical-iscc", git = "https://github.com/iscc/zensical-iscc?tag=v0.3.0" }]
+docs = [{ name = "zensical-iscc", git = "https://github.com/iscc/zensical-iscc?tag=v0.3.1" }]
 
 [[package]]
 name = "isort"
@@ -1546,8 +1546,8 @@ name = "loguru"
 version = "0.7.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-8-iscc-web-cpu' and extra == 'extra-8-iscc-web-gpu') or (extra == 'extra-8-iscc-web-gpu' and extra == 'group-8-iscc-web-dev')" },
-    { name = "win32-setctime", marker = "sys_platform == 'win32' or (extra == 'extra-8-iscc-web-cpu' and extra == 'extra-8-iscc-web-gpu') or (extra == 'extra-8-iscc-web-gpu' and extra == 'group-8-iscc-web-dev')" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
+    { name = "win32-setctime", marker = "sys_platform == 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/3a/05/a1dae3dffd1116099471c643b8924f5aa6524411dc6c63fdae648c4f1aca/loguru-0.7.3.tar.gz", hash = "sha256:19480589e77d47b8d85b2c827ad95d49bf31b0dcde16593892eb51dd18706eb6", size = 63559, upload-time = "2024-12-06T11:20:56.608Z" }
 wheels = [
@@ -2795,7 +2795,7 @@ name = "tqdm"
 version = "4.70.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-8-iscc-web-cpu' and extra == 'extra-8-iscc-web-gpu') or (extra == 'extra-8-iscc-web-gpu' and extra == 'group-8-iscc-web-dev')" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/0d/ea/b2a5bd54b28a324dae8211928b2d730b6547500342c7e6c6dea08bd0a485/tqdm-4.70.1.tar.gz", hash = "sha256:cefd0eca11b2a37a3aee776544d4f4ae913f02688135b5556b8788dfa474afc4", size = 171846, upload-time = "2026-09-11T07:25:16.601Z" }
 wheels = [
@@ -2829,7 +2829,7 @@ version = "0.28.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "annotated-doc" },
-    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-8-iscc-web-cpu' and extra == 'extra-8-iscc-web-gpu') or (extra == 'extra-8-iscc-web-gpu' and extra == 'group-8-iscc-web-dev')" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
     { name = "rich" },
     { name = "shellingham" },
 ]
@@ -3097,8 +3097,8 @@ wheels = [
 
 [[package]]
 name = "zensical-iscc"
-version = "0.3.0"
-source = { git = "https://github.com/iscc/zensical-iscc?tag=v0.3.0#9b0050d607a388ab7fd801166175bbbb861db0ee" }
+version = "0.3.1"
+source = { git = "https://github.com/iscc/zensical-iscc?tag=v0.3.1#e347ace7954f9d7469695080e8c8488b0529cd20" }
 dependencies = [
     { name = "fonttools", extra = ["woff"] },
     { name = "pyyaml" },

@@ -5,6 +5,7 @@
 import { UNIT_STYLE, type UnitKind } from "../lib/iscc";
 import CodeBar from "./CodeBar.vue";
 import UiIcon from "./UiIcon.vue";
+import UnitAxis from "./UnitAxis.vue";
 
 const CARDS: Array<{ kind: UnitKind; name: string; code: string; compares: string; from: string }> = [
   {
@@ -53,6 +54,7 @@ section.education-strip
   CodeBar(:code="null" idle)
   .edu-arrow
     UiIcon(name="arrow-down" :size="18")
+  UnitAxis
   .edu-grid
     .edu-card(v-for="card in CARDS" :key="card.kind")
       .edu-color(:style="{ background: UNIT_STYLE[card.kind].color }")
@@ -62,16 +64,12 @@ section.education-strip
       .edu-card-body
         .edu-compares(v-text="card.compares")
         .edu-from(v-text="card.from")
-  .edu-axis
-    span Abstract &amp; persistent
-    .axis-line
-    span Concrete &amp; volatile
   .api-pointer
     .d-flex.align-items-center.gap-3
       .api-icon
         UiIcon(name="code" :size="18")
       div
-        .api-head Everything on this page is one REST call away
+        .api-head Generate #[span.text-nowrap ISO 24138:2024] #[span.text-nowrap ISCC-CODEs] through the REST API
         .api-calls POST /api/v1/iscc · GET /api/v1/explain/{iscc} · POST /api/v1/simprint
     a.api-btn.iscc-btn.iscc-btn--primary(href="/docs" target="_blank") Open API docs
 </template>
@@ -178,28 +176,6 @@ section.education-strip
   line-height: 1.45;
 }
 
-.edu-axis {
-  margin-top: 1.1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.9rem;
-
-  span {
-    font-size: 0.69rem;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    color: #6c757d;
-    text-transform: uppercase;
-  }
-
-  .axis-line {
-    flex: 1;
-    height: 4px;
-    border-radius: 2px;
-    background: var(--iscc-bright-yellow);
-  }
-}
-
 .api-pointer {
   margin-top: 1.75rem;
   background: #f8f9fa;
@@ -229,6 +205,7 @@ section.education-strip
   font-size: 0.88rem;
   font-weight: 600;
   color: #212529;
+  text-wrap: balance;
 }
 
 .api-calls {

@@ -21,6 +21,7 @@ nav = [
     { "How-to Guides" = [
         "howto/deployment.md",
         "howto/configuration.md",
+        "howto/restrict-access.md",
     ]},
     { "Explanation" = [
         "explanation/architecture.md",

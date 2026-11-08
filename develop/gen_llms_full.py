@@ -12,6 +12,7 @@ PAGES = [
     "tutorials/getting-started.md",
     "howto/deployment.md",
     "howto/configuration.md",
+    "howto/restrict-access.md",
     "explanation/architecture.md",
     "reference/rest-api.md",
     "reference/for-coding-agents.md",

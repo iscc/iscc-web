@@ -21,8 +21,9 @@ Run: `docker run -p 8000:8000 ghcr.io/iscc/iscc-web:main`
 
 ## How-to Guides
 
-- [Deployment](https://web.iscc.codes/howto/deployment.md): Production deployment with Docker Compose and Caddy
+- [Deployment](https://web.iscc.codes/howto/deployment.md): Production deployment with Docker Compose behind a reverse proxy
 - [Configuration](https://web.iscc.codes/howto/configuration.md): Environment variables and ISCC processing defaults
+- [Restrict access](https://web.iscc.codes/howto/restrict-access.md): Permissioned instances behind an authenticating reverse proxy
 
 ## Explanation
 

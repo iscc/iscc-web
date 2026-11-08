@@ -40,6 +40,10 @@ description: Release history of the iscc-web microservice.
     with the coral-dot logo and a link back to the generator, Readex Pro and JetBrains Mono served
     by the service itself, ISCC Blue accents and Deep Navy panels; on phones the sidebar becomes a
     menu instead of pushing the page wider than the screen
+- Documented what the reverse proxy in front of the service must do (forwarded headers, upload
+    size, timeouts) without prescribing a specific proxy, running a permissioned instance behind an
+    authenticating reverse proxy (basic auth or single sign-on), and the session affinity (sticky
+    sessions) that deployments with several instances need
 - Removed the unused pre-rebrand ISCC logo files (`/images/iscc-logo-*.svg` and
     `/images/iscc-icon-*.svg`)
 

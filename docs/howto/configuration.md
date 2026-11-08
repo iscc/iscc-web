@@ -68,9 +68,12 @@ the hash.
 !!! warning "Reverse proxies must forward real client IPs"
 
     Behind a reverse proxy, make sure the proxy forwards real client IPs and that the ASGI server
-    trusts the forwarding headers (e.g. `FORWARDED_ALLOW_IPS=*` for gunicorn/uvicorn, as in the
-    [deployment example](deployment.md)). Otherwise every client appears to be the proxy's IP and
-    all uploads become accessible to everyone.
+    trusts the forwarding headers (`FORWARDED_ALLOW_IPS` for gunicorn/uvicorn; see
+    [Forwarded client IPs](deployment.md#forwarded-client-ips) for when `*` is safe). Otherwise
+    every client appears to be the proxy's IP and all uploads become accessible to everyone.
+
+Behind an authenticating reverse proxy, the uploader is still identified by IP address, not by the
+signed-in user; see [Restrict access](restrict-access.md#private-files-behind-a-login).
 
 ## Worker processes and memory
 

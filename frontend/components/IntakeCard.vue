@@ -218,13 +218,11 @@ const submitCode = () => {
       textarea.text-input(v-model="text" placeholder="Paste or type plain text — an article, a post, a chapter…")
       .row-actions
         span.input-note UTF-8 · uploaded as pasted-text.txt · {{ text.length.toLocaleString() }} characters
-        button.btn-go(
+        button.btn-go.iscc-btn.iscc-btn--generate(
           type="button"
           :disabled="!canSubmitText"
           @click="submitText"
-        )
-          span Generate ISCC
-          UiIcon(name="arrow-right" :size="14")
+        ) Generate ISCC
     template(v-else)
       input.code-input(
         v-model="codeInput"
@@ -237,13 +235,11 @@ const submitCode = () => {
         .d-flex.align-items-center.gap-2
           .valid-dot(:class="codeState")
           span.input-note(v-text="codeHint")
-        button.btn-go(
+        button.btn-go.iscc-btn.iscc-btn--primary(
           type="button"
           :disabled="codeState !== 'valid'"
           @click="submitCode"
-        )
-          span Decode code
-          UiIcon(name="arrow-right" :size="14")
+        ) Decode code
       .code-help
         | No upload needed — the code itself carries its units. You get the same readout:
         | unit fields, bits and per-layer explanations. File-specific panels stay hidden.
@@ -255,7 +251,7 @@ const submitCode = () => {
           label.toggle-label(for="semantic-toggle")
             span Semantic code
             span.chip-experimental EXPERIMENTAL
-          .toggle-desc Create experimental ML-based Semantic Code (images and text only).
+          .toggle-desc Include experimental ML-based Semantic Unit (images and text only).
       .toggle-row
         .form-check.form-switch.m-0
           input#granular-toggle.form-check-input(type="checkbox" v-model="granular")
@@ -273,7 +269,7 @@ const submitCode = () => {
 <style scoped lang="scss">
 .intake-card {
   background: #ffffff;
-  border-radius: 1rem;
+  border-radius: var(--iscc-radius);
   box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.3);
   overflow: hidden;
 }
@@ -314,7 +310,7 @@ const submitCode = () => {
 
 .drop-zone {
   border: 2px dashed #ced4da;
-  border-radius: 0.65rem;
+  border-radius: var(--iscc-radius-sm);
   background: #f8f9fa;
   padding: 2.1rem 1.25rem;
   display: flex;
@@ -340,7 +336,7 @@ const submitCode = () => {
   .drop-icon {
     width: 2.9rem;
     height: 2.9rem;
-    border-radius: 0.65rem;
+    border-radius: var(--iscc-radius-sm);
     background: rgba(0, 84, 178, 0.08);
     color: var(--iscc-blue);
     display: flex;
@@ -378,7 +374,7 @@ const submitCode = () => {
   line-height: 1.6;
   padding: 0.75rem 0.9rem;
   border: 1px solid #ced4da;
-  border-radius: 0.65rem;
+  border-radius: var(--iscc-radius-sm);
   background: #f8f9fa;
   color: #212529;
   outline: none;
@@ -397,7 +393,7 @@ const submitCode = () => {
   letter-spacing: -0.01em;
   padding: 0.75rem 0.9rem;
   border: 1px solid #ced4da;
-  border-radius: 0.65rem;
+  border-radius: var(--iscc-radius-sm);
   background: #f8f9fa;
   color: #212529;
   outline: none;
@@ -407,39 +403,29 @@ const submitCode = () => {
   }
 }
 
+// The note sits beside the button; when the row is too narrow for both, the button wraps below it.
 .row-actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
   margin-top: 0.65rem;
+
+  > :first-child {
+    flex: 1 1 12rem;
+  }
+}
+
+.btn-go {
+  margin-left: auto;
 }
 
 .input-note {
   font-family: var(--bs-font-monospace);
   font-size: 0.69rem;
   font-weight: 300;
-  color: #adb5bd;
-}
-
-.btn-go {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  background: var(--iscc-blue);
-  color: #ffffff;
-  font-size: 0.82rem;
-  font-weight: 600;
-  padding: 0.55rem 1rem;
-  border: none;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  flex-shrink: 0;
-
-  &:disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
-  }
+  color: var(--iscc-muted);
 }
 
 .valid-dot {
@@ -462,7 +448,7 @@ const submitCode = () => {
   margin-top: 0.85rem;
   background: #f8f9fa;
   border: 1px solid #e9ecef;
-  border-radius: 0.65rem;
+  border-radius: var(--iscc-radius-sm);
   padding: 0.75rem 0.9rem;
   font-size: 0.76rem;
   font-weight: 300;
@@ -526,7 +512,7 @@ const submitCode = () => {
     position: absolute;
     inset: 12px;
     border: 2px dashed rgba(255, 255, 255, 0.8);
-    border-radius: 0.65rem;
+    border-radius: var(--iscc-radius-sm);
     display: flex;
     flex-direction: column;
     align-items: center;

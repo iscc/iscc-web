@@ -225,9 +225,7 @@ const compareOptionsFor = (specimen: IsccWeb.Specimen) =>
             @code-submit="onCodeSubmit"
           )
         .copy-col
-          .iso-badge
-            UiIcon(name="check-circle" :size="13")
-            span ISO 24138:2024
+          .iso-badge ISO 24138:2024
           h1.hero-title The #[span.accent DNA] of your digital content#[span.accent .]
           p.hero-sub An ISCC is a fingerprint generated #[b from the content itself] — no registry, no signup. Drop a file and read its code layer by layer.
           ul.hero-points
@@ -292,6 +290,7 @@ const compareOptionsFor = (specimen: IsccWeb.Specimen) =>
   color: #ffffff;
 }
 
+// A plain standard reference - no checkmark, which would read as a certification badge.
 .iso-badge {
   display: inline-flex;
   align-items: center;

@@ -65,7 +65,7 @@ const previewFacts = computed(() => {
     span(v-text="pillText")
   .detail-grid(:class="{ 'code-mode': specimen.kind === 'code' }")
     .explain-col
-      h3.layer-title(:style="{ color: style.accent }" v-text="copy.title")
+      h3.layer-title(v-text="copy.title")
       p.layer-body(v-text="copy.body")
       .chips
         span.chip.experimental(v-if="kind === 'semantic'") EXPERIMENTAL · NON-ISO
@@ -111,12 +111,12 @@ const previewFacts = computed(() => {
           v-model="form.description"
           :disabled="specimen.embedBusy"
         )
-        button.embed-btn(
+        button.embed-btn.iscc-btn.iscc-btn--generate.iscc-btn--compact(
           type="button"
           :disabled="specimen.embedBusy"
           @click="emit('embed', { ...form })"
         )
-          span(v-text="specimen.embedBusy ? 'Embedding…' : 'Embed metadata → re-decode'")
+          span(v-text="specimen.embedBusy ? 'Embedding…' : 'Embed metadata'")
         .embed-error(v-if="specimen.embedError" v-text="specimen.embedError")
         a.updated-link(v-if="specimen.metadataChanged && mediaId" :href="downloadUrl")
           UiIcon(name="download" :size="13")
@@ -180,6 +180,7 @@ const previewFacts = computed(() => {
   margin: 0 0 0.5rem;
   font-size: 1.1rem;
   font-weight: 600;
+  color: var(--iscc-ink);
 }
 
 .layer-body {
@@ -222,7 +223,7 @@ const previewFacts = computed(() => {
 .panel {
   background: #f8f9fa;
   border: 1px solid #e9ecef;
-  border-radius: 0.65rem;
+  border-radius: var(--iscc-radius-sm);
   padding: 1rem 1.1rem;
 }
 
@@ -244,7 +245,7 @@ const previewFacts = computed(() => {
 .preview-thumb {
   width: 4rem;
   height: 4rem;
-  border-radius: 0.4rem;
+  border-radius: var(--iscc-radius-sm);
   object-fit: cover;
   flex-shrink: 0;
 
@@ -316,20 +317,9 @@ const previewFacts = computed(() => {
 }
 
 .embed-btn {
-  display: block;
   width: 100%;
-  background: var(--iscc-blue);
-  color: #ffffff;
-  font-size: 0.78rem;
-  font-weight: 600;
-  text-align: center;
-  padding: 0.55rem 0;
-  border: none;
-  border-radius: 0.5rem;
-  cursor: pointer;
 
   &:disabled {
-    opacity: 0.55;
     cursor: wait;
   }
 }

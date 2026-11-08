@@ -1,4 +1,4 @@
-// ISCC brand theme (see .claude/skills/iscc-brand-guidelines)
+// ISCC brand theme (brand kit: github.com/iscc/iscc-brand, GUIDELINES.md, Edition 01)
 $primary: #0054b2; // ISCC Blue
 $success: #a6db50; // Lime Green
 $info: #4596f5; // Sky Blue
@@ -6,12 +6,22 @@ $warning: #ffc300; // Bright Yellow
 $danger: #f56169; // Coral Red
 $dark: #123663; // Deep Navy
 
+// Bauhaus-leaning corners: 4 px on cards and panels, 2 px on controls inside them.
+$border-radius: 2px;
+$border-radius-sm: 2px;
+$border-radius-lg: 4px;
+
 $font-family-sans-serif: "Readex Pro", Arial, sans-serif;
 $font-family-monospace: "JetBrains Mono", Consolas, monospace;
 
 @import "~bootstrap/scss/bootstrap";
 
 :root {
+  --iscc-ink: #212529; // near-black: text, dark fields, primary buttons
+  --iscc-muted: #636b71;
+  --iscc-rule: #d2d6d9;
+  --iscc-radius: 4px; // cards and panels
+  --iscc-radius-sm: 2px; // controls, chips and bars inside them
   --iscc-blue: #0054b2;
   --iscc-deep-navy: #123663;
   --iscc-bright-yellow: #ffc300;
@@ -19,7 +29,7 @@ $font-family-monospace: "JetBrains Mono", Consolas, monospace;
   --iscc-lime-green: #a6db50;
   --iscc-sky-blue: #4596f5;
   --iscc-light-cyan: #7ac2f7;
-  // ISCC-UNIT layer colors (Concept 4 decoder readout palette; mirrored in frontend/lib/iscc.ts)
+  // ISCC-UNIT colours (brand kit unit palette; mirrored in frontend/lib/iscc.ts)
   --iscc-unit-meta: #7ac2f7;
   --iscc-unit-semantic: #4596f5;
   --iscc-unit-content: #0054b2;
@@ -32,11 +42,270 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+// Brand keyboard focus: 2 px ISCC Blue outline offset by 4 px; white inside dark fields (.on-dark).
+:focus-visible {
+  outline: 2px solid var(--iscc-blue);
+  outline-offset: 4px;
+}
+
+.on-dark :focus-visible {
+  outline-color: #ffffff;
+}
+
 // Grain texture overlay; the element sets its own background-color to blend with.
 .grain {
   background-image: url("./assets/grain.png");
   background-size: 256px 256px;
   background-blend-mode: overlay;
+}
+
+// ---------- brand buttons ----------
+// Shapes follow the brand kit button tokens, measured from the button height --h: label padding
+// 0.43h, point depth 0.3h, chevron thickness 0.26h, chevron gap 0.09h, unit-cap stripes 0.2h.
+// Labels are JetBrains Mono Medium capitals with 0.06em tracking.
+
+.iscc-btn {
+  --h: 46px;
+  --label: 14px;
+  --fill: var(--iscc-ink);
+  --fg: #ffffff;
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  height: var(--h);
+  padding: 0 calc(var(--h) * 0.43);
+  flex-shrink: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--fg);
+  font-family: var(--bs-font-monospace);
+  font-size: var(--label);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--fg);
+  }
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    transition: transform 160ms ease-out;
+  }
+
+  &:disabled {
+    --fill: var(--iscc-rule);
+    --fg: var(--iscc-muted);
+    cursor: not-allowed;
+  }
+}
+
+.iscc-btn--compact {
+  --h: 36px;
+  --label: 12px;
+}
+
+// Primary: near-black block with a pointed end and a coral chevron. One per view.
+.iscc-btn--primary {
+  padding-right: calc(var(--h) * (0.43 + 0.3 + 0.09 + 0.26));
+
+  &::before {
+    left: 0;
+    right: calc(var(--h) * (0.09 + 0.26));
+    z-index: -1;
+    background: var(--fill);
+    clip-path: polygon(
+      0 0,
+      calc(100% - var(--h) * 0.3) 0,
+      100% 50%,
+      calc(100% - var(--h) * 0.3) 100%,
+      0 100%
+    );
+  }
+
+  &::after {
+    right: 0;
+    width: calc(var(--h) * (0.3 + 0.26));
+    background: var(--iscc-coral-red);
+    clip-path: polygon(
+      0 0,
+      calc(var(--h) * 0.26) 0,
+      100% 50%,
+      calc(var(--h) * 0.26) 100%,
+      0 100%,
+      calc(var(--h) * 0.3) 50%
+    );
+  }
+
+  &:hover:not(:disabled)::after {
+    transform: translateX(calc(var(--h) * 0.09));
+  }
+
+  &:disabled::after {
+    background: var(--iscc-rule);
+  }
+}
+
+// Generate: near-black block capped with the five ISCC-UNIT colours. Only for actions that
+// create an ISCC-CODE.
+.iscc-btn--generate {
+  padding-right: calc(var(--h) * (0.43 + 1));
+
+  &::before {
+    left: 0;
+    right: var(--h);
+    z-index: -1;
+    background: var(--fill);
+  }
+
+  &::after {
+    right: 0;
+    width: var(--h);
+    background: linear-gradient(
+      to right,
+      var(--iscc-unit-meta) 0 20%,
+      var(--iscc-unit-semantic) 20% 40%,
+      var(--iscc-unit-content) 40% 60%,
+      var(--iscc-unit-data) 60% 80%,
+      var(--iscc-unit-instance) 80% 100%
+    );
+  }
+
+  &:hover:not(:disabled)::after {
+    transform: translateX(calc(var(--h) * 0.09));
+  }
+
+  &:disabled::after {
+    background: var(--iscc-rule);
+  }
+}
+
+// Secondary: 1.5 px outline in the text colour; thickens to 2.5 px on hover.
+.iscc-btn--secondary {
+  --fg: var(--iscc-ink);
+  box-shadow: inset 0 0 0 1.5px currentColor;
+
+  &:hover:not(:disabled) {
+    box-shadow: inset 0 0 0 2.5px currentColor;
+  }
+
+  &:disabled {
+    --fg: var(--iscc-muted);
+  }
+
+  .on-dark & {
+    --fg: #ffffff;
+  }
+}
+
+// ---------- ISCC-CODE bar ----------
+// The only text the brand kit allows on coral. White on coral is 3.09:1, which passes WCAG AA only as large
+// text (bold from 18.67 px); the brand kit sets the code in Bold, the demo a notch lighter in SemiBold at
+// 19 px. Narrow bars shrink it just enough to keep a 73-character ISCC-CODE on two lines (22.5 = 37 characters
+// x 0.6 em advance, plus slack), never below 12 px; bars that show a real result carry a Copy button for those
+// sizes.
+.iscc-code-bar {
+  container-type: inline-size;
+  background-color: var(--iscc-coral-red);
+  color: #ffffff;
+  border-radius: var(--iscc-radius-sm);
+  padding: 0.7rem 1rem;
+
+  > span {
+    display: block;
+    font-family: var(--bs-font-monospace);
+    font-size: clamp(12px, 100cqi / 22.5, 19px);
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: 0;
+    word-break: break-all;
+    text-wrap: balance;
+  }
+}
+
+// ---------- coral dot ----------
+// The coral dot of the brand symbol, hopping with squash and stretch like the iscc.io home mark.
+.iscc-dot {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--iscc-coral-red);
+  transform-origin: 50% 100%;
+}
+
+// One hop, floor contact to floor contact: squash, stretch on take-off, ease out to the apex, fall,
+// stretch, squash. CodeBar.vue lands the dot on a contact, so it relies on the 560 ms cycle.
+@keyframes dot-hop {
+  0%,
+  100% {
+    transform: translateY(0) scale(1.3, 0.7);
+    animation-timing-function: ease-out;
+  }
+
+  10% {
+    transform: translateY(0) scale(0.9, 1.12);
+    animation-timing-function: cubic-bezier(0.25, 0.6, 0.4, 1);
+  }
+
+  50% {
+    transform: translateY(-12px) scale(1, 1);
+    animation-timing-function: cubic-bezier(0.6, 0, 0.75, 0.4);
+  }
+
+  90% {
+    transform: translateY(0) scale(0.94, 1.08);
+    animation-timing-function: ease-out;
+  }
+}
+
+// A resting dot that now and then crouches, hops, lands and rebounds once.
+@keyframes dot-idle {
+  0%,
+  30%,
+  100% {
+    transform: translateY(0) scale(1, 1);
+  }
+
+  4% {
+    transform: translateY(0) scale(1.22, 0.78);
+    animation-timing-function: ease-out;
+  }
+
+  8% {
+    transform: translateY(0) scale(0.9, 1.12);
+    animation-timing-function: cubic-bezier(0.25, 0.6, 0.4, 1);
+  }
+
+  14% {
+    transform: translateY(-12px) scale(1, 1);
+    animation-timing-function: cubic-bezier(0.6, 0, 0.75, 0.4);
+  }
+
+  20% {
+    transform: translateY(0) scale(1.25, 0.75);
+    animation-timing-function: ease-out;
+  }
+
+  24% {
+    transform: translateY(-4px) scale(0.97, 1.03);
+    animation-timing-function: ease-in;
+  }
+
+  27% {
+    transform: translateY(0) scale(1.1, 0.9);
+  }
 }
 
 // Keyframes used via inline animation styles (must be global - scoped keyframes

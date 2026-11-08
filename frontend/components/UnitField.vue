@@ -1,8 +1,9 @@
 <script setup lang="ts">
-// One selectable ISCC-UNIT field on the navy readout strip: swatch, unit code
-// and the contiguous bit strip. Also renders the queued/hashing loading states.
+// One selectable ISCC-UNIT field on the readout strip: unit name, unit code and the
+// contiguous bit strip. Also renders the queued/hashing loading states. Styled like the
+// unit cards of the first-visit panel (EducationStrip.vue) that it takes over from.
 import { computed } from "vue";
-import { UNIT_STYLE, type UnitKind, seedBits } from "../lib/iscc";
+import { BIT_ZERO as ZERO, UNIT_STYLE, type UnitKind, seedBits } from "../lib/iscc";
 
 const props = withDefaults(
   defineProps<{
@@ -19,8 +20,7 @@ const emit = defineEmits<{ (e: "select"): void }>();
 
 const style = computed(() => UNIT_STYLE[props.kind]);
 
-const ZERO = "rgba(255, 255, 255, 0.25)";
-const QUEUED = "rgba(255, 255, 255, 0.08)";
+const QUEUED = "rgba(18, 54, 99, 0.05)";
 
 const bitCells = computed<Array<{ color: string; anim: boolean }>>(() => {
   if (props.state === "queued") {
@@ -65,33 +65,31 @@ button.unit-field(
   :aria-pressed="selected"
   @click="emit('select')"
 )
-  .uf-head
-    .uf-name
-      .swatch(:style="{ background: style.color }")
-      span(v-text="style.label")
+  .uf-color(:style="{ background: style.color }")
+  .uf-head(:style="{ background: style.tint }")
+    span.uf-name(v-text="style.label")
     span.uf-tag(:class="state" v-text="tag")
-  .uf-code(v-text="code")
-  .uf-bits(v-if="bitCells.length")
-    .bit(
-      v-for="(cell, index) in bitCells"
-      :key="index"
-      :style="bitStyle(cell, index)"
-    )
-  .uf-meaning(v-text="style.meaning")
+  .uf-body
+    .uf-code(v-text="code")
+    .uf-bits(v-if="bitCells.length")
+      .bit(
+        v-for="(cell, index) in bitCells"
+        :key="index"
+        :style="bitStyle(cell, index)"
+      )
+    .uf-meaning(v-text="style.meaning")
 </template>
 
 <style scoped lang="scss">
 .unit-field {
   display: block;
   width: 100%;
+  padding: 0;
   text-align: left;
-  background: rgba(255, 255, 255, 0.07);
-  border: 2px solid rgba(255, 255, 255, 0.16);
-  border-radius: 0.65rem;
-  padding: 0.8rem 0.9rem 0.85rem;
+  background: #ffffff;
+  border: 1px solid #e9ecef;
   cursor: default;
   transition:
-    border-color 0.15s ease,
     box-shadow 0.15s ease,
     transform 0.15s ease;
 
@@ -100,15 +98,19 @@ button.unit-field(
 
     &:hover {
       transform: translateY(-2px);
+      box-shadow: 0 8px 16px -8px rgba(18, 54, 99, 0.3);
     }
   }
 
   &.selected {
-    border-color: var(--iscc-bright-yellow);
     box-shadow:
-      0 0 0 3px rgba(255, 195, 0, 0.3),
-      0 8px 20px rgba(0, 0, 0, 0.35);
+      0 0 0 3px var(--iscc-coral-red),
+      0 8px 18px -6px rgba(18, 54, 99, 0.3);
   }
+}
+
+.uf-color {
+  height: 6px;
 }
 
 .uf-head {
@@ -116,48 +118,36 @@ button.unit-field(
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
 }
 
 .uf-name {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-
-  .swatch {
-    width: 10px;
-    height: 10px;
-    border-radius: 3px;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    flex-shrink: 0;
-  }
-
-  span {
-    font-family: var(--bs-font-monospace);
-    font-size: 0.69rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    color: #ffffff;
-  }
+  font-family: var(--bs-font-monospace);
+  font-size: 0.69rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--iscc-deep-navy);
 }
 
 .uf-tag {
   font-family: var(--bs-font-monospace);
   font-size: 0.62rem;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(18, 54, 99, 0.65);
   white-space: nowrap;
 
   &.hashing {
-    color: var(--iscc-bright-yellow);
+    color: #7a5c00;
   }
+}
+
+.uf-body {
+  padding: 0.55rem 0.75rem 0.65rem;
 }
 
 .uf-code {
   font-family: var(--bs-font-monospace);
   font-size: 0.69rem;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.85);
-  margin-top: 0.4rem;
+  color: #495057;
   letter-spacing: 0.01em;
   white-space: nowrap;
   overflow: hidden;
@@ -181,7 +171,7 @@ button.unit-field(
 .uf-meaning {
   font-size: 0.66rem;
   font-weight: 300;
-  color: rgba(255, 255, 255, 0.65);
+  color: var(--iscc-muted);
   margin-top: 0.5rem;
 }
 </style>

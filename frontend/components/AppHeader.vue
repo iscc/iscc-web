@@ -1,23 +1,23 @@
 <script setup lang="ts">
-// Navy top bar: brand mark, product name and the developer exits.
-import isccLogo from "../assets/iscc-logo-white.png";
+// Navy top bar: brand signature, product name and the developer exits.
+import isccLogo from "../assets/iscc-logo-white-coral.svg";
 import UiIcon from "./UiIcon.vue";
 </script>
 
 <template lang="pug">
-header.app-header.grain
+header.app-header.grain.on-dark
   .container-xl.d-flex.align-items-center.justify-content-between.py-3
     .d-flex.align-items-center.gap-3
-      img.logo(:src="isccLogo" alt="ISCC logo")
-      .divider
-      span.product GENERATOR
+      img.logo(:src="isccLogo" alt="ISCC")
+      .divider.d-none.d-sm-block
+      span.product.d-none.d-sm-inline GENERATOR
     .d-flex.align-items-center.gap-4
       a.quiet-link.d-none.d-md-inline(
         href="https://iscc.codes"
         target="_blank"
         rel="noopener"
       ) What is an ISCC?
-      a.docs-btn(href="/docs" target="_blank")
+      a.iscc-btn.iscc-btn--secondary.iscc-btn--compact(href="/docs" target="_blank")
         UiIcon(name="code" :size="14")
         span API Docs
 </template>
@@ -26,8 +26,9 @@ header.app-header.grain
 .app-header {
   background-color: var(--iscc-deep-navy);
 
+  // The SVG master carries its clear space in the viewBox; 2.5rem tall = 144 px wide.
   .logo {
-    height: 1.9rem;
+    height: 2.5rem;
     width: auto;
     display: block;
   }
@@ -53,24 +54,6 @@ header.app-header.grain
     text-decoration: none;
 
     &:hover {
-      color: #ffffff;
-    }
-  }
-
-  .docs-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    color: #ffffff;
-    font-size: 0.85rem;
-    font-weight: 500;
-    text-decoration: none;
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    border-radius: 0.5rem;
-    padding: 0.45rem 0.8rem;
-
-    &:hover {
-      border-color: rgba(255, 255, 255, 0.7);
       color: #ffffff;
     }
   }

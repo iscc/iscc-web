@@ -17,9 +17,11 @@ describe("EducationStrip", () => {
     ]);
   });
 
-  it("shows a sample composite code and the API pointer", () => {
+  it("keeps the code slot empty and shows the API pointer", () => {
     const wrapper = mount(EducationStrip);
-    expect(wrapper.find(".sample-bar").text()).toMatch(/^ISCC:[A-Z2-7]+$/);
+    expect(wrapper.find(".code-bar.slot.idle").text()).toBe("Your ISCC-CODE will land here");
+    expect(wrapper.find(".code-bar .iscc-dot").exists()).toBe(true);
+    expect(wrapper.text()).not.toMatch(/ISCC:[A-Z2-7]{8,}/);
     expect(wrapper.find(".api-calls").text()).toContain("POST /api/v1/iscc");
     expect(wrapper.find("a.api-btn").attributes("href")).toBe("/docs");
   });

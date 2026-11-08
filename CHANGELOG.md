@@ -9,6 +9,15 @@
 - All ISCC worker processes now start with the service and load the ONNX models up front instead
     of on first use, so no request waits for a model load (about 700 MB of RAM per worker on CPU;
     set `ISCC_WEB_MAX_WORKERS` on many-core hosts)
+- The demo frontend adopts the ISCC brand identity: the coral-dot logo and favicon, brand-shaped
+    buttons (a Generate button capped with the five ISCC-UNIT colours), tighter corners with
+    hard-cornered ISCC-UNIT cards, and a bold ISCC-CODE bar that wraps onto two lines on phones
+    instead of shrinking the code below a readable size; the page design is otherwise unchanged
+- The demo frontend no longer shows a sample ISCC-CODE before anything is processed: the code
+    bar starts as an empty slot with a hopping coral dot, and the generated code lands with an
+    animated reveal (skipped when the viewer prefers reduced motion); the result and comparison
+    readouts are light, with ISCC-UNIT fields and diff cards styled like the unit cards of the
+    first-visit panel
 - Requires Python 3.14; the Docker images run CPython 3.14.10 (`python:3.14-slim` on Debian
     trixie for the CPU image, a uv-managed CPython on the CUDA base for the GPU image)
 - Updated `iscc-sdk` to 0.9.7, `iscc-sci` to 0.4.1, `iscc-sct` to 0.2.2 and `iscc-tika` to 0.6.0;

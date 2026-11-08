@@ -1,14 +1,15 @@
 <script setup lang="ts">
-// Navy footer mirroring the header: copyright, legal pages and developer exits.
-import isccLogo from "../assets/iscc-logo-white.png";
+// Navy footer mirroring the header: copyright, legal pages and developer exits. The name is
+// established in the header, so the footer carries the brand symbol only.
+import isccSymbol from "../assets/iscc-icon-white-coral.svg";
 import UiIcon from "./UiIcon.vue";
 </script>
 
 <template lang="pug">
-footer.app-footer.grain
-  .container-xl.d-flex.align-items-center.justify-content-between.gap-4.flex-wrap.py-3
-    .d-flex.align-items-center.gap-3
-      img.logo(:src="isccLogo" alt="ISCC logo")
+footer.app-footer.grain.on-dark
+  .container-xl.d-flex.align-items-center.justify-content-between.gap-4.flex-wrap.py-2
+    .d-flex.align-items-center.gap-2
+      img.logo(:src="isccSymbol" alt="ISCC")
       span.copyright Copyright © 2022–2026 ISCC Foundation
     .d-flex.align-items-center.gap-4.flex-wrap
       a.legal(
@@ -53,11 +54,11 @@ footer.app-footer.grain
   background-color: var(--iscc-deep-navy);
   margin-top: auto;
 
+  // The SVG symbol carries its clear space in the viewBox (brand screen minimum: 32 px wide).
   .logo {
-    height: 1.1rem;
+    height: 2.25rem;
     width: auto;
     display: block;
-    opacity: 0.9;
   }
 
   .copyright {

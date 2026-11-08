@@ -5,9 +5,6 @@ description: A microservice for generating International Standard Content Codes 
 
 # iscc-web
 
-[![CI](https://github.com/iscc/iscc-web/actions/workflows/ci.yml/badge.svg)](https://github.com/iscc/iscc-web/actions/workflows/ci.yml)
-[![License](https://img.shields.io/badge/license-Apache%202.0-green.svg)](https://github.com/iscc/iscc-web/blob/main/LICENSE)
-
 **A microservice for generating International Standard Content Codes
 ([ISCC](https://iscc.codes), ISO 24138) for media files.**
 
@@ -129,7 +126,7 @@ its `units`, and technical metadata. Continue with the
 - **[Reference](reference/rest-api.md)** - API details
 
     [REST API reference](reference/rest-api.md) and a
-    [guide for coding agents](reference/for-coding-agents.md).
+    [guide for coding agents](for-coding-agents.md).
 
 </div>
 

@@ -24,7 +24,8 @@ FROM builder AS prod-build
 # Install dependencies into /app/.venv. --extra cpu pulls the CPU onnxruntime variant of
 # iscc-sct/iscc-sci (post-split, no extra means no onnxruntime at all). The GPU image uses
 # --extra gpu in its own stage; the two onnxruntime variants must never co-resolve.
-RUN uv sync --frozen --no-dev --no-install-project --extra cpu
+# --no-default-groups leaves out the dev and docs dependency groups.
+RUN uv sync --frozen --no-default-groups --no-install-project --extra cpu
 
 # Fetch content processing tools (ffmpeg, ffprobe, fpcalc) into /root/.local/share/iscc-sdk
 RUN /app/.venv/bin/iscc-sdk install
@@ -137,7 +138,7 @@ COPY pyproject.toml uv.lock .python-version /app/
 RUN uv python install
 
 # Install dependencies into /app/.venv with the GPU onnxruntime variant.
-RUN uv sync --frozen --no-dev --no-install-project --extra gpu
+RUN uv sync --frozen --no-default-groups --no-install-project --extra gpu
 
 # Fetch content processing tools (ffmpeg, ffprobe, fpcalc) into /root/.local/share/iscc-sdk
 RUN /app/.venv/bin/iscc-sdk install

@@ -142,12 +142,21 @@ Serve the docs locally with live reload:
 uv run poe docs-serve
 ```
 
-Build for deployment — this builds the static site with [Zensical](https://zensical.org/) into
-`site/` and generates `llms-full.txt` for LLM consumption:
+The live server shows the plain ISCC logo in the header; the "ISCC | web." project logo only
+appears in a built site.
+
+Build for deployment — this builds the static site with [Zensical](https://zensical.org/) and the
+ISCC theme ([zensical-iscc](https://github.com/iscc/zensical-iscc)) into `site/`, with a Markdown
+copy of every page plus `llms.txt` and `llms-full.txt` for LLM consumption. Then check it as CI
+does:
 
 ```bash
 uv run poe docs-build
+uv run poe docs-check
 ```
+
+The check fails on findings such as a page that loads files from other sites or a Mermaid
+diagram: keep images in `docs/` and draw diagrams as SVG files.
 
 ## Cross-platform support
 

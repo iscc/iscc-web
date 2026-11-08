@@ -59,10 +59,11 @@ dev = [
     "ruff>=0.15.1",
     "prek>=0.2.9",
     "radon>=6.0.1",
-    "zensical>=0.0.21",
     # CPU onnxruntime for local dev/tests so `uv sync` runs semantic inference without the gpu extra.
     "onnxruntime",
 ]
+# The documentation site (docs/, zensical.toml): Zensical with the ISCC theme, which pins the Zensical version.
+docs = ["zensical-iscc"]
 
 [tool.uv]
 default-groups = "all"
@@ -76,6 +77,9 @@ conflicts = [
     # dev brings CPU onnxruntime; never co-resolve it with the gpu extra's onnxruntime-gpu.
     [{ group = "dev" }, { extra = "gpu" }],
 ]
+
+[tool.uv.sources]
+zensical-iscc = { git = "https://github.com/iscc/zensical-iscc", tag = "v0.3.0" }
 
 [tool.uv.build-backend]
 module-name = "iscc_web"
@@ -141,11 +145,11 @@ precommit = { cmd = "uv run prek run", help = "Run prek hooks on changed files" 
 test = { cmd = "uv run python -m pytest -n auto --tb=line --no-header -q --cov --cov-config=pyproject.toml --cov-report=term-missing", help = "Test the code with pytest" }
 check-complexity = { cmd = "uv run radon cc --min C --show-complexity --average iscc_web/", help = "Check code complexity with radon" }
 run = { cmd = "uv run uvicorn iscc_web.asgi:application --reload", help = "Run dev server" }
-docs-serve = { cmd = "uv run zensical serve", help = "Serve docs locally with live reload" }
+docs-serve = { cmd = "uv run zensical serve --dev-addr 127.0.0.1:45208", help = "Serve docs locally with live reload (plain ISCC logo; the project logo needs docs-build)" }
 docs-changelog = { cmd = "uv run python -m develop.copy_changelog", help = "Sync CHANGELOG.md into the docs site" }
 docs-build = { sequence = [
     { cmd = "uv run python -m develop.copy_changelog" },
-    { cmd = "uv run zensical build" },
-    { cmd = "uv run python -m develop.gen_llms_full" },
-], help = "Build docs site with llms-full.txt" }
+    { cmd = "uv run zensical-iscc build" },
+], help = "Build the docs site into site/ with its Markdown copies, llms.txt and llms-full.txt" }
+docs-check = { cmd = "uv run zensical-iscc check --strict", help = "Check the docs configuration and the built site (as CI does)" }
 all = { sequence = ["formatopenapi", "codegen", "format", "test", "check-complexity"], help = "Run all tasks" }

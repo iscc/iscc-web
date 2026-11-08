@@ -12,7 +12,7 @@ the codebase. Tables and code over prose. Terminology matches the codebase exact
 
 Base path: `/api/v1` (public instance: `https://web.iscc.io/api/v1`). The OpenAPI spec is served at
 `/docs/openapi.yaml` with interactive docs at `/docs`. Full details:
-[REST API reference](rest-api.md).
+[REST API reference](reference/rest-api.md).
 
 ### Endpoints
 
@@ -101,7 +101,7 @@ the `X-Upload-Filename` header. Applies to `POST /iscc` and `POST /media`.
 - Uploads are ephemeral: a cleanup task deletes media packages older than
     `ISCC_WEB_STORAGE_EXPIRY` (default 3600 s). Persist the `201` response JSON.
 - CORS is disabled by default; set `ISCC_WEB_CORS_ORIGINS` for cross-origin clients
-    (see [Configuration](../howto/configuration.md)).
+    (see [Configuration](howto/configuration.md)).
 
 ## Working on the codebase
 
@@ -161,7 +161,7 @@ Frontend (pnpm; Node version pinned in `.tool-versions`):
 ### Environment variables
 
 All service options use the `ISCC_WEB_` prefix (`iscc_web/options.py`). Quick table — full
-reference in [Configuration](../howto/configuration.md):
+reference in [Configuration](howto/configuration.md):
 
 | Variable                    | Default                     | Purpose                                                      |
 | --------------------------- | --------------------------- | ------------------------------------------------------------ |
@@ -225,7 +225,7 @@ reference in [Configuration](../howto/configuration.md):
 1. Add a field to `IsccWebOptions` in `iscc_web/options.py` (env name = `ISCC_WEB_` + field name).
 1. Cover it in `tests/test_options.py`. Note: `opts` is instantiated at import time — test
     servers configure the environment before importing `iscc_web` (see `tests/conftest.py`).
-1. Document it in `README.md` and [Configuration](../howto/configuration.md).
+1. Document it in `README.md` and [Configuration](howto/configuration.md).
 
 #### Bump iscc-sdk / iscc-schema / iscc-core
 

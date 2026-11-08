@@ -34,6 +34,7 @@ htmlcov/
 # Tests, docs and dev tooling (never run inside the image)
 tests/
 docs/
+includes/
 site/
 develop/
 zensical.toml

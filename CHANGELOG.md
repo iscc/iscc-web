@@ -39,6 +39,10 @@
     size, timeouts) without prescribing a specific proxy, running a permissioned instance behind an
     authenticating reverse proxy (basic auth or single sign-on), and the session affinity (sticky
     sessions) that deployments with several instances need
+- The documentation site at https://web.iscc.codes uses the shared ISCC documentation theme
+    (zensical-iscc) with the "ISCC | web." project logo, a menu of related ISCC sites and a
+    "Copy page" button; the guide for coding agents moved to
+    https://web.iscc.codes/for-coding-agents/, and `llms.txt` is generated from the pages
 - Removed the unused pre-rebrand ISCC logo files (`/images/iscc-logo-*.svg` and
     `/images/iscc-icon-*.svg`)
 

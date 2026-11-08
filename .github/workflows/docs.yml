@@ -1,43 +1,52 @@
+# Builds the documentation site from docs/ with Zensical and the ISCC theme (zensical-iscc), checks it,
+# and deploys it to GitHub Pages at web.iscc.codes (docs/CNAME). Pull requests build and check only;
+# pushes to main deploy, so the site describes the released version.
+# Based on the theme's template, skills/iscc-docs-theme/docs-workflow.yml in iscc/zensical-iscc.
 name: docs
 
 on:
+  pull_request:
+    paths: [docs/**, includes/**, zensical.toml, pyproject.toml, uv.lock, .github/workflows/docs.yml]
   push:
     branches: [main]
+    paths: [docs/**, includes/**, zensical.toml, pyproject.toml, uv.lock, .github/workflows/docs.yml]
   workflow_dispatch:
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
 concurrency:
-  group: pages
-  cancel-in-progress: false
+  group: docs-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
         with:
           version-file: .tool-versions  # uv (and Python) versions come from .tool-versions
-          enable-cache: true
 
-      - name: Install dependencies
-        run: uv sync --frozen
-
-      - name: Build docs
-        run: uv run poe docs-build
+      - run: uv sync --frozen --only-group docs
+      - run: uv run --no-sync zensical-iscc build
+      - run: uv run --no-sync zensical-iscc check --strict
 
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: site
 
   deploy:
+    if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

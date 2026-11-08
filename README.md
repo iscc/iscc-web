@@ -111,8 +111,10 @@ Run `pnpm run test` to run the frontend test suite (vitest).
 ### Documentation
 
 The documentation site at https://web.iscc.codes is built with
-[Zensical](https://zensical.org/) from the `docs/` directory. Serve it locally with
-`uv run poe docs-serve` and build it with `uv run poe docs-build`. See the
+[Zensical](https://zensical.org/) and the ISCC theme
+([zensical-iscc](https://github.com/iscc/zensical-iscc)) from the `docs/` directory. Serve it
+locally with `uv run poe docs-serve`, build it with `uv run poe docs-build` and check it with
+`uv run poe docs-check`. See the
 [contribution guide](https://web.iscc.codes/development/contributing/) for details.
 
 # Special thanks to the developers of

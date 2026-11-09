@@ -1,14 +1,14 @@
 [project]
 name = "iscc-web"
-version = "0.3.3"
+version = "0.4.0"
 description = "ISCC - Generator Web Application"
 authors = [{ name = "Titusz", email = "tp@py7.de" }]
-requires-python = ">=3.13"
+requires-python = ">=3.14"
 readme = "README.md"
 license = "Apache-2.0"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
     "blacksheep>=2.6,<3",
@@ -16,9 +16,9 @@ dependencies = [
     "aiofiles>=24.1",
     # Not iscc-sdk[sct,sci]: since iscc-sdk 0.9.5 those extras request iscc-sct[cpu]/iscc-sci[cpu],
     # which would put CPU onnxruntime into the gpu image. The bare libs carry no onnxruntime.
-    "iscc-sdk==0.9.6",
-    "iscc-sct>=0.2.0",
-    "iscc-sci>=0.3.0",
+    "iscc-sdk==0.9.7",
+    "iscc-sct>=0.2.2",
+    "iscc-sci>=0.4.1",
     "iscc-core>=1.5.0",
     "iscc-lib>=0.7.0",
     "xxhash>=3.5",
@@ -37,9 +37,9 @@ dependencies = [
 [project.optional-dependencies]
 # onnxruntime now lives in the cpu|gpu extras of iscc-sct/iscc-sci (variant wheels that clobber
 # each other in site-packages). Pick exactly one per built image; never both. The base
-# dependencies carry the bare libs; these extras attach the onnxruntime variant and the >=0.2.0/>=0.3.0 floor.
-cpu = ["iscc-sct[cpu]>=0.2.0", "iscc-sci[cpu]>=0.3.0"]
-gpu = ["iscc-sct[gpu]>=0.2.0", "iscc-sci[gpu]>=0.3.0"]
+# dependencies carry the bare libs; these extras attach the onnxruntime variant and the >=0.2.2/>=0.4.1 floor.
+cpu = ["iscc-sct[cpu]>=0.2.2", "iscc-sci[cpu]>=0.4.1"]
+gpu = ["iscc-sct[gpu]>=0.2.2", "iscc-sci[gpu]>=0.4.1"]
 
 [project.urls]
 Homepage = "https://github.com/iscc/iscc-web"
@@ -59,10 +59,11 @@ dev = [
     "ruff>=0.15.1",
     "prek>=0.2.9",
     "radon>=6.0.1",
-    "zensical>=0.0.21",
     # CPU onnxruntime for local dev/tests so `uv sync` runs semantic inference without the gpu extra.
     "onnxruntime",
 ]
+# The documentation site (docs/, zensical.toml): Zensical with the ISCC theme, which pins the Zensical version.
+docs = ["zensical-iscc"]
 
 [tool.uv]
 default-groups = "all"
@@ -77,22 +78,29 @@ conflicts = [
     [{ group = "dev" }, { extra = "gpu" }],
 ]
 
+[tool.uv.sources]
+zensical-iscc = { git = "https://github.com/iscc/zensical-iscc", tag = "v0.3.1" }
+
 [tool.uv.build-backend]
 module-name = "iscc_web"
 module-root = ""
 
 [build-system]
-requires = ["uv_build>=0.11.7,<0.12.0"]
+requires = ["uv_build>=0.13.7,<0.14.0"]
 build-backend = "uv_build"
 
 [tool.ruff]
-target-version = "py313"
+target-version = "py314"
 line-length = 120
 fix = true
 
 [tool.ruff.format]
 preview = true
 line-ending = "lf"
+
+[tool.ruff.lint]
+# Explicit rule set (the ruff <0.17 defaults); ruff 0.17 widened its default selection considerably.
+select = ["E4", "E7", "E9", "F"]
 
 [tool.ruff.lint.per-file-ignores]
 # Star imports register BlackSheep controllers as an import side effect.
@@ -126,7 +134,7 @@ output = "iscc_web/api/schema.py"
 output-model-type = "pydantic_v2.BaseModel"
 encoding = "UTF-8"
 disable-timestamp = true
-target-python-version = "3.13"
+target-python-version = "3.14"
 formatters = []
 
 [tool.poe.tasks]
@@ -137,11 +145,11 @@ precommit = { cmd = "uv run prek run", help = "Run prek hooks on changed files" 
 test = { cmd = "uv run python -m pytest -n auto --tb=line --no-header -q --cov --cov-config=pyproject.toml --cov-report=term-missing", help = "Test the code with pytest" }
 check-complexity = { cmd = "uv run radon cc --min C --show-complexity --average iscc_web/", help = "Check code complexity with radon" }
 run = { cmd = "uv run uvicorn iscc_web.asgi:application --reload", help = "Run dev server" }
-docs-serve = { cmd = "uv run zensical serve", help = "Serve docs locally with live reload" }
+docs-serve = { cmd = "uv run zensical serve --dev-addr 127.0.0.1:45208", help = "Serve docs locally with live reload (plain ISCC logo; the project logo needs docs-build)" }
 docs-changelog = { cmd = "uv run python -m develop.copy_changelog", help = "Sync CHANGELOG.md into the docs site" }
 docs-build = { sequence = [
     { cmd = "uv run python -m develop.copy_changelog" },
-    { cmd = "uv run zensical build" },
-    { cmd = "uv run python -m develop.gen_llms_full" },
-], help = "Build docs site with llms-full.txt" }
+    { cmd = "uv run zensical-iscc build" },
+], help = "Build the docs site into site/ with its Markdown copies, llms.txt and llms-full.txt" }
+docs-check = { cmd = "uv run zensical-iscc check --strict", help = "Check the docs configuration and the built site (as CI does)" }
 all = { sequence = ["formatopenapi", "codegen", "format", "test", "check-complexity"], help = "Run all tasks" }

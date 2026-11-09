@@ -34,7 +34,10 @@ The microservice provides a REST API for generating ISCCs. The endpoints support
 upload/download, metadata extraction/embedding and ISCC processing.<br>
 
 Files uploaded for processing are automatically deleted after a configurable timeout.
-An interactive API documentation is available at [/docs](https://web.iscc.io/docs)<br><br>
+An interactive API documentation is available at [/docs](https://web.iscc.io/docs). `GET /health`
+(at the site root) is a readiness probe for monitors and the Docker `HEALTHCHECK`: it reports
+whether the semantic-code ONNX models are loaded, which execution provider (GPU or CPU) they run
+on, and the image version and revision.<br><br>
 
 **Experimental features** (not part of ISO 24138, algorithms may change before their v1.0
 release):
@@ -108,8 +111,10 @@ Run `pnpm run test` to run the frontend test suite (vitest).
 ### Documentation
 
 The documentation site at https://web.iscc.codes is built with
-[Zensical](https://zensical.org/) from the `docs/` directory. Serve it locally with
-`uv run poe docs-serve` and build it with `uv run poe docs-build`. See the
+[Zensical](https://zensical.org/) and the ISCC theme
+([zensical-iscc](https://github.com/iscc/zensical-iscc)) from the `docs/` directory. Serve it
+locally with `uv run poe docs-serve`, build it with `uv run poe docs-build` and check it with
+`uv run poe docs-check`. See the
 [contribution guide](https://web.iscc.codes/development/contributing/) for details.
 
 # Special thanks to the developers of

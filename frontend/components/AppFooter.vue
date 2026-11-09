@@ -1,36 +1,32 @@
 <script setup lang="ts">
-// Navy footer mirroring the header: copyright, legal pages and developer exits.
-import isccLogo from "../assets/iscc-logo-white.png";
+// Navy footer mirroring the header: copyright, legal pages and developer exits. The product name
+// is established in the header, so the footer carries the plain ISCC logo, small and white only.
+import isccLogo from "../assets/iscc-logo-white.svg";
 import UiIcon from "./UiIcon.vue";
 </script>
 
 <template lang="pug">
-footer.app-footer.grain
-  .container-xl.d-flex.align-items-center.justify-content-between.gap-4.flex-wrap.py-3
-    .d-flex.align-items-center.gap-3
-      img.logo(:src="isccLogo" alt="ISCC logo")
+footer.app-footer.grain.on-dark
+  .container-xl.footer-row.d-flex.align-items-center.justify-content-between.gap-4.flex-wrap
+    .d-flex.align-items-center.gap-2
+      img.logo(:src="isccLogo" alt="ISCC")
       span.copyright Copyright © 2022–2026 ISCC Foundation
     .d-flex.align-items-center.gap-4.flex-wrap
       a.legal(
-        href="https://iscc.foundation/privacy/"
+        href="https://iscc.io/privacy"
         target="_blank"
         rel="noopener"
       ) Privacy Policy
       a.legal(
-        href="https://iscc.foundation/cookies"
+        href="https://iscc.io/cookies"
         target="_blank"
         rel="noopener"
       ) Cookie Policy
       a.legal(
-        href="https://iscc.foundation/imprint"
+        href="https://iscc.io/imprint"
         target="_blank"
         rel="noopener"
       ) Imprint
-      a.legal(
-        href="https://iscc.foundation/disclaimer"
-        target="_blank"
-        rel="noopener"
-      ) Disclaimer
       .divider
       a.exit(href="/docs" target="_blank")
         UiIcon(name="code" :size="13")
@@ -53,11 +49,17 @@ footer.app-footer.grain
   background-color: var(--iscc-deep-navy);
   margin-top: auto;
 
+  // 51 px tall on one row: 0.85rem above and below the 1.5rem logo.
+  .footer-row {
+    padding-block: 0.85rem;
+  }
+
+  // The SVG master carries its clear space in the viewBox; 1.5rem tall = 86 px wide, below the
+  // brand's recommended 120 px screen minimum, hence the mono version the brand prefers there.
   .logo {
-    height: 1.1rem;
+    height: 1.5rem;
     width: auto;
     display: block;
-    opacity: 0.9;
   }
 
   .copyright {

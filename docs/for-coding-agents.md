@@ -12,7 +12,7 @@ the codebase. Tables and code over prose. Terminology matches the codebase exact
 
 Base path: `/api/v1` (public instance: `https://web.iscc.io/api/v1`). The OpenAPI spec is served at
 `/docs/openapi.yaml` with interactive docs at `/docs`. Full details:
-[REST API reference](rest-api.md).
+[REST API reference](reference/rest-api.md).
 
 ### Endpoints
 
@@ -27,6 +27,7 @@ Base path: `/api/v1` (public instance: `https://web.iscc.io/api/v1`). The OpenAP
 | `POST`   | `/metadata/{media_id}`      | Embed metadata into a copy + re-ISCC (uploader-only\*) | `201`   |
 | `GET`    | `/explain/{iscc}`           | Decompose an ISCC into its units                       | `200`   |
 | `POST`   | `/simprint`                 | Granular simprints from plain text (JSON body)         | `200`   |
+| `GET`    | `/health` (site root)       | Readiness probe (models loaded, GPU/CPU, version)      | `200`   |
 
 \* With `ISCC_WEB_PRIVATE_FILES=true` (the default) these return `403` unless the request comes
 from the original uploader's IP (identified by its blake3 hash — no raw IPs are stored).
@@ -100,34 +101,35 @@ the `X-Upload-Filename` header. Applies to `POST /iscc` and `POST /media`.
 - Uploads are ephemeral: a cleanup task deletes media packages older than
     `ISCC_WEB_STORAGE_EXPIRY` (default 3600 s). Persist the `201` response JSON.
 - CORS is disabled by default; set `ISCC_WEB_CORS_ORIGINS` for cross-origin clients
-    (see [Configuration](../howto/configuration.md)).
+    (see [Configuration](howto/configuration.md)).
 
 ## Working on the codebase
 
 ### Architecture map
 
-| File                                | Contains                                                                                                                                                     |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `iscc_web/__init__.py`              | Star imports that register all controllers as an import side effect — routing depends on this                                                                |
-| `iscc_web/main.py`                  | BlackSheep `Application`, CORS setup, static file serving, `Route.value_patterns` (`mid`, `iscc`), cleanup-task startup, `Pool` shutdown, uvicorn `main()`   |
-| `iscc_web/asgi.py`                  | ASGI entrypoint for the uvicorn dev server                                                                                                                   |
-| `iscc_web/options.py`               | `IsccWebOptions` (pydantic-settings, `ISCC_WEB_` prefix); `ISCC_LIB_ENV_DEFAULTS` applied via `os.environ.setdefault` before the iscc libraries are imported |
-| `iscc_web/cleanup.py`               | `cleanup_task()` — deletes expired media packages; skips `061knt35ejv6o` and `.gitignore`                                                                    |
-| `iscc_web/vite.py`                  | Jinja2 tags `{% vite_hmr_client %}` / `{% vite_asset %}`; Vite manifest resolution in production                                                             |
-| `iscc_web/api/iscc.py`              | `Iscc` controller — `POST /iscc`, `GET /iscc/{media_id}`                                                                                                     |
-| `iscc_web/api/media.py`             | `Media` controller — `POST /media`, `GET`/`DELETE /media/{media_id}`                                                                                         |
-| `iscc_web/api/metadata.py`          | `Metadata` controller — `GET`/`POST /metadata/{media_id}`                                                                                                    |
-| `iscc_web/api/explain.py`           | `Explain` controller — `GET /explain/{iscc}` (with iscc-core `IndexError` workaround)                                                                        |
-| `iscc_web/api/simprint.py`          | `Simprint` controller — `POST /simprint`; `text_simprints()` (byte-identical to iscc-search)                                                                 |
-| `iscc_web/api/mixins.py`            | `FileHandler` — shared upload/storage logic; `code_iscc()` pool wrapper                                                                                      |
-| `iscc_web/api/pool.py`              | `Pool` — `ProcessPoolExecutor` wrapper, self-healing on `BrokenProcessPool`                                                                                  |
-| `iscc_web/api/schema.py`            | **Generated** pydantic models from `openapi.yaml` — never edit by hand                                                                                       |
-| `iscc_web/api/models.py`            | `UploadMeta` — internal upload metadata model (hand-written)                                                                                                 |
-| `iscc_web/api/common.py`            | `rmtree`, `base_url` helpers                                                                                                                                 |
-| `iscc_web/static/docs/openapi.yaml` | API source of truth; served at `/docs`                                                                                                                       |
-| `iscc_web/templates/index.jinja`    | Frontend host page (Vite asset tags)                                                                                                                         |
-| `frontend/`                         | Vue 3 + TypeScript demo SPA; the API boundary is `frontend/services/api.service.ts`                                                                          |
-| `tests/conftest.py`                 | Session-scoped uvicorn server subprocess (port 44555 + xdist worker offset)                                                                                  |
+| File                                | Contains                                                                                                                                                                                    |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `iscc_web/__init__.py`              | Star imports that register all controllers as an import side effect — routing depends on this                                                                                               |
+| `iscc_web/main.py`                  | BlackSheep `Application`, CORS setup, static file serving, `Route.value_patterns` (`mid`, `iscc`), `GET /health`, cleanup-task and model warm-up startup, `Pool` shutdown, uvicorn `main()` |
+| `iscc_web/health.py`                | Readiness state for `GET /health`: `load_models()` (pool worker initializer), `probe_models()`, `fetch_models()`, `assess()`, `warm_up()`, `report()`                                       |
+| `iscc_web/asgi.py`                  | ASGI entrypoint for the uvicorn dev server                                                                                                                                                  |
+| `iscc_web/options.py`               | `IsccWebOptions` (pydantic-settings, `ISCC_WEB_` prefix); `ISCC_LIB_ENV_DEFAULTS` applied via `os.environ.setdefault` before the iscc libraries are imported                                |
+| `iscc_web/cleanup.py`               | `cleanup_task()` — deletes expired media packages; skips `061knt35ejv6o` and `.gitignore`                                                                                                   |
+| `iscc_web/vite.py`                  | Jinja2 tags `{% vite_hmr_client %}` / `{% vite_asset %}`; Vite manifest resolution in production                                                                                            |
+| `iscc_web/api/iscc.py`              | `Iscc` controller — `POST /iscc`, `GET /iscc/{media_id}`                                                                                                                                    |
+| `iscc_web/api/media.py`             | `Media` controller — `POST /media`, `GET`/`DELETE /media/{media_id}`                                                                                                                        |
+| `iscc_web/api/metadata.py`          | `Metadata` controller — `GET`/`POST /metadata/{media_id}`                                                                                                                                   |
+| `iscc_web/api/explain.py`           | `Explain` controller — `GET /explain/{iscc}` (with iscc-core `IndexError` workaround)                                                                                                       |
+| `iscc_web/api/simprint.py`          | `Simprint` controller — `POST /simprint`; `text_simprints()` (byte-identical to iscc-search)                                                                                                |
+| `iscc_web/api/mixins.py`            | `FileHandler` — shared upload/storage logic; `code_iscc()` pool wrapper                                                                                                                     |
+| `iscc_web/api/pool.py`              | `Pool` — `ProcessPoolExecutor` wrapper, self-healing on `BrokenProcessPool`                                                                                                                 |
+| `iscc_web/api/schema.py`            | **Generated** pydantic models from `openapi.yaml` — never edit by hand                                                                                                                      |
+| `iscc_web/api/models.py`            | `UploadMeta` — internal upload metadata model (hand-written)                                                                                                                                |
+| `iscc_web/api/common.py`            | `rmtree`, `base_url` helpers                                                                                                                                                                |
+| `iscc_web/static/docs/openapi.yaml` | API source of truth; served at `/docs`                                                                                                                                                      |
+| `iscc_web/templates/index.jinja`    | Frontend host page (Vite asset tags)                                                                                                                                                        |
+| `frontend/`                         | Vue 3 + TypeScript demo SPA; the API boundary is `frontend/services/api.service.ts`                                                                                                         |
+| `tests/conftest.py`                 | Session-scoped uvicorn server subprocess (port 44555 + xdist worker offset)                                                                                                                 |
 
 ### Commands
 
@@ -159,7 +161,7 @@ Frontend (pnpm; Node version pinned in `.tool-versions`):
 ### Environment variables
 
 All service options use the `ISCC_WEB_` prefix (`iscc_web/options.py`). Quick table — full
-reference in [Configuration](../howto/configuration.md):
+reference in [Configuration](howto/configuration.md):
 
 | Variable                    | Default                     | Purpose                                                      |
 | --------------------------- | --------------------------- | ------------------------------------------------------------ |
@@ -173,6 +175,8 @@ reference in [Configuration](../howto/configuration.md):
 | `ISCC_WEB_CORS_ORIGINS`     | *(empty)*                   | CORS origins; empty disables CORS                            |
 | `ISCC_WEB_STORAGE_EXPIRY`   | `3600`                      | Seconds until uploads are deleted                            |
 | `ISCC_WEB_CLEANUP_INTERVAL` | `600`                       | Cleanup interval in seconds; `0` deactivates                 |
+| `ISCC_WEB_BUILD_VERSION`    | *(empty)*                   | Image version reported by `GET /health` (set at image build) |
+| `ISCC_WEB_BUILD_REVISION`   | *(empty)*                   | Git commit reported by `GET /health` (set at image build)    |
 | `ISCC_WEB_LOG_LEVEL`        | `DEBUG`                     | Loguru log level                                             |
 | `ISCC_WEB_SENTRY_DSN`       | *(empty)*                   | Optional Sentry DSN                                          |
 
@@ -196,9 +200,13 @@ reference in [Configuration](../howto/configuration.md):
     `text_simprints`, `idk.extract_metadata`, `idk.embed_metadata`).
 - `iscc_web/options.py` must be imported before `iscc_sdk`/`iscc_sct`/`iscc_sci` — it seeds their
     environment defaults at import time, and pool workers inherit them.
-- Style: ruff with line-length 120, LF line endings, target py313; prek hooks enforce
+- Style: ruff with line-length 120, LF line endings, target py314, rule selection pinned in
+    `pyproject.toml`; prek hooks enforce
     whitespace/EOL fixes, mdformat for Markdown, and openapi-spec-validator for the spec.
-- Renovate ignores `iscc-tika` (`renovate.json` `ignoreDeps`) — it must stay `<0.5.0`.
+- Builds are pinned: Python in `.python-version`, Python/Node.js/uv for CI in `.tool-versions`,
+    Docker base images by digest and GitHub Actions by commit SHA. Renovate maintains all of
+    them and holds `onnxruntime` below 1.27 and the GPU base on CUDA 12.6 (the production GPU is
+    a Pascal card that CUDA 13 no longer supports).
 
 ### Change playbook
 
@@ -217,7 +225,7 @@ reference in [Configuration](../howto/configuration.md):
 1. Add a field to `IsccWebOptions` in `iscc_web/options.py` (env name = `ISCC_WEB_` + field name).
 1. Cover it in `tests/test_options.py`. Note: `opts` is instantiated at import time — test
     servers configure the environment before importing `iscc_web` (see `tests/conftest.py`).
-1. Document it in `README.md` and [Configuration](../howto/configuration.md).
+1. Document it in `README.md` and [Configuration](howto/configuration.md).
 
 #### Bump iscc-sdk / iscc-schema / iscc-core
 

@@ -34,6 +34,14 @@ describe("ResultCard — done state", () => {
     wrapper.unmount();
   });
 
+  it("heads the unit fields with the abstract-to-concrete axis", () => {
+    const wrapper = mountCard(makeSpecimen());
+    const labels = wrapper.findAll(".units-axis span").map((s) => s.text().replace(/\u00a0/g, " "));
+    expect(labels).toEqual(["ABSTRACT & PERSISTENT", "ISCC-UNITS", "CONCRETE & VOLATILE"]);
+    expect(wrapper.find(".units-axis").element.nextElementSibling?.classList.contains("unit-grid")).toBe(true);
+    wrapper.unmount();
+  });
+
   it("selects CONTENT by default and switches the detail panel on click", async () => {
     const wrapper = mountCard(makeSpecimen());
     expect(wrapper.find(".unit-field.selected").text()).toContain("CONTENT");
@@ -139,7 +147,7 @@ describe("ResultCard — lifecycle states", () => {
       makeSpecimen({ status: "error", error: "422: unsupported", metadata: null, explain: null }),
     );
     expect(wrapper.find(".alert-strip").text()).toContain("422: unsupported");
-    expect(wrapper.find(".navy-strip").exists()).toBe(false);
+    expect(wrapper.find(".readout-strip").exists()).toBe(false);
     wrapper.unmount();
   });
 });

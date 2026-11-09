@@ -5,45 +5,37 @@ export type UnitKind = "meta" | "semantic" | "content" | "data" | "instance";
 export const UNIT_ORDER: UnitKind[] = ["meta", "semantic", "content", "data", "instance"];
 
 /**
- * Visual identity of each ISCC-UNIT layer (Concept 4 decoder readout palette;
- * mirrored as --iscc-unit-* custom properties in main.scss).
+ * Visual identity of each ISCC-UNIT layer (brand kit unit palette; mirrored as --iscc-unit-*
+ * custom properties in main.scss). `tint` backs unit-card headers that carry dark text.
  */
-export const UNIT_STYLE: Record<
-  UnitKind,
-  { label: string; color: string; accent: string; tint: string; meaning: string }
-> = {
+export const UNIT_STYLE: Record<UnitKind, { label: string; color: string; tint: string; meaning: string }> = {
   meta: {
     label: "META",
     color: "#7ac2f7",
-    accent: "#1f86c9",
     tint: "rgba(122, 194, 247, 0.18)",
     meaning: "metadata similarity",
   },
   semantic: {
     label: "SEMANTIC",
     color: "#4596f5",
-    accent: "#2e7ad6",
     tint: "rgba(69, 150, 245, 0.13)",
     meaning: "semantic similarity · experimental",
   },
   content: {
     label: "CONTENT",
     color: "#0054b2",
-    accent: "#0054b2",
     tint: "rgba(0, 84, 178, 0.10)",
     meaning: "syntactic similarity",
   },
   data: {
     label: "DATA",
     color: "#123663",
-    accent: "#123663",
     tint: "rgba(18, 54, 99, 0.10)",
     meaning: "data similarity",
   },
   instance: {
     label: "INSTANCE",
     color: "#a6db50",
-    accent: "#6d9c2a",
     tint: "rgba(166, 219, 80, 0.18)",
     meaning: "exact match · checksum",
   },
@@ -83,10 +75,16 @@ export function matchPercent(aBits: string, bBits: string): number | null {
   return Math.round((equal / aBits.length) * 100);
 }
 
-/** Traffic-light color for a similarity percentage. */
-export function pctColor(pct: number): string {
-  return pct >= 80 ? "#a6db50" : pct >= 55 ? "#ffc300" : "#f56169";
+/** Traffic-light colors for a similarity percentage: a bright `fill` for bars, a darker `text` shade that
+ * stays readable on the light diff cards. */
+export function pctColor(pct: number): { fill: string; text: string } {
+  if (pct >= 80) return { fill: "#a6db50", text: "#3a6b12" };
+  if (pct >= 55) return { fill: "#ffc300", text: "#7a5c00" };
+  return { fill: "#f56169", text: "#b3262e" };
 }
+
+/** Color of a 0 bit in the bit strips on the light readout. */
+export const BIT_ZERO = "rgba(18, 54, 99, 0.12)";
 
 export const ISCC_PATTERN = /^ISCC:[A-Z2-7]{10,68}$/;
 
@@ -168,8 +166,7 @@ const expectedPayloadBytes = (mainType: number, subType: number, length: number)
   return null;
 };
 
-const hasSupportedVersion = (mainType: number, version: number) =>
-  version === 0 || (mainType === 6 && version === 1);
+const hasSupportedVersion = (mainType: number, version: number) => version === 0 || (mainType === 6 && version === 1);
 
 /** True when an ISCC passes the same canonical prefix/header/length checks as iscc-core. */
 export function isValidIscc(code: string): boolean {

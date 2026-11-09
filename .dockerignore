@@ -14,7 +14,6 @@ Dockerfile
 eslint.config.js
 vitest.config.ts
 renovate.json
-.python-version
 .tool-versions
 
 # Local environments and secrets
@@ -35,6 +34,7 @@ htmlcov/
 # Tests, docs and dev tooling (never run inside the image)
 tests/
 docs/
+includes/
 site/
 develop/
 zensical.toml

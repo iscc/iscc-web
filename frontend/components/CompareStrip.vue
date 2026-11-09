@@ -1,8 +1,9 @@
 <script setup lang="ts">
 // Diff readout for two docked specimens: aligned A/B bit strips per layer,
-// Hamming match percentages and a plain-language verdict ribbon.
+// Hamming match percentages and a plain-language verdict ribbon. Light like the single
+// readout it replaces, with diff cards built like its ISCC-UNIT fields (UnitField.vue).
 import { computed, ref } from "vue";
-import { UNIT_STYLE, compareUnits, pctColor, verdict } from "../lib/iscc";
+import { BIT_ZERO, UNIT_STYLE, compareUnits, pctColor, verdict } from "../lib/iscc";
 import UiIcon from "./UiIcon.vue";
 
 const props = defineProps<{ a: IsccWeb.Specimen; b: IsccWeb.Specimen }>();
@@ -14,14 +15,13 @@ const EQUAL_A = "#a6db50";
 const EQUAL_B = "#85b53a";
 const DIFF_A = "#f56169";
 const DIFF_B = "#c94850";
-const NEUTRAL_ZERO = "rgba(255, 255, 255, 0.25)";
 
 const rows = computed(() =>
   diffs.value.map((diff) => {
     const comparable = diff.pct !== null && diff.a !== null && diff.b !== null;
-    const unitColor = UNIT_STYLE[diff.kind].color;
+    const { color: unitColor, tint, label } = UNIT_STYLE[diff.kind];
     const plain = (bits: string | undefined) =>
-      bits ? Array.from(bits, (b) => (b === "1" ? unitColor : NEUTRAL_ZERO)) : [];
+      bits ? Array.from(bits, (b) => (b === "1" ? unitColor : BIT_ZERO)) : [];
     let cellsA: string[];
     let cellsB: string[];
     if (comparable) {
@@ -40,12 +40,13 @@ const rows = computed(() =>
     }
     return {
       kind: diff.kind,
-      label: UNIT_STYLE[diff.kind].label,
+      label,
       color: unitColor,
+      tint,
       note: diff.note,
       pct: diff.pct,
       pctText: diff.pct !== null ? `${diff.pct}%` : "—",
-      pctCol: diff.pct !== null ? pctColor(diff.pct) : "rgba(255, 255, 255, 0.5)",
+      tone: diff.pct !== null ? pctColor(diff.pct) : null,
       cellsA,
       cellsB,
     };
@@ -77,32 +78,32 @@ const copyReport = async () => {
 </script>
 
 <template lang="pug">
-.compare-strip.grain
+.compare-strip
   .strip-label
     span ISCC-UNITS · DIFF · TOP STRIP = A · BOTTOM STRIP = B
     .rule
   .diff-grid(:style="{ '--cols': rows.length }")
     .diff-card(v-for="row in rows" :key="row.kind")
-      .dc-head
-        .dc-name
-          .swatch(:style="{ background: row.color }")
-          span(v-text="row.label")
-        span.dc-pct(:style="{ color: row.pctCol }" v-text="row.pctText")
-      .dc-bits
-        .bit(
-          v-for="(color, index) in row.cellsA"
-          :key="index"
-          :style="{ background: color }"
-        )
-      .dc-bits.b-row
-        .bit(
-          v-for="(color, index) in row.cellsB"
-          :key="index"
-          :style="{ background: color }"
-        )
-      .dc-bar
-        .dc-bar-fill(v-if="row.pct !== null" :style="{ width: `${row.pct}%`, background: row.pctCol }")
-      .dc-note(v-text="row.note")
+      .dc-color(:style="{ background: row.color }")
+      .dc-head(:style="{ background: row.tint }")
+        span.dc-name(v-text="row.label")
+        span.dc-pct(:style="row.tone ? { color: row.tone.text } : undefined" v-text="row.pctText")
+      .dc-body
+        .dc-bits
+          .bit(
+            v-for="(color, index) in row.cellsA"
+            :key="index"
+            :style="{ background: color }"
+          )
+        .dc-bits.b-row
+          .bit(
+            v-for="(color, index) in row.cellsB"
+            :key="index"
+            :style="{ background: color }"
+          )
+        .dc-bar
+          .dc-bar-fill(v-if="row.tone" :style="{ width: `${row.pct}%`, background: row.tone.fill }")
+        .dc-note(v-text="row.note")
   .verdict-ribbon
     .verdict-text
       UiIcon(
@@ -119,8 +120,12 @@ const copyReport = async () => {
 
 <style scoped lang="scss">
 .compare-strip {
-  background-color: var(--iscc-deep-navy);
+  border-top: 1px solid #e9ecef;
   padding: 1.25rem 1.75rem 1.5rem;
+
+  @media (max-width: 575.98px) {
+    padding-inline: 1rem;
+  }
 }
 
 .strip-label {
@@ -134,14 +139,13 @@ const copyReport = async () => {
     font-size: 0.6rem;
     font-weight: 600;
     letter-spacing: 0.16em;
-    color: rgba(255, 255, 255, 0.6);
-    white-space: nowrap;
+    color: var(--iscc-muted);
   }
 
   .rule {
     flex: 1;
     height: 1px;
-    background: rgba(255, 255, 255, 0.15);
+    background: #e9ecef;
   }
 }
 
@@ -160,10 +164,12 @@ const copyReport = async () => {
 }
 
 .diff-card {
-  background: rgba(255, 255, 255, 0.07);
-  border: 2px solid rgba(255, 255, 255, 0.16);
-  border-radius: 0.65rem;
-  padding: 0.8rem 0.9rem 0.85rem;
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+}
+
+.dc-color {
+  height: 6px;
 }
 
 .dc-head {
@@ -171,40 +177,31 @@ const copyReport = async () => {
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
 }
 
 .dc-name {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-
-  .swatch {
-    width: 10px;
-    height: 10px;
-    border-radius: 3px;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    flex-shrink: 0;
-  }
-
-  span {
-    font-family: var(--bs-font-monospace);
-    font-size: 0.69rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    color: #ffffff;
-  }
+  font-family: var(--bs-font-monospace);
+  font-size: 0.69rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--iscc-deep-navy);
 }
 
 .dc-pct {
   font-family: var(--bs-font-monospace);
   font-size: 0.88rem;
   font-weight: 700;
+  color: rgba(18, 54, 99, 0.65);
+}
+
+.dc-body {
+  padding: 0.6rem 0.75rem 0.7rem;
 }
 
 .dc-bits {
   display: flex;
   gap: 1px;
-  margin-top: 0.6rem;
 
   &.b-row {
     margin-top: 2px;
@@ -223,7 +220,7 @@ const copyReport = async () => {
   margin-top: 0.6rem;
   height: 5px;
   border-radius: 3px;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(18, 54, 99, 0.08);
   overflow: hidden;
 }
 
@@ -235,14 +232,14 @@ const copyReport = async () => {
 .dc-note {
   font-size: 0.66rem;
   font-weight: 300;
-  color: rgba(255, 255, 255, 0.65);
+  color: var(--iscc-muted);
   margin-top: 0.5rem;
 }
 
 .verdict-ribbon {
   margin-top: 1rem;
   background: var(--iscc-bright-yellow);
-  border-radius: 0.65rem;
+  border-radius: var(--iscc-radius-sm);
   padding: 0.8rem 1.25rem;
   display: flex;
   align-items: center;

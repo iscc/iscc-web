@@ -1,3 +1,7 @@
+# Documentation site of iscc-web, published at web.iscc.codes from main by .github/workflows/docs.yml.
+# Theme: zensical-iscc (pyproject.toml, docs group); its reference configuration is zensical.toml in
+# github.com/iscc/zensical-iscc. Build with `uv run poe docs-build`, check with `uv run poe docs-check`.
+
 [project]
 site_name = "iscc-web"
 site_description = "Microservice for generating International Standard Content Codes (ISCC, ISO 24138) for media files."
@@ -5,64 +9,72 @@ site_author = "Titusz Pan"
 site_url = "https://web.iscc.codes/"
 repo_url = "https://github.com/iscc/iscc-web"
 repo_name = "iscc/iscc-web"
-copyright = "Copyright &copy; 2022-2026 ISCC Foundation"
-extra_css = ["stylesheets/extra.css"]
-extra_javascript = [
-    "https://iscc.ai/copilot/index.js",
-    "javascripts/copilot.js",
-    "javascripts/copypage.js",
-]
+edit_uri = "edit/main/docs/"
+copyright = "Copyright © 2022-2026 The Authors" # the theme adds the ISCC links
 
+# Each page sets its navigation icon with `icon: lucide/<name>` in its front matter.
+# The last page in the navigation is "For Coding Agents".
 nav = [
-    "index.md",
+    { "Home" = "index.md" },
     { "Tutorials" = [
         "tutorials/getting-started.md",
     ]},
     { "How-to Guides" = [
         "howto/deployment.md",
         "howto/configuration.md",
+        "howto/restrict-access.md",
     ]},
     { "Explanation" = [
         "explanation/architecture.md",
     ]},
     { "Reference" = [
         "reference/rest-api.md",
-        "reference/for-coding-agents.md",
     ]},
     { "Development" = [
         "development/contributing.md",
         "development/changelog.md",
     ]},
+    { "For Coding Agents" = "for-coding-agents.md" },
 ]
 
+[project.extra.iscc]
+tagline = "ISCC Generator Microservice"
+copy_page = true
+chat = false # iscc.ai does not serve web.iscc.codes
+
+# Related ISCC sites for the "Projects" menu in the header, in display order.
+[[project.extra.iscc.related]]
+name = "iscc-web"
+link = "https://web.iscc.codes/"
+description = "Service that generates ISCC codes for media files"
+
+[[project.extra.iscc.related]]
+name = "ISCC Specification"
+link = "https://iscc.codes/"
+description = "The International Standard Content Code, ISO 24138"
+
+[[project.extra.iscc.related]]
+name = "iscc-hub"
+link = "https://hub.iscc.codes/"
+description = "Timestamping service for signed content declarations"
+
+[[project.extra.iscc.related]]
+name = "iscc-search"
+link = "https://search.iscc.codes/"
+description = "Similarity search engine for ISCC codes"
+
+[[project.extra.iscc.related]]
+name = "iscc-monitor"
+link = "https://monitor.iscc.codes/"
+description = "Verifies and mirrors the transparency logs of ISCC hubs"
+
+[[project.extra.social]]
+icon = "fontawesome/brands/github"
+link = "https://github.com/iscc/iscc-web"
+
+# Fonts, palette, logo, favicon and the default features come from the theme.
 [project.theme]
-language = "en"
-custom_dir = "docs/overrides"
-logo = "assets/logo_light.png"
-favicon = "assets/favicon.png"
-features = [
-    "content.code.annotate",
-    "content.code.copy",
-    "content.tooltips",
-    "header.autohide",
-    "navigation.expand",
-    "navigation.footer",
-    "navigation.sections",
-    "navigation.top",
-    "navigation.tracking",
-    "search.highlight",
-    "toc.follow",
-]
-
-[[project.theme.palette]]
-media = "(prefers-color-scheme: light)"
-scheme = "default"
-toggle = { icon = "lucide/sun", name = "Switch to dark mode" }
-
-[[project.theme.palette]]
-media = "(prefers-color-scheme: dark)"
-scheme = "slate"
-toggle = { icon = "lucide/moon", name = "Switch to light mode" }
+name = "zensical_iscc"
 
 [project.markdown_extensions]
 abbr = {}
@@ -103,5 +115,6 @@ custom_fences = [{ name = "mermaid", class = "mermaid" }]
 alternate_style = true
 combine_header_slug = true
 
+# Every page gets the abbreviation tooltips. The file lives outside docs/, so it is not a page itself.
 [project.markdown_extensions.pymdownx.snippets]
-auto_append = ["docs/includes/abbreviations.md"]
+auto_append = ["includes/abbreviations.md"]

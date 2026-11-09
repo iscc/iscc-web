@@ -45,9 +45,9 @@ class IsccWebOptions(BaseSettings):
     media_path: Path = HERE.parent.absolute() / "media"
     max_workers: Optional[int] = Field(
         None,
-        description="Max number of iscc worker processes (defaults to CPU count). Each worker lazy-loads "
-        "iscc-sdk and, for semantic features, the iscc-sct/iscc-sci ONNX models - several hundred MB of "
-        "RAM per worker.",
+        description="Max number of iscc worker processes (defaults to CPU count). All workers start with "
+        "the service and load iscc-sdk and the iscc-sct/iscc-sci ONNX models up front (see GET /health) - "
+        "several hundred MB of RAM per worker.",
     )
     max_upload_size: int = 1_073_741_824  # 1 GB
     io_read_size: int = 2_097_152  # 2 MB
@@ -68,6 +68,16 @@ class IsccWebOptions(BaseSettings):
         True,
         description="Initial state of the Semantic Code toggle in the bundled frontend. Independent of "
         "`semantic_default`; the frontend always sends the toggle value explicitly per request.",
+    )
+    build_version: str = Field(
+        "",
+        description="Image version reported by GET /health. Baked into the Docker images at build time "
+        "(build arg VERSION, same value as the org.opencontainers.image.version label); empty for local builds.",
+    )
+    build_revision: str = Field(
+        "",
+        description="Git commit reported by GET /health. Baked into the Docker images at build time "
+        "(build arg REVISION, same value as the org.opencontainers.image.revision label); empty for local builds.",
     )
     log_level: str = Field("DEBUG", description="Set logging level")
     sentry_dsn: Optional[str] = Field(default="", description="Sentry DSN for error reporting")

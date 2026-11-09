@@ -1,17 +1,24 @@
 """Tests for the periodic upload cleanup task."""
 
 import asyncio
+import time
 
 import iscc_web as iw
 from iscc_web.cleanup import cleanup_task
 
 
-def _run_cleanup_briefly():
-    """Run cleanup_task for a moment, then cancel it (the task loops forever by design)."""
+def _run_cleanup_briefly(until=None, timeout=0.3):
+    """
+    Run cleanup_task until `until()` is true or `timeout` seconds passed, then cancel it (the task
+    loops forever by design). Polling instead of a fixed sleep keeps the test reliable when the
+    machine is busy, e.g. while the test servers load their ONNX models.
+    """
 
     async def runner():
         task = asyncio.create_task(cleanup_task())
-        await asyncio.sleep(0.3)
+        deadline = time.monotonic() + timeout
+        while not (until and until()) and time.monotonic() < deadline:
+            await asyncio.sleep(0.05)
         task.cancel()
         try:
             await task
@@ -32,7 +39,7 @@ def test_cleanup_deletes_expired_packages(monkeypatch, tmp_path):
     monkeypatch.setattr(iw.opts, "storage_expiry", -1)
     monkeypatch.setattr(iw.opts, "cleanup_interval", 0)
 
-    _run_cleanup_briefly()
+    _run_cleanup_briefly(until=lambda: not expired.exists(), timeout=30)
 
     assert not expired.exists()
     assert fixture.exists()

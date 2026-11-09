@@ -5,6 +5,7 @@
 import { ref } from "vue";
 import type { Meta, Body, UppyFile } from "@uppy/core";
 import AppFooter from "./components/AppFooter.vue";
+import ApiPointer from "./components/ApiPointer.vue";
 import AppHeader from "./components/AppHeader.vue";
 import EducationStrip from "./components/EducationStrip.vue";
 import IntakeCard from "./components/IntakeCard.vue";
@@ -226,10 +227,14 @@ const compareOptionsFor = (specimen: IsccWeb.Specimen) =>
           )
         .copy-col
           .iso-badge
-            UiIcon(name="check-circle" :size="13")
+            UiIcon(
+              name="shield-check"
+              :size="14"
+              :stroke-width="2.2"
+            )
             span ISO 24138:2024
           h1.hero-title The #[span.accent DNA] of your digital content#[span.accent .]
-          p.hero-sub An ISCC is a fingerprint generated #[b from the content itself] — no registry, no signup. Drop a file and read its code layer by layer.
+          p.hero-sub Identify digital content and find similar versions across file formats. Drop a file to create an ISCC for your content.
           ul.hero-points
             li
               UiIcon(
@@ -261,6 +266,7 @@ const compareOptionsFor = (specimen: IsccWeb.Specimen) =>
           @eject="onEject(specimen)"
           @swap="onSwap(specimen)"
         )
+      ApiPointer
   AppFooter
 </template>
 
@@ -292,17 +298,19 @@ const compareOptionsFor = (specimen: IsccWeb.Specimen) =>
   color: #ffffff;
 }
 
+// The standard reference with a shield-check icon, solid white so it stands out on the blue hero
+// (near-black on white: 15.4:1).
 .iso-badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  color: #ffffff;
-  padding: 0.35rem 0.8rem;
+  gap: 0.4rem;
+  background: #ffffff;
+  color: var(--iscc-ink);
+  padding: 0.4rem 0.9rem;
   border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 500;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   margin-bottom: 1.1rem;
 }
 

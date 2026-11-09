@@ -1,23 +1,23 @@
 <script setup lang="ts">
-// Navy top bar: brand mark, product name and the developer exits.
-import isccLogo from "../assets/iscc-logo-white.png";
+// Navy top bar: the ISCC generator project logo (the ISCC signature alone on phones, where the
+// lockup would be too small) and the developer exits.
+import isccLogo from "../assets/iscc-logo-white-coral.svg";
+import productLockup from "../assets/iscc-generator-white-coral.svg";
 import UiIcon from "./UiIcon.vue";
 </script>
 
 <template lang="pug">
-header.app-header.grain
+header.app-header.grain.on-dark
   .container-xl.d-flex.align-items-center.justify-content-between.py-3
-    .d-flex.align-items-center.gap-3
-      img.logo(:src="isccLogo" alt="ISCC logo")
-      .divider
-      span.product GENERATOR
+    img.lockup.d-none.d-sm-block(:src="productLockup" alt="ISCC generator")
+    img.logo.d-sm-none(:src="isccLogo" alt="ISCC")
     .d-flex.align-items-center.gap-4
       a.quiet-link.d-none.d-md-inline(
         href="https://iscc.codes"
         target="_blank"
         rel="noopener"
       ) What is an ISCC?
-      a.docs-btn(href="/docs" target="_blank")
+      a.docs-btn.iscc-btn.iscc-btn--secondary.iscc-btn--thin.iscc-btn--compact(href="/docs" target="_blank")
         UiIcon(name="code" :size="14")
         span API Docs
 </template>
@@ -26,24 +26,21 @@ header.app-header.grain
 .app-header {
   background-color: var(--iscc-deep-navy);
 
-  .logo {
-    height: 1.9rem;
+  // Both SVGs carry the logo's clear space in their viewBox. The lockup's viewBox also reaches
+  // below the baseline for the g of "generator." (19.2 % of its height); a negative bottom margin
+  // of that depth leaves it out of the layout, so the header centers the ISCC logo itself.
+  .lockup {
+    --lockup-height: 3rem;
+    height: var(--lockup-height);
+    margin-bottom: calc(var(--lockup-height) * -0.192);
     width: auto;
     display: block;
   }
 
-  .divider {
-    width: 3px;
-    height: 1.6rem;
-    background: var(--iscc-bright-yellow);
-    border-radius: 1px;
-  }
-
-  .product {
-    color: #ffffff;
-    font-weight: 300;
-    letter-spacing: 0.1em;
-    font-size: 1.05rem;
+  .logo {
+    height: 2.5rem;
+    width: auto;
+    display: block;
   }
 
   .quiet-link {
@@ -53,24 +50,6 @@ header.app-header.grain
     text-decoration: none;
 
     &:hover {
-      color: #ffffff;
-    }
-  }
-
-  .docs-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    color: #ffffff;
-    font-size: 0.85rem;
-    font-weight: 500;
-    text-decoration: none;
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    border-radius: 0.5rem;
-    padding: 0.45rem 0.8rem;
-
-    &:hover {
-      border-color: rgba(255, 255, 255, 0.7);
       color: #ffffff;
     }
   }

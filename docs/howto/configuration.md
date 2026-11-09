@@ -14,22 +14,24 @@ options accept the usual pydantic spellings (`true`/`false`, `1`/`0`).
 
 ## Option reference
 
-| Variable                       | Type   | Default                                | Description                                                                                                                         |
-| ------------------------------ | ------ | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `ISCC_WEB_ENVIRONMENT`         | string | `development`                          | `development` or `production`. Development enables debug error details and resolves frontend assets from the Vite dev server.       |
-| `ISCC_WEB_SITE_ADDRESS`        | URL    | `http://localhost:8000`                | Public site address. The dev server binds to its host/port; its origin is always CORS-allowed.                                      |
-| `ISCC_WEB_MEDIA_PATH`          | path   | `media/` beside the `iscc_web` package | Directory for uploaded media packages (one subdirectory per upload).                                                                |
-| `ISCC_WEB_MAX_WORKERS`         | int    | CPU count                              | Max number of ISCC worker processes. See [Worker processes](#worker-processes-and-memory).                                          |
-| `ISCC_WEB_MAX_UPLOAD_SIZE`     | int    | `1073741824`                           | Max file size per upload in bytes (1 GB).                                                                                           |
-| `ISCC_WEB_IO_READ_SIZE`        | int    | `2097152`                              | File read chunk size in bytes (2 MB).                                                                                               |
-| `ISCC_WEB_PRIVATE_FILES`       | bool   | `true`                                 | Restrict file download/delete/embed to the original uploader. See [Private files](#private-files).                                  |
-| `ISCC_WEB_CORS_ORIGINS`        | string | *(empty)*                              | Origins allowed for cross-origin API requests. Empty disables CORS. See [CORS origins](#cors-origins).                              |
-| `ISCC_WEB_STORAGE_EXPIRY`      | int    | `3600`                                 | Seconds after which uploaded files are deleted.                                                                                     |
-| `ISCC_WEB_CLEANUP_INTERVAL`    | int    | `600`                                  | Interval in seconds for the file cleanup task. `0` deactivates cleanup.                                                             |
-| `ISCC_WEB_SEMANTIC_DEFAULT`    | bool   | `false`                                | Backend default for the `semantic` query param on `POST /iscc` when omitted. See [Semantic Code defaults](#semantic-code-defaults). |
-| `ISCC_WEB_UI_SEMANTIC_DEFAULT` | bool   | `true`                                 | Initial state of the Semantic Code toggle in the bundled frontend. See [Semantic Code defaults](#semantic-code-defaults).           |
-| `ISCC_WEB_LOG_LEVEL`           | string | `DEBUG`                                | Logging level (loguru level name, e.g. `INFO`).                                                                                     |
-| `ISCC_WEB_SENTRY_DSN`          | string | *(empty)*                              | Optional Sentry DSN for error reporting.                                                                                            |
+| Variable                       | Type   | Default                                | Description                                                                                                                                   |
+| ------------------------------ | ------ | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ISCC_WEB_ENVIRONMENT`         | string | `development`                          | `development` or `production`. Development enables debug error details and resolves frontend assets from the Vite dev server.                 |
+| `ISCC_WEB_SITE_ADDRESS`        | URL    | `http://localhost:8000`                | Public site address. The dev server binds to its host/port; its origin is always CORS-allowed.                                                |
+| `ISCC_WEB_MEDIA_PATH`          | path   | `media/` beside the `iscc_web` package | Directory for uploaded media packages (one subdirectory per upload).                                                                          |
+| `ISCC_WEB_MAX_WORKERS`         | int    | CPU count                              | Max number of ISCC worker processes. See [Worker processes](#worker-processes-and-memory).                                                    |
+| `ISCC_WEB_MAX_UPLOAD_SIZE`     | int    | `1073741824`                           | Max file size per upload in bytes (1 GB).                                                                                                     |
+| `ISCC_WEB_IO_READ_SIZE`        | int    | `2097152`                              | File read chunk size in bytes (2 MB).                                                                                                         |
+| `ISCC_WEB_PRIVATE_FILES`       | bool   | `true`                                 | Restrict file download/delete/embed to the original uploader. See [Private files](#private-files).                                            |
+| `ISCC_WEB_CORS_ORIGINS`        | string | *(empty)*                              | Origins allowed for cross-origin API requests. Empty disables CORS. See [CORS origins](#cors-origins).                                        |
+| `ISCC_WEB_STORAGE_EXPIRY`      | int    | `3600`                                 | Seconds after which uploaded files are deleted.                                                                                               |
+| `ISCC_WEB_CLEANUP_INTERVAL`    | int    | `600`                                  | Interval in seconds for the file cleanup task. `0` deactivates cleanup.                                                                       |
+| `ISCC_WEB_SEMANTIC_DEFAULT`    | bool   | `false`                                | Backend default for the `semantic` query param on `POST /iscc` when omitted. See [Semantic Code defaults](#semantic-code-defaults).           |
+| `ISCC_WEB_UI_SEMANTIC_DEFAULT` | bool   | `true`                                 | Initial state of the Semantic Code toggle in the bundled frontend. See [Semantic Code defaults](#semantic-code-defaults).                     |
+| `ISCC_WEB_BUILD_VERSION`       | string | *(empty)*                              | Image version reported by `GET /health`. The Docker images set it at build time (same value as the `org.opencontainers.image.version` label). |
+| `ISCC_WEB_BUILD_REVISION`      | string | *(empty)*                              | Git commit reported by `GET /health`. The Docker images set it at build time (same value as the `org.opencontainers.image.revision` label).   |
+| `ISCC_WEB_LOG_LEVEL`           | string | `DEBUG`                                | Logging level (loguru level name, e.g. `INFO`).                                                                                               |
+| `ISCC_WEB_SENTRY_DSN`          | string | *(empty)*                              | Optional Sentry DSN for error reporting.                                                                                                      |
 
 ## CORS origins
 
@@ -66,16 +68,20 @@ the hash.
 !!! warning "Reverse proxies must forward real client IPs"
 
     Behind a reverse proxy, make sure the proxy forwards real client IPs and that the ASGI server
-    trusts the forwarding headers (e.g. `FORWARDED_ALLOW_IPS=*` for gunicorn/uvicorn, as in the
-    [deployment example](deployment.md)). Otherwise every client appears to be the proxy's IP and
-    all uploads become accessible to everyone.
+    trusts the forwarding headers (`FORWARDED_ALLOW_IPS` for gunicorn/uvicorn; see
+    [Forwarded client IPs](deployment.md#forwarded-client-ips) for when `*` is safe). Otherwise
+    every client appears to be the proxy's IP and all uploads become accessible to everyone.
+
+Behind an authenticating reverse proxy, the uploader is still identified by IP address, not by the
+signed-in user; see [Restrict access](restrict-access.md#private-files-behind-a-login).
 
 ## Worker processes and memory
 
 CPU-bound ISCC processing runs in a `ProcessPoolExecutor` with `ISCC_WEB_MAX_WORKERS` worker
-processes (default: CPU count). Each worker lazy-loads the iscc-sdk toolchain and — when semantic
-features are requested — the iscc-sct and iscc-sci ONNX models, which can take several hundred MB
-of RAM per worker.
+processes (default: CPU count). All workers start with the service and load the iscc-sdk
+toolchain and the iscc-sct and iscc-sci ONNX models up front, so no request waits for a model load
+and [`GET /health`](../reference/rest-api.md#get-health) can report readiness. Expect roughly
+1 GB of RAM per worker on CPU (about 700 MB of it for the models).
 
 Lower this value on memory-constrained hosts:
 

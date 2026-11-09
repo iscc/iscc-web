@@ -6,6 +6,52 @@ description: Release history of the iscc-web microservice.
 
 # Changelog
 
+## [0.4.0] - 2026-11-09
+
+- Added `GET /health` (at the site root) as a readiness probe: it reports whether the
+    semantic-code ONNX models are loaded, which execution provider they run on, and the image
+    version and revision, and answers `503` while models load or when a GPU image's models fell
+    back to CPU. Both Docker images declare a matching `HEALTHCHECK`
+- All ISCC worker processes now start with the service and load the ONNX models up front instead
+    of on first use, so no request waits for a model load (about 700 MB of RAM per worker on CPU;
+    set `ISCC_WEB_MAX_WORKERS` on many-core hosts)
+- The demo frontend adopts the ISCC brand identity: the "ISCC | generator." project logo in
+    the header (the coral-dot logo alone on phones), the coral-dot favicon, brand-shaped
+    buttons (a Generate button capped with the five ISCC-UNIT colours), tighter corners with
+    hard-cornered ISCC-UNIT cards, and a bold ISCC-CODE bar that wraps onto two lines on phones
+    instead of shrinking the code below a readable size; the page design is otherwise unchanged
+- The demo frontend no longer shows a sample ISCC-CODE before anything is processed: the code
+    bar starts as an empty slot with a hopping coral dot, and the generated code lands with an
+    animated reveal (skipped when the viewer prefers reduced motion); the result and comparison
+    readouts are light, with ISCC-UNIT fields and diff cards styled like the unit cards of the
+    first-visit panel
+- Requires Python 3.14; the Docker images run CPython 3.14.10 (`python:3.14-slim` on Debian
+    trixie for the CPU image, a uv-managed CPython on the CUDA base for the GPU image)
+- Updated `iscc-sdk` to 0.9.7, `iscc-sci` to 0.4.1, `iscc-sct` to 0.2.2 and `iscc-tika` to 0.6.0;
+    the `generator` field reports `iscc-sdk - v0.9.7`, and metadata embedding
+    (`POST /api/v1/metadata/{media_id}`) writes slightly different file bytes, so the Data-Code,
+    Instance-Code and `datahash` of embedded files change (Meta-Code and Content-Code do not)
+- Updated all other backend and frontend dependencies; the frontend builds with Node.js 26 LTS
+    and pnpm 12
+- Builds are reproducible: Docker base images are pinned by digest, GitHub Actions by commit SHA,
+    and the Python, Node.js and uv versions in `.python-version` and `.tool-versions`
+- The API reference page at `/docs` loads an exact Stoplight Elements version (9.0.29) with
+    subresource integrity checks instead of whatever version unpkg currently serves
+- The API reference page at `/docs` follows the ISCC brand like the demo frontend: a navy header
+    with the "ISCC | generator." project logo and a link back to the generator, Readex Pro and
+    JetBrains Mono served by the service itself, ISCC Blue accents and Deep Navy panels; on phones
+    the sidebar becomes a menu instead of pushing the page wider than the screen
+- Documented what the reverse proxy in front of the service must do (forwarded headers, upload
+    size, timeouts) without prescribing a specific proxy, running a permissioned instance behind an
+    authenticating reverse proxy (basic auth or single sign-on), and the session affinity (sticky
+    sessions) that deployments with several instances need
+- The documentation site at https://web.iscc.codes uses the shared ISCC documentation theme
+    (zensical-iscc) with the "ISCC | web." project logo, a menu of related ISCC sites and a
+    "Copy page" button; the guide for coding agents moved to
+    https://web.iscc.codes/for-coding-agents/, and `llms.txt` is generated from the pages
+- Removed the unused pre-rebrand ISCC logo files (`/images/iscc-logo-*.svg` and
+    `/images/iscc-icon-*.svg`)
+
 ## [0.3.3] - 2026-10-18
 
 - Updated `iscc-core` to 1.5.0 and `iscc-lib` to 0.7.0 (now the minimum required versions), which
@@ -66,7 +112,7 @@ description: Release history of the iscc-web microservice.
 
 - Added support for pdf, epub thumbnails and metadata embedding
 - Added support for audio cover art extraction
-- Addded support for keyword metadata field
+- Added support for keyword metadata field
 - Updated dependencies
 
 ## [0.1.0] - 2022-11-16
@@ -76,3 +122,7 @@ description: Release history of the iscc-web microservice.
 [0.1.0]: https://github.com/iscc/iscc-web/releases/tag/v0.1.0
 [0.2.0]: https://github.com/iscc/iscc-web/compare/v0.1.0...v0.2.0
 [0.3.0]: https://github.com/iscc/iscc-web/compare/v0.2.0...v0.3.0
+[0.3.1]: https://github.com/iscc/iscc-web/compare/v0.3.0...v0.3.1
+[0.3.2]: https://github.com/iscc/iscc-web/compare/v0.3.1...v0.3.2
+[0.3.3]: https://github.com/iscc/iscc-web/compare/v0.3.2...v0.3.3
+[0.4.0]: https://github.com/iscc/iscc-web/compare/v0.3.3...v0.4.0

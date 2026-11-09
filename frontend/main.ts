@@ -8,6 +8,7 @@ import "@fontsource/readex-pro/700.css";
 import "@fontsource/jetbrains-mono/300.css";
 import "@fontsource/jetbrains-mono";
 import "@fontsource/jetbrains-mono/500.css";
+import "@fontsource/jetbrains-mono/600.css";
 import "@fontsource/jetbrains-mono/700.css";
 import App from "./App.vue";
 

@@ -1,12 +1,11 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Covers pyproject/uv.lock, pnpm, GitHub Actions, Dockerfile and prek hooks. iscc-tika must stay <0.5.0 (0.5.0 is not stable as of 2026-06) - never propose updates for it.",
+  "description": "Covers pyproject/uv.lock, pnpm, GitHub Actions, Dockerfile, .python-version/.tool-versions and prek hooks. Docker images are pinned to digests and GitHub Actions to commit SHAs; Renovate keeps both current.",
   "extends": [
     "config:recommended",
-    ":enablePreCommit"
-  ],
-  "ignoreDeps": [
-    "iscc-tika"
+    ":enablePreCommit",
+    "docker:pinDigests",
+    "helpers:pinGitHubActionDigests"
   ],
   "lockFileMaintenance": {
     "enabled": true,
@@ -22,6 +21,45 @@
         "patch"
       ],
       "groupName": "minor and patch dependencies"
+    },
+    {
+      "description": "Python runtime: the Docker base image, .python-version and .tool-versions move together in their own PR",
+      "matchDepNames": [
+        "python"
+      ],
+      "groupName": "python runtime"
+    },
+    {
+      "description": "Node.js runtime: the Docker base image and .tool-versions move together in their own PR",
+      "matchDepNames": [
+        "node"
+      ],
+      "groupName": "node runtime"
+    },
+    {
+      "description": "uv: the Docker image, .tool-versions and the uv_build backend move together in their own PR",
+      "matchDepNames": [
+        "ghcr.io/astral-sh/uv",
+        "uv",
+        "uv_build",
+        "uv-build"
+      ],
+      "groupName": "uv"
+    },
+    {
+      "description": "onnxruntime >=1.27 ships CUDA 13 wheels, which drop the production GPU (GTX 1080, Pascal). Hold until the GPU base image moves to CUDA 13.",
+      "matchPackageNames": [
+        "onnxruntime",
+        "onnxruntime-gpu"
+      ],
+      "allowedVersions": "<1.27"
+    },
+    {
+      "description": "Keep the GPU base image on CUDA 12.6 (see the onnxruntime rule); digest updates only",
+      "matchDepNames": [
+        "nvidia/cuda"
+      ],
+      "allowedVersions": "/^12[.]6[.]/"
     }
   ]
 }

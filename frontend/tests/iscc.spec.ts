@@ -3,6 +3,8 @@ import { describe, expect, it } from "vitest";
 import {
   type UnitDiff,
   type UnitKind,
+  UNIT_ORDER,
+  UNIT_STYLE,
   compareUnits,
   formatBytes,
   isValidIscc,
@@ -18,6 +20,18 @@ import {
   verdict,
 } from "../lib/iscc";
 import { makeUnit } from "./fixtures";
+
+describe("UNIT_STYLE", () => {
+  it("keeps the brand kit's fixed ISCC-UNIT colour mapping in code order", () => {
+    expect(UNIT_ORDER.map((kind) => UNIT_STYLE[kind].color)).toEqual([
+      "#7ac2f7", // Meta-Code: Light Cyan
+      "#4596f5", // Semantic-Code: Sky Blue
+      "#0054b2", // Content-Code: ISCC Blue
+      "#123663", // Data-Code: Deep Navy
+      "#a6db50", // Instance-Code: Lime
+    ]);
+  });
+});
 
 describe("unitKindFromIscc", () => {
   it("maps the codec header to the unit maintype", () => {
@@ -58,11 +72,17 @@ describe("matchPercent", () => {
 
 describe("pctColor", () => {
   it("maps percentages to traffic-light colors", () => {
-    expect(pctColor(100)).toBe("#a6db50");
-    expect(pctColor(80)).toBe("#a6db50");
-    expect(pctColor(79)).toBe("#ffc300");
-    expect(pctColor(55)).toBe("#ffc300");
-    expect(pctColor(54)).toBe("#f56169");
+    expect(pctColor(100).fill).toBe("#a6db50");
+    expect(pctColor(80).fill).toBe("#a6db50");
+    expect(pctColor(79).fill).toBe("#ffc300");
+    expect(pctColor(55).fill).toBe("#ffc300");
+    expect(pctColor(54).fill).toBe("#f56169");
+  });
+
+  it("pairs each fill with a darker text shade", () => {
+    expect(pctColor(90)).toEqual({ fill: "#a6db50", text: "#3a6b12" });
+    expect(pctColor(60)).toEqual({ fill: "#ffc300", text: "#7a5c00" });
+    expect(pctColor(10)).toEqual({ fill: "#f56169", text: "#b3262e" });
   });
 });
 

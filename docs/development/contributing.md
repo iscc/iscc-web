@@ -22,7 +22,7 @@ working against the real API.
     ```
 
 1. Install dependencies with [uv](https://docs.astral.sh/uv/) (the Python version is pinned in
-    `.python-version`):
+    `.python-version`, the uv version used by CI in `.tool-versions`):
 
     ```bash
     uv sync
@@ -142,12 +142,23 @@ Serve the docs locally with live reload:
 uv run poe docs-serve
 ```
 
-Build for deployment — this builds the static site with [Zensical](https://zensical.org/) into
-`site/` and generates `llms-full.txt` for LLM consumption:
+The live server shows the plain ISCC logo in the header; the "ISCC | web." project logo only
+appears in a built site.
+
+Build for deployment — this builds the static site with [Zensical](https://zensical.org/) and the
+ISCC theme ([zensical-iscc](https://github.com/iscc/zensical-iscc)) into `site/`, with a Markdown
+copy of every page plus `llms.txt` and `llms-full.txt` for LLM consumption. Then check it as CI
+does:
 
 ```bash
 uv run poe docs-build
+uv run poe docs-check
 ```
+
+The check fails on findings such as a page that loads files from other sites (keep images in
+`docs/`) or a link in the Markdown copies that points at nothing. Mermaid diagrams render (the
+theme serves its own copy of Mermaid) but cannot be enlarged, so draw diagrams that need zooming
+as SVG files in `docs/assets/` and link them with `{ .glightbox }` to open them in a lightbox.
 
 ## Cross-platform support
 

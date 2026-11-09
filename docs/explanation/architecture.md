@@ -87,22 +87,7 @@ modified file into a fresh package with a new media ID and reprocesses its ISCC.
 
 ### Upload → ISCC flow
 
-```mermaid
-sequenceDiagram
-    participant C as Client
-    participant A as BlackSheep app (event loop)
-    participant W as Pool worker (process)
-
-    C->>A: POST /api/v1/iscc (raw body + X-Upload-Filename)
-    A->>A: create media/{media_id}/
-    A->>A: write {media_id}.meta.json
-    A->>A: stream body to media file
-    A->>W: code_iscc(file) via run_in_executor
-    W->>W: iscc-sdk processing (CPU-bound)
-    W-->>A: IsccMeta result
-    A->>A: write {media_id}.iscc.json
-    A-->>C: 201 Created, Location: /api/v1/media/{media_id}
-```
+[![The client posts the raw body with X-Upload-Filename to POST /api/v1/iscc; the BlackSheep app creates media/{media_id}/, writes {media_id}.meta.json and streams the body to the media file, then runs code_iscc(file) in a pool worker process via run_in_executor; the worker does the CPU-bound iscc-sdk processing and returns the IsccMeta result; the app writes {media_id}.iscc.json and answers 201 Created with Location /api/v1/media/{media_id}](../assets/upload-flow.svg)](../assets/upload-flow.svg){ .glightbox }
 
 ## CPU-bound work in worker processes
 
@@ -117,10 +102,13 @@ Two properties of the pool matter operationally:
 - **Self-healing** — if a worker dies (out-of-memory kill, crash in a native library), the executor
     raises `BrokenProcessPool`. `Pool.submit` catches it, discards the broken executor, creates a
     fresh one, and retries the submission once.
-- **Lazy loading** — worker processes import `iscc-sdk` (and, for semantic features, the
-    `iscc-sct`/`iscc-sci` ONNX models) on first use. The first ISCC or simprint request per worker is
-    therefore noticeably slower, and each warm worker holds several hundred MB of RAM. The worker
-    count is capped via `ISCC_WEB_MAX_WORKERS` (default: CPU count).
+- **Warm-up** — every worker loads `iscc-sdk` and the `iscc-sct`/`iscc-sci` ONNX models in its
+    initializer, before it takes its first job, so no request reaches a cold worker. After startup
+    the service downloads any missing model files once, then submits one probe per worker
+    (`iscc_web/health.py`), which starts all workers and reports which execution provider the models
+    run on; `GET /health` answers `503` until the probes finish and flags a GPU image whose models
+    fell back to CPU. Each warm worker holds several hundred MB of RAM; the worker count is capped
+    via `ISCC_WEB_MAX_WORKERS` (default: CPU count).
 
 `iscc_web/options.py` seeds `ISCC_SDK_*`, `ISCC_SCT_*` and `ISCC_SCI_*` environment defaults with
 `os.environ.setdefault` before those libraries are imported, so workers inherit consistent

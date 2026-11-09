@@ -5,8 +5,10 @@
 import { computed, onUnmounted, ref, watch } from "vue";
 import { type UnitKind, formatBytes, scramble, unitKindFromIscc } from "../lib/iscc";
 import { apiService } from "../services/api.service";
+import CodeBar from "./CodeBar.vue";
 import CompareStrip from "./CompareStrip.vue";
 import UiIcon from "./UiIcon.vue";
+import UnitAxis from "./UnitAxis.vue";
 import UnitDetail from "./UnitDetail.vue";
 import UnitField from "./UnitField.vue";
 
@@ -100,22 +102,7 @@ watch(
 const selectedView = computed(() => unitViews.value.find((v) => v.kind === selected.value) ?? null);
 
 const iscc = computed(() => props.specimen.metadata?.iscc ?? props.specimen.explain?.iscc ?? null);
-const scrambleLength = computed(() => (props.specimen.semantic ? 68 : 64));
-const codeText = computed(() => {
-  if (iscc.value && !working.value) return iscc.value;
-  if (reducedMotion) return `ISCC:${"·".repeat(scrambleLength.value)}`;
-  return `ISCC:${scramble(scrambleLength.value, tick.value)}`;
-});
 const pendingCode = (index: number) => (reducedMotion ? "·".repeat(16) : scramble(16, tick.value * 31 + index * 7));
-
-const unitsLabel = computed(() => {
-  if (working.value) return "ISCC-UNITS · SELF-DESCRIBING · DECODING…";
-  const count = unitViews.value.length;
-  const note = unitViews.value.some((v) => v.kind === "semantic")
-    ? " · SEMANTIC IS EXPERIMENTAL / NON-ISO"
-    : " · CLICK A FIELD TO INSPECT ITS LAYER";
-  return `ISCC-UNITS · ${count} OF ${count}${note}`;
-});
 
 // --- card head -------------------------------------------------------------------
 
@@ -276,10 +263,10 @@ article.result-card(:class="`is-${specimen.status}`")
             .name(v-text="compareB.label")
             .code-mini(v-text="shortIscc(compareB)")
       .actions
-        button.ghost-btn(type="button" @click="emit('swap')")
+        button.ghost-btn.iscc-btn.iscc-btn--secondary.iscc-btn--compact(type="button" @click="emit('swap')")
           UiIcon(name="compare" :size="13")
           span Swap
-        button.ghost-btn(type="button" @click="emit('eject')")
+        button.ghost-btn.iscc-btn.iscc-btn--secondary.iscc-btn--compact(type="button" @click="emit('eject')")
           UiIcon(name="x" :size="13")
           span Eject B
     CompareStrip(:a="compareA" :b="compareB")
@@ -330,22 +317,19 @@ article.result-card(:class="`is-${specimen.status}`")
       div
         b Processing failed.
         span(v-text="' ' + (specimen.error ?? 'Unknown error')")
-    .navy-strip.grain(v-else)
+    .readout-strip(v-else)
       .progress-track(:style="trackStyle")
       .scan-line(v-if="specimen.status === 'processing' && !reducedMotion")
       .code-row
-        .code-bar.grain(:class="{ working }")
-          span(v-text="codeText")
-        button.copy-btn(
+        CodeBar(:code="working ? null : iscc")
+        button.copy-btn.iscc-btn.iscc-btn--secondary.iscc-btn--compact(
           type="button"
           :disabled="!iscc || working"
           @click="copyCode"
         )
           UiIcon(:name="copied ? 'check' : 'copy'" :size="14")
           span(v-text="copied ? 'Copied' : 'Copy'")
-      .units-label
-        span(v-text="unitsLabel")
-        .rule
+      UnitAxis.units-axis
       .unit-grid
         template(v-if="working")
           UnitField(
@@ -368,10 +352,6 @@ article.result-card(:class="`is-${specimen.status}`")
             :selected="view.kind === selected"
             @select="selected = view.kind"
           )
-      .axis
-        span ABSTRACT &amp; PERSISTENT
-        .axis-line
-        span CONCRETE &amp; VOLATILE
     UnitDetail(
       v-if="specimen.status === 'done' && selectedView"
       :specimen="specimen"
@@ -388,7 +368,7 @@ article.result-card(:class="`is-${specimen.status}`")
         UiIcon(name="chevron-right" :size="13")
         span Raw result JSON
       .compare-cta(v-if="compareOptions.length")
-        button.compare-btn(type="button" @click="onCompareClick")
+        button.compare-btn.iscc-btn.iscc-btn--secondary.iscc-btn--compact(type="button" @click="onCompareClick")
           UiIcon(name="compare" :size="14")
           span Compare with another file
         .picker(v-if="pickerOpen")
@@ -408,7 +388,7 @@ article.result-card(:class="`is-${specimen.status}`")
 .result-card {
   background: #ffffff;
   border: 1px solid #e9ecef;
-  border-radius: 0.75rem;
+  border-radius: var(--iscc-radius);
   box-shadow:
     0 10px 24px -4px rgba(18, 54, 99, 0.14),
     0 4px 8px -4px rgba(18, 54, 99, 0.08);
@@ -436,7 +416,7 @@ article.result-card(:class="`is-${specimen.status}`")
 .thumb {
   width: 2.4rem;
   height: 2.4rem;
-  border-radius: 0.5rem;
+  border-radius: var(--iscc-radius-sm);
   object-fit: cover;
   flex-shrink: 0;
 
@@ -539,7 +519,7 @@ article.result-card(:class="`is-${specimen.status}`")
 .icon-btn {
   width: 2rem;
   height: 2rem;
-  border-radius: 0.5rem;
+  border-radius: var(--iscc-radius-sm);
   border: 1px solid #dee2e6;
   background: none;
   color: #495057;
@@ -563,7 +543,7 @@ article.result-card(:class="`is-${specimen.status}`")
   align-items: flex-start;
   background: rgba(245, 97, 105, 0.08);
   border: 1px solid rgba(245, 97, 105, 0.4);
-  border-radius: 0.65rem;
+  border-radius: var(--iscc-radius-sm);
   padding: 0.8rem 1rem;
   font-size: 0.8rem;
   color: #8c3338;
@@ -574,13 +554,19 @@ article.result-card(:class="`is-${specimen.status}`")
   }
 }
 
-// ---------- navy readout strip ----------
+// ---------- readout strip ----------
+// Light like the first-visit panel it takes over from; the coral code bar is its one strong colour.
 
-.navy-strip {
-  background-color: var(--iscc-deep-navy);
+.readout-strip {
+  border-top: 1px solid #e9ecef;
   padding: 1.25rem 1.75rem 1.5rem;
   position: relative;
   overflow: hidden;
+
+  // Phones: room for the code bar's two-line minimum.
+  @media (max-width: 575.98px) {
+    padding-inline: 1rem;
+  }
 }
 
 .progress-track {
@@ -588,7 +574,7 @@ article.result-card(:class="`is-${specimen.status}`")
   top: 0;
   left: 0;
   height: 3px;
-  background: var(--iscc-bright-yellow);
+  background: var(--iscc-blue);
   transition:
     width 0.2s linear,
     opacity 0.6s ease;
@@ -601,8 +587,8 @@ article.result-card(:class="`is-${specimen.status}`")
   right: 0;
   top: 0;
   height: 2px;
-  background: linear-gradient(to right, transparent, #7ac2f7 30%, #7ac2f7 70%, transparent);
-  box-shadow: 0 0 14px 3px rgba(122, 194, 247, 0.45);
+  background: linear-gradient(to right, transparent, var(--iscc-blue) 30%, var(--iscc-blue) 70%, transparent);
+  box-shadow: 0 0 14px 3px rgba(0, 84, 178, 0.3);
   animation: scan-sweep 2.1s ease-in-out infinite alternate;
   z-index: 4;
   pointer-events: none;
@@ -610,69 +596,25 @@ article.result-card(:class="`is-${specimen.status}`")
 
 .code-row {
   display: flex;
-  align-items: center;
-  gap: 0.9rem;
+  flex-wrap: wrap;
+  gap: 0.6rem 0.9rem;
 }
 
+// 18.75rem fits two lines of code at the 12 px floor; narrower rows put the Copy button below the bar.
 .code-bar {
-  flex: 1;
+  flex: 1 1 18.75rem;
   min-width: 0;
-  background-color: var(--iscc-coral-red);
-  border-radius: 0.5rem;
-  padding: 0.7rem 1rem;
-  font-family: var(--bs-font-monospace);
-  font-size: clamp(7px, 1.9vw, 17px);
-  font-weight: 300;
-  letter-spacing: -0.01em;
-  color: #ffffff;
-  white-space: nowrap;
-  overflow: hidden;
-
-  &.working span {
-    color: rgba(255, 255, 255, 0.45);
-  }
 }
 
+// As tall as the code bar beside it (one or two lines); on its own row below the bar, the compact height.
 .copy-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  background: var(--iscc-bright-yellow);
-  color: var(--iscc-deep-navy);
-  font-size: 0.78rem;
-  font-weight: 600;
-  padding: 0.5rem 0.95rem;
-  border: none;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  flex-shrink: 0;
-
-  &:disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
-  }
+  margin-left: auto;
+  height: auto;
+  min-height: var(--h);
 }
 
-.units-label {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
+.units-axis {
   margin-top: 0.9rem;
-  margin-bottom: 0.5rem;
-
-  span {
-    font-family: var(--bs-font-monospace);
-    font-size: 0.6rem;
-    font-weight: 600;
-    letter-spacing: 0.16em;
-    color: rgba(255, 255, 255, 0.6);
-  }
-
-  .rule {
-    flex: 1;
-    height: 1px;
-    background: rgba(255, 255, 255, 0.15);
-  }
 }
 
 .unit-grid {
@@ -682,27 +624,6 @@ article.result-card(:class="`is-${specimen.status}`")
 
   @media (max-width: 575.98px) {
     grid-template-columns: 1fr;
-  }
-}
-
-.axis {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-top: 1rem;
-
-  span {
-    font-family: var(--bs-font-monospace);
-    font-size: 0.6rem;
-    font-weight: 500;
-    letter-spacing: 0.14em;
-    color: rgba(255, 255, 255, 0.55);
-  }
-
-  .axis-line {
-    flex: 1;
-    height: 2px;
-    background: rgba(255, 195, 0, 0.6);
   }
 }
 
@@ -744,31 +665,13 @@ article.result-card(:class="`is-${specimen.status}`")
   position: relative;
 }
 
-.compare-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: none;
-  border: 1.5px solid var(--iscc-blue);
-  color: var(--iscc-blue);
-  font-size: 0.78rem;
-  font-weight: 600;
-  padding: 0.45rem 0.9rem;
-  border-radius: 9999px;
-  cursor: pointer;
-
-  &:hover {
-    background: rgba(0, 84, 178, 0.06);
-  }
-}
-
 .picker {
   position: absolute;
   right: 0;
   bottom: calc(100% + 0.4rem);
   background: #ffffff;
   border: 1px solid #dee2e6;
-  border-radius: 0.5rem;
+  border-radius: var(--iscc-radius-sm);
   box-shadow: 0 10px 24px -4px rgba(18, 54, 99, 0.2);
   min-width: 16rem;
   max-height: 14rem;
@@ -856,7 +759,7 @@ article.result-card(:class="`is-${specimen.status}`")
   font-weight: 700;
   color: #6c757d;
   background: #f1f3f5;
-  border-radius: 0.4rem;
+  border-radius: var(--iscc-radius-sm);
   width: 1.4rem;
   height: 1.4rem;
   display: flex;
@@ -868,7 +771,7 @@ article.result-card(:class="`is-${specimen.status}`")
 .thumb-mini {
   width: 2rem;
   height: 2rem;
-  border-radius: 0.45rem;
+  border-radius: var(--iscc-radius-sm);
   object-fit: cover;
   flex-shrink: 0;
 
@@ -897,25 +800,6 @@ article.result-card(:class="`is-${specimen.status}`")
   display: flex;
   align-items: center;
   gap: 0.6rem;
-}
-
-.ghost-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  border: 1px solid #dee2e6;
-  background: none;
-  color: #495057;
-  font-size: 0.78rem;
-  font-weight: 500;
-  padding: 0.45rem 0.8rem;
-  border-radius: 0.5rem;
-  cursor: pointer;
-
-  &:hover {
-    border-color: var(--iscc-blue);
-    color: var(--iscc-blue);
-  }
 }
 
 .compare-legend {

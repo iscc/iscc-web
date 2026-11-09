@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: ISCC-WEB Generator API
   description: Simple ISCC Generator Service
-  version: 0.3.3
+  version: 0.4.0
 servers:
 - url: /api/v1
 tags:
@@ -16,6 +16,8 @@ tags:
   description: Decompose ISCC and return various representations.
 - name: simprint
   description: Create granular simprints from plain text.
+- name: health
+  description: Service readiness for monitors and container health checks.
 paths:
   /iscc:
     post:
@@ -295,6 +297,34 @@ paths:
           description: Bad Request
         422:
           description: Unprocessable Entity - simprint processing error.
+  /health:
+    servers:
+    - url: /
+    get:
+      operationId: get-health
+      summary: Service Health
+      description: Readiness probe for monitors and container health checks, served at the
+        site root (`/health`, not under `/api/v1`). Answers from cached state - no inference
+        per request. At startup the service loads the semantic-code ONNX models in every ISCC
+        worker process; the endpoint returns 200 once they are loaded and run on the expected
+        execution provider, and 503 while they load, if loading failed, or if the onnxruntime
+        build offers CUDA but a model runs on CPU (silent GPU fallback).
+      tags:
+      - health
+      responses:
+        200:
+          description: Ready - models loaded on the expected execution provider.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+        503:
+          description: Not ready - models still loading (`starting`), failed to load (`error`),
+            or running on CPU although CUDA is offered (`degraded`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
 components:
   schemas:
     MediaID:
@@ -623,3 +653,43 @@ components:
                 description: Bitpattern of ISCC-BODY
                 type: string
                 example: '1110000111111011011111011100010011100011110110111011010010111110'
+    Health:
+      type: object
+      description: Service readiness and build information
+      required:
+      - status
+      - models_loaded
+      properties:
+        status:
+          description: '`ok` (ready), `starting` (models loading), `degraded` (CUDA offered
+            but a model runs on CPU) or `error` (models failed to load).'
+          type: string
+          enum:
+          - ok
+          - starting
+          - degraded
+          - error
+          example: ok
+        version:
+          description: Image version (same as the `org.opencontainers.image.version` label);
+            null for local builds.
+          type: string
+          nullable: true
+          example: 0.4.0-gpu
+        revision:
+          description: Git commit the image was built from (same as the `org.opencontainers.image.revision`
+            label); null for local builds.
+          type: string
+          nullable: true
+          example: 1bb0c619a73069023df02decf529c3d20a0c34ae
+        execution_provider:
+          description: ONNX Runtime execution provider the models run on (the slowest one
+            if they differ); null until the models are loaded.
+          type: string
+          nullable: true
+          example: CUDAExecutionProvider
+        models_loaded:
+          description: Whether the semantic-code ONNX models are loaded in all ISCC worker
+            processes.
+          type: boolean
+          example: true

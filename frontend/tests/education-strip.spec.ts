@@ -17,10 +17,20 @@ describe("EducationStrip", () => {
     ]);
   });
 
-  it("shows a sample composite code and the API pointer", () => {
+  it("heads the unit cards with the same axis as the result readout", () => {
     const wrapper = mount(EducationStrip);
-    expect(wrapper.find(".sample-bar").text()).toMatch(/^ISCC:[A-Z2-7]+$/);
-    expect(wrapper.find(".api-calls").text()).toContain("POST /api/v1/iscc");
-    expect(wrapper.find("a.api-btn").attributes("href")).toBe("/docs");
+    const axis = wrapper.find(".units-axis");
+    expect(axis.find(".axis-title").text()).toBe("ISCC-UNITS");
+    expect(axis.element.previousElementSibling?.classList.contains("code-bar")).toBe(true);
+    expect(axis.element.nextElementSibling?.classList.contains("edu-grid")).toBe(true);
+    expect(wrapper.findAll(".units-axis")).toHaveLength(1);
+  });
+
+  it("keeps the code slot empty", () => {
+    const wrapper = mount(EducationStrip);
+    expect(wrapper.find(".edu-title").text()).toBe("Your ISCC");
+    expect(wrapper.find(".code-bar.slot.idle").text()).toBe("Your ISCC-CODE will land here");
+    expect(wrapper.find(".code-bar .iscc-dot").exists()).toBe(true);
+    expect(wrapper.text()).not.toMatch(/ISCC:[A-Z2-7]{8,}/);
   });
 });

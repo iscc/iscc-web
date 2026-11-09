@@ -2,6 +2,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { flushPromises, mount } from "@vue/test-utils";
 import App from "../App.vue";
+import ApiPointer from "../components/ApiPointer.vue";
 import EducationStrip from "../components/EducationStrip.vue";
 import IntakeCard from "../components/IntakeCard.vue";
 import ResultCard from "../components/ResultCard.vue";
@@ -32,11 +33,13 @@ describe("App", () => {
   it("morphs the education strip into the readout feed on the first result", async () => {
     const wrapper = mountApp();
     expect(wrapper.findComponent(EducationStrip).exists()).toBe(true);
+    expect(wrapper.findComponent(ApiPointer).exists()).toBe(true);
 
     wrapper.findComponent(IntakeCard).vm.$emit("text-submit", "hello world", { semantic: false, granular: true });
     await flushPromises();
 
     expect(wrapper.findComponent(EducationStrip).exists()).toBe(false);
+    expect(wrapper.findComponent(ApiPointer).exists()).toBe(true);
     const card = wrapper.findComponent(ResultCard);
     expect(card.exists()).toBe(true);
     expect(card.find(".status-pill").text()).toContain("DONE IN");
@@ -119,5 +122,19 @@ describe("App", () => {
     expect(wrapper.findComponent(ResultCard).exists()).toBe(false);
     expect(wrapper.findComponent(EducationStrip).exists()).toBe(true);
     wrapper.unmount();
+  });
+});
+
+describe("hero", () => {
+  it("marks the ISO reference pill with a shield-check icon", () => {
+    const badge = mountApp().find(".iso-badge");
+    expect(badge.text()).toBe("ISO 24138:2024");
+    expect(badge.find("svg.ui-icon").html()).toContain("M9 12l2 2 4-4");
+  });
+
+  it("leads the hero copy with the benefit and ends with the action", () => {
+    expect(mountApp().find(".hero-sub").text()).toBe(
+      "Identify digital content and find similar versions across file formats. Drop a file to create an ISCC for your content.",
+    );
   });
 });

@@ -218,8 +218,8 @@ response. The endpoint also accepts the code without its `ISCC:` prefix.
 
 ## Next steps
 
-- **[Deployment](../howto/deployment.md)** -- Run iscc-web in production with Docker Compose and
-    Caddy.
+- **[Deployment](../howto/deployment.md)** -- Run iscc-web in production with Docker Compose
+    behind a reverse proxy.
 - **[Configuration](../howto/configuration.md)** -- All `ISCC_WEB_*` options and the ISCC
     processing defaults.
 - **[REST API reference](../reference/rest-api.md)** -- Every endpoint, parameter, and response

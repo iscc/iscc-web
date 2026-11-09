@@ -26,7 +26,7 @@ see the [deployment guide](https://web.iscc.codes/howto/deployment/) for GPU req
 
 ## Overview
 
-<img align="left" width="200" src="docs/assets/iscc-web-rest-api.jpg?raw=true">
+<img align="left" width="200" src="docs/assets/iscc-web-rest-api.jpg?raw=true" alt="API reference page of iscc-web">
 
 **REST API**
 
@@ -34,7 +34,7 @@ The microservice provides a REST API for generating ISCCs. The endpoints support
 upload/download, metadata extraction/embedding and ISCC processing.<br>
 
 Files uploaded for processing are automatically deleted after a configurable timeout.
-An interactive API documentation is available at [/docs](https://web.iscc.io/docs). `GET /health`
+Interactive API documentation is available at [/docs](https://web.iscc.io/docs). `GET /health`
 (at the site root) is a readiness probe for monitors and the Docker `HEALTHCHECK`: it reports
 whether the semantic-code ONNX models are loaded, which execution provider (GPU or CPU) they run
 on, and the image version and revision.<br><br>
@@ -55,12 +55,13 @@ release):
     [iscc-search](https://github.com/iscc/iscc-search)'s local simprint generation, so search
     services can delegate text processing to this service.
 
-<img align="left" width="200" src="docs/assets/iscc-web-vue-frontend.jpg?raw=true">
+<img align="left" width="200" src="docs/assets/iscc-web-vue-frontend.jpg?raw=true" alt="Demo frontend of iscc-web showing the ISCC-CODE of an image">
 
 **Demo Frontend**
 
-The service also hosts a [Vue.js](https://vuejs.org/) based demo frontend that shows how to
-upload media files, generate ISCCs, embed metadata, and compare ISCCs.<br><br><br>
+The service also hosts a [Vue.js](https://vuejs.org/) based demo frontend that generates ISCCs
+for media files and pasted text, decodes existing ISCC-CODEs unit by unit, embeds metadata, and
+compares two ISCCs bit by bit.<br><br><br>
 
 ## Configuration
 
@@ -70,8 +71,8 @@ processing defaults (`ISCC_SDK_*`, `ISCC_SCT_*`, `ISCC_SCI_*`). See the
 
 ## Deployment
 
-A docker-compose based standalone deployment with automatic SSL/TLS configuration is documented
-in the [deployment guide](https://web.iscc.codes/howto/deployment/).
+A Docker Compose deployment behind a reverse proxy that terminates TLS is documented in the
+[deployment guide](https://web.iscc.codes/howto/deployment/).
 
 ## Development
 
@@ -88,19 +89,19 @@ uv sync
 uv run iscc-web
 ```
 
-Access the app at http://localhost:8000
-API documentation is at /docs
+Open the demo frontend at http://localhost:8000 and the API documentation at
+http://localhost:8000/docs.
 
 Before committing any changes run code formatting and tests with:
 
-```
+```shell
 uv run poe all
 ```
 
 ### Frontend
 
-Install Node.js with [asdf](https://asdf-vm.com/) or see [.tool-versions](.tool-versions) for the correct version. Packages are managed by
-[pnpm](https://pnpm.io/installation).
+Install the Node.js version listed in [.tool-versions](.tool-versions), for example with
+[asdf](https://asdf-vm.com/). Packages are managed by [pnpm](https://pnpm.io/installation).
 
 Run `pnpm install` to install the frontend dependencies.
 
@@ -117,7 +118,7 @@ locally with `uv run poe docs-serve`, build it with `uv run poe docs-build` and 
 `uv run poe docs-check`. See the
 [contribution guide](https://web.iscc.codes/development/contributing/) for details.
 
-# Special thanks to the developers of
+## Special thanks to the developers of
 
 - [BlackSheep](https://github.com/Neoteroi/BlackSheep)
 - [Schemathesis](https://github.com/schemathesis/schemathesis)

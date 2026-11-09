@@ -1,4 +1,4 @@
-__version__ = "0.3.3"
+__version__ = "0.4.0"
 from iscc_web.options import *
 from iscc_web.main import *
 from iscc_web.api.media import *

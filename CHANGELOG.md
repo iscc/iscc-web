@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.4.0] - Unreleased
+## [0.4.0] - 2026-11-09
 
 - Added `GET /health` (at the site root) as a readiness probe: it reports whether the
     semantic-code ONNX models are loaded, which execution provider they run on, and the image
@@ -119,4 +119,4 @@
 [0.3.1]: https://github.com/iscc/iscc-web/compare/v0.3.0...v0.3.1
 [0.3.2]: https://github.com/iscc/iscc-web/compare/v0.3.1...v0.3.2
 [0.3.3]: https://github.com/iscc/iscc-web/compare/v0.3.2...v0.3.3
-[0.4.0]: https://github.com/iscc/iscc-web/compare/v0.3.3...HEAD
+[0.4.0]: https://github.com/iscc/iscc-web/compare/v0.3.3...v0.4.0
